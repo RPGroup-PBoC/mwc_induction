@@ -17,7 +17,6 @@
 #Ignore images
 *.jpg
 *.tif*
-*.png
 *.eps
 *.ai
 *.svg
