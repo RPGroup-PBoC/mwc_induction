@@ -44,3 +44,7 @@
 #Ignore various code garbage.
 *.pyc
 *.ipynb_checkpoints*
+
+#Ignore local copies of the raw data
+/data/flow
+/data/microscopy
