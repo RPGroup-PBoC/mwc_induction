@@ -39,6 +39,8 @@ rbs = np.array(['auto', 'delta', 'RBS1L', 'RBS1', 'RBS1027', 'RBS446', 'RBS1147'
 repressors = np.array([0, 0, 870, 610, 130, 62, 30, 11])
 
 #=============================================================================== 
+fsc_range = [5E3, 3E4]
+ssc_range = [2E4, 1E5]
 
 # scatter-plot of the side scattering vs the frontal scattering
 df_example = pd.read_csv(datadir + files[0])
@@ -50,10 +52,10 @@ plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('FSC-A')
 plt.ylabel('SSC-A')
-#plt.axvspan(1E1, 5E3, color='red', alpha=0.3)
-#plt.axhspan(1E1, 2E4, color='red', alpha=0.3)
-plt.axvline(x=5E3, color='darkred')
-plt.axhline(y=2E4, color='darkred')
+plt.axvline(x=fsc_range[0], color='darkred')
+plt.axvline(x=fsc_range[1], color='darkred')
+plt.axhline(y=ssc_range[0], color='darkred')
+plt.axhline(y=ssc_range[1], color='darkred')
 plt.tight_layout()
 plt.savefig('output/FSC_SSC.png')
 
@@ -70,7 +72,15 @@ for i, operator in enumerate(operators):
             # read the csv file
             data = pd.read_csv(filename)
             # filter by side and front scattering
-            data = data[(data['SSC-A'] > 2E4) & (data['FSC-A'] > 5E3)]
+            data = data[(data['SSC-A'] > ssc_range[0]) & \
+                    (data['FSC-A'] > fsc_range[0]) & \
+                    (data['SSC-A'] < ssc_range[1]) & \
+                    (data['FSC-A'] < fsc_range[1])]
+            # filter by excluding the bottom 2.5 and top 97.5 percentiles
+            percentile = np.percentile(data['FITC-A'], [2.5, 97.5])
+            data = data[(data['FITC-A'] > percentile[0]) & \
+                        (data['FITC-A'] < percentile[1])]
+
            # compute the mean and append it to the data frame along the
             # operator and strain
             df = df.append([[20160712, 'mrazomej', operator, energies[i], 

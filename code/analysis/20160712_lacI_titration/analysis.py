@@ -34,45 +34,29 @@ rbs = df.rbs.unique()
 #=============================================================================== 
 
 # compute the theoretical repression level
-repressor_array = np.logspace(0, 3, 100)
+repressor_array = np.logspace(1, 3, 100)
 epsilon_array = np.array([-15.3, -13.9, -9.7, -17])
 operators = np.array(['O1', 'O2', 'O3', 'Oid'])
 
 colors = sns.hls_palette(len(operators), l=.3, s=.8)
 # plot theoretical curve
-plt.figure()
+plt.figure(figsize=(7, 7))
 for i, o in enumerate(operators):
     fold_change_theor = 1 / (1 + 2 * repressor_array / 5E6 \
             * np.exp(-epsilon_array[i]))
     plt.plot(repressor_array, fold_change_theor, label=o,
             color=colors[i])
-    plt.plot(df[df.operator == o].repressors, 
-            df[df.operator == o].fold_change,
-            marker='o', linewidth=0, color=colors[i])
+    plt.plot(df[(df.operator == o) & (df.rbs != 'auto') & \
+            (df.rbs != 'delta')].repressors, 
+            df[(df.operator == o) & (df.rbs != 'auto') & \
+            (df.rbs != 'delta')].fold_change,
+            marker='o', linewidth=0, color=colors[i], 
+            label=o + ' flow cytometer')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('repressor copy number')
 plt.ylabel('fold-change')
+plt.xlim(left=10)
 plt.legend(loc='lower left')
 plt.tight_layout()
 plt.savefig('output/lacI_titration.png')
-
-#=============================================================================== 
-
-#plt.figure()
-#for i, o in enumerate(operators):
-#    fold_change_theor = 1 / (1 + 2 * repressor_array / 5E6 \
-#            * np.exp(-epsilon_array[i]))
-#    plt.plot(repressor_array, fold_change_theor, label=o,
-#            color=colors[i])
-#    plt.plot(df[df.operator == o].repressors, 
-#            df[df.operator == o].fold_change_ctrl,
-#            marker='o', linewidth=0, color=colors[i],
-#            label=o + ' flow cytometer data')
-#plt.xscale('log')
-#plt.yscale('log')
-#plt.xlabel('repressor copy number')
-#plt.ylabel('fold-change')
-#plt.legend(loc='lower left')
-#plt.tight_layout()
-#plt.savefig('outputdir/lacI_titration_ctrl.png')
