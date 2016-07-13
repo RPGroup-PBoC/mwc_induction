@@ -117,4 +117,13 @@ mean_fc.append(df.groupby('operator').get_group(operator).mean_YFP_bgcorr / \
 
 mean_fc.name = 'fold_change'
 df = pd.concat([df, mean_fc], join_axes=[df.index], axis=1, join='inner')
-df.to_csv('output/20160712_lacI_titration.csv')
+
+# write
+df.to_csv('output/20160712_lacI_titration_MACSQuant.csv', index=False)
+#=============================================================================== 
+# Add the comments to the header of the data file
+filenames = ['./comments.txt', 'output/20160712_lacI_titration_MACSQuant.csv']
+with open('../../../data/20160712_lacI_titration_MACSQuant.csv', 'w') as output:
+    for fname in filenames:
+        with open(fname) as infile:
+            output.write(infile.read())
