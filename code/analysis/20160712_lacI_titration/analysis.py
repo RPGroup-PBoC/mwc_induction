@@ -29,7 +29,7 @@ sns.set_palette("deep", color_codes=True)
 #=============================================================================== 
 
 # read the CSV file with the mean fold change
-df = pd.read_csv('output/20160712_lacI_titration.csv')
+df = pd.read_csv('output/20160712_lacI_titration_MACSQuant.csv')
 rbs = df.rbs.unique()
 #=============================================================================== 
 
