@@ -55,7 +55,7 @@ def main():
         files_names = usr_files[files_idx]
         
         #Add the input directory ahead of each file.
-        for f in file_names:
+        for f in files_names:
             files.append('%s/%s' %(options.inputdir, f)) 
     else:
         files.append(options.filename)
@@ -80,6 +80,7 @@ def main():
             else:
                 filename = filename.rsplit('/', 1)[1]
                 fcs_data.to_csv(options.outputdir + '/' + filename)
+                print(filename)
     
 
 if __name__ == '__main__':
