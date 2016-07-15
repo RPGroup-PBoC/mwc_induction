@@ -21,10 +21,10 @@ def main():
         template for renamed files', metavar='FILE')
     parser.add_option('-e', '--ext', dest='ext', help='target file\
         extension', default='.fcs', metavar='PATTERN')
-    parser.add_option('-v', '--verbose', action='store_true',\
-            dest='verbose', default=False, help='print progress to stdout')
     parser.add_option('-o', '--output', dest='out', help='path to output\
     directory', metavar='DIRECTORY')
+    parser.add_option('-v', '--verbose', action='store_true',\
+            dest='verbose', default=False, help='print progress to stdout')
     parser.add_option('-f', '--force',  action='store_true', dest='force',
             default=False, help='force creation of any necessary output\
             directories')

@@ -16,7 +16,7 @@ def main():
     parser = optparse.OptionParser()
     
     #Add options.
-    parser.add_option('-f', '--file', dest='filename', help='name of single\
+    parser.add_option('-i', '--input_file', dest='filename', help='name of single\
             file to be processed.', metavar="filename")
     parser.add_option('-d', '--directory', dest='inputdir', help='name of\
             input directory to be processed')
@@ -29,6 +29,9 @@ def main():
             own -c flag.') 
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',\
             help='print progress to stdout', default=False)
+    parser.add_option('-f', '--force', action='store_true', dest='force',
+            help='force saving of files to output directory if needed.',
+            default=False)
     
     # get the ops and args
     ops, args = parser.parse_args()
@@ -85,11 +88,14 @@ def main():
                     fcs_data.to_csv(ops.out + '/' + filename)
 
                 elif len(os.listdir(ops.out)) != None:
-                    cont = input('Output directory is not empty! Continue? [y/n] :')
-                    if cont.lower() = 'y':
+                    if ops.force == True:
                         fcs_data.to_csv(ops.out + '/' + filename)
                     else:
-                        raise ValueError('output directory is not empty.')
+                        cont = input('Output directory is not empty! Continue? [y/n] :')
+                        if cont.lower() = 'y':
+                            fcs_data.to_csv(ops.out + '/' + filename)
+                        else:
+                            raise ValueError('output directory is not empty.')
     
 
 if __name__ == '__main__':
