@@ -1,47 +1,89 @@
+#! /usr/bin/env python
+"""
+This script renames a directory of Flow Cytometry Standard (fcs) files in
+accordance to a user-provided template of file names.
+"""
 import os
-# Our numerical workhorses
+import optparse
+import shutil
 import numpy as np
 import pandas as pd
 
-#=============================================================================== 
-# Define function to read a csv file containing the standardized file names and
-# rename the files accordingly
+# ########################################################################
+def main():
+    #Initialize the option parser
+    parser = optparse.OptionParser()
 
-def file_rename(dirname, pattern, csv_filename, file_order='number', file_extension='fcs'):
-    '''
-    Reads the csv file csv_filename containing all the names of the files to be
-    renamed and renames the files according to how the original files were
-    named.
-    Parameters
-    ----------
-    dirname : str.
-        directory containing the files to be renamed.
-    pattern : str.
-        pattern to look for in the old files.
-    csv_filename : str.
-        path to csv file containing the standardize filenames to use.
-        The file should be in the 8x12. 96-well plate format.
-    file_order : str.
-        Indicator of how the original file names were named. It can take two
-        values. 'well' for filenames having row and column in the alphanumeric
-        standard format, e.g. A1, B12. 'number' for files that only have the
-        number of the well, e.g. 00001, 00012
-    '''
-    # read the CSV file that contains the new standardized names
-    filename = pd.read_csv(csv_filename, header=None)
+    #Add the various options.
+    parser.add_option('-d', '--dir', dest='targ', help='directory\
+        containing files to be renamed', metavar='DIRECTORY')
+    parser.add_option('-t', '--temp', dest='temp', help='path to csv\
+        template for renamed files', metavar='FILE')
+    parser.add_option('-e', '--ext', dest='ext', help='target file\
+        extension', default='.fcs', metavar='PATTERN')
+    parser.add_option('-v', '--verbose', action='store_true',\
+            dest='verbose', default=False, help='print progress to stdout')
+    parser.add_option('-o', '--output', dest='out', help='path to output\
+    directory', metavar='DIRECTORY')
+    parser.add_option('-f', '--force',  action='store_true', dest='force',
+            default=False, help='force creation of any necessary output\
+            directories')
+    #Get the options and arguments.
+    ops, args = parser.parse_args()
 
-    # read the old files that contain the file_extension pattern
-    old_files = np.array(os.listdir(dirname))
-    # find the files that contain the pattern and the file extension
-    csv_bool = np.array([pattern in f and file_extension in f for f in old_files])
-    old_files = old_files[np.array(csv_bool)]
+    #Ensure that the required directory and template files are provided.
+    if (ops.targ == None) | (ops.temp == None):
+        raise ValueError('directory and template file are required.')
+
+    #Load the renaming template file.
+    fname_temp = pd.read_csv(ops.temp, header=None)
     
-    if file_order=='number':
-        # flatten the array into a single column
-        filename = filename.values.flatten(order='F')
-        # loop through the files and rename them
-        for i, f in enumerate(old_files):
-            print(i, f, filename[i] + '.' + file_extension)
-            # replace on-site the file
-            os.replace(dirname + f, filename[i] + '.' + file_extension)
-    
+    #Read the old files that contain the file_extension pattern.
+    old_files = np.array(os.listdir(ops.targ))
+
+    #Identify all of the target files which contain the proper file extension.
+    ext_bool = np.array([ops.ext in f for f in old_files])
+
+    #Consider only the files which have the correct file extension.
+    targets = old_files[np.array(ext_bool)]
+
+    #Flatten the list of new file names in the template file.
+    new_names = fname_temp.values.flatten(order='F')
+
+    #Make sure the list of new names is the same length as the targets.
+    if len(new_names) != len(targets):
+        raise ValueError('length mismatch between template and target files.\
+                Did you forget a sample?')
+    #Iterate through all files and rename.
+    for i, f in enumerate(targets):
+        #The the original file name and define the new name.
+        orig = ops.targ + f
+        renamed = new_names[i] + ops.ext 
+
+        #Determine if it will be renamed or copied.
+        if ops.out != None:
+            if os.path.isdir(ops.out) == False:
+                os.mkdir(ops.out)
+                print("Made new output directory %s. Hope that's okay..."
+                        %ops.out)
+                shutil.copy(orig, ops.out + '/' + renamed)
+
+            elif len(os.listdir(ops.out))!=0:
+                if ops.force==True:
+                    shutil.copy(orig, ops.out + renamed)
+                else:
+                    cont = input('Output directory is not empty! Continue? [y/n] :')
+                    if cont.lower() == 'y':
+                        shutil.copy(orig, ops.out + '/' + renamed)
+                    else: 
+                        raise ValueError('output directory is not empty.')
+        else:
+            os.rename(orig, ops.targ + renamed)
+        if ops.verbose == True:
+            print(f + ' -> ' + renamed)
+
+
+if __name__ == '__main__':
+    main()
+    print('thank you -- come again')
+
