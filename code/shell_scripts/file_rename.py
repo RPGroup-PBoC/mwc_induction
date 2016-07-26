@@ -20,7 +20,9 @@ def main():
     parser.add_option('-t', '--temp', dest='temp', help='path to csv\
         template for renamed files', metavar='FILE')
     parser.add_option('-e', '--ext', dest='ext', help='target file\
-        extension', default='.fcs', metavar='PATTERN')
+        extension', default='.fcs', metavar='EXTENSION')
+    parser.add_option('-p', '--pattern', dest='pattern', help='target file\
+        pattern for parsing', metavar='PATTERN')
     parser.add_option('-o', '--output', dest='out', help='path to output\
     directory', metavar='DIRECTORY')
     parser.add_option('-v', '--verbose', action='store_true',\
@@ -41,8 +43,12 @@ def main():
     #Read the old files that contain the file_extension pattern.
     old_files = np.array(os.listdir(ops.targ))
 
-    #Identify all of the target files which contain the proper file extension.
-    ext_bool = np.array([ops.ext in f for f in old_files])
+    if ops.pattern != None:
+    #Identify all of the target files which contain the proper file extension
+    #and the pattern to parse the files
+        ext_bool = np.array([(ops.ext in f) and (ops.pattern in f) for f in old_files])
+    else:
+        ext_bool = np.array([ops.ext in f for f in old_files])
 
     #Consider only the files which have the correct file extension.
     targets = old_files[np.array(ext_bool)]

@@ -37,7 +37,7 @@ def main():
     ops, args = parser.parse_args()
     
     # list files
-    if (ops.inputdir == None) | (ops.filename == None):
+    if (ops.inputdir == None) and (ops.filename == None):
         raise ValueError('no input directory/file provided! Please indicate\
                 the input directory that contains the fcs files')
     
@@ -47,7 +47,7 @@ def main():
         usr_files = np.array(os.listdir(ops.inputdir))
         # Use the pattern to identify all of the files.
         files_idx = np.array([ops.pattern in f for f in usr_files])
-        files_names = usr_files[files_idx]
+        file_names = usr_files[files_idx]
         
         #Add the input directory ahead of each file.
         for f in file_names:
@@ -73,7 +73,7 @@ def main():
             
             #Deterimne if output should be printed.
             if ops.verbose == True:
-                print(f + ' -> ' filename)
+                print(f + ' -> ' + filename)
 
             #Determine if they should be saved to an output directory or not.
             if ops.out == None:
@@ -92,7 +92,7 @@ def main():
                         fcs_data.to_csv(ops.out + '/' + filename)
                     else:
                         cont = input('Output directory is not empty! Continue? [y/n] :')
-                        if cont.lower() = 'y':
+                        if cont.lower() == 'y':
                             fcs_data.to_csv(ops.out + '/' + filename)
                         else:
                             raise ValueError('output directory is not empty.')
