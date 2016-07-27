@@ -1,0 +1,14 @@
+# Date : 2016-07-25
+# Equipment : MACSQuant (Bjorkman lab)
+# Description : 
+# LacI titration with 4 different operators (O1, O2, O3 and Oid) 
+# and 7 different RBS (delta, HG104, RBS1147, RBS446, RBS1027, RBS1 and RBS1L)
+# The strains were grown in deep 96-well plates in 1 mL of LB + Kan + Spec and then
+# diluted next morning 1:1000 into 0.5 mL of M9 + 0.5% glucose also in deep 96-well plates.
+# Because of this format we were able to have 3 biological replicas for each of the strains.
+# The files are named 20160725_rbs_operator_0mMIPTG_0X where X is the number of replica
+# indexing from 0.
+# Comments : 
+# The machine ran out of space for waste during the middle of the measurement so the actual
+# reading took much longer than it should have. The 96-well plate was on the "chill 96-well"
+# holder which remained cold but this could definitely have affected the last measurements.
