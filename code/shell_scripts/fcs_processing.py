@@ -37,7 +37,11 @@ def main():
     ops, args = parser.parse_args()
     
     # list files
+<<<<<<< HEAD
+    if (ops.inputdir == None) & (ops.filename == None):
+=======
     if (ops.inputdir == None) and (ops.filename == None):
+>>>>>>> 3e75acde905ab9c654b969975c6f99b6df6cb3fd
         raise ValueError('no input directory/file provided! Please indicate\
                 the input directory that contains the fcs files')
     
@@ -79,7 +83,13 @@ def main():
             if ops.out == None:
                 fcs_data.to_csv(filename)
             else:
+<<<<<<< HEAD
+                find_split = filename.rsplit('/', 1)
+                if len(find_split) != 1:
+                    filename = filename.rsplit('/', 1)[1]
+=======
                 filename = filename.rsplit('/', 1)[0]
+>>>>>>> 3e75acde905ab9c654b969975c6f99b6df6cb3fd
                 #Determine if the output directory should be made.
                 if os.path.isdir(ops.out) == False:
                     os.mkdir(ops.out)
@@ -91,7 +101,11 @@ def main():
                     if ops.force == True:
                         fcs_data.to_csv(ops.out + '/' + filename)
                     else:
+<<<<<<< HEAD
+                        cont = raw_input('Output directory is not empty! Continue? [y/n] : ')
+=======
                         cont = input('Output directory is not empty! Continue? [y/n] :')
+>>>>>>> 3e75acde905ab9c654b969975c6f99b6df6cb3fd
                         if cont.lower() == 'y':
                             fcs_data.to_csv(ops.out + '/' + filename)
                         else:
@@ -100,4 +114,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    print 'thank you -- come again'
+    print('thank you -- come again')
