@@ -79,7 +79,7 @@ def main():
             if ops.out == None:
                 fcs_data.to_csv(filename)
             else:
-                filename = filename.rsplit('/', 1)[1]
+                filename = filename.rsplit('/', 1)[0]
                 #Determine if the output directory should be made.
                 if os.path.isdir(ops.out) == False:
                     os.mkdir(ops.out)
