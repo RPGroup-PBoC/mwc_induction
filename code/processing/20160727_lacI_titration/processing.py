@@ -25,6 +25,12 @@ sns.set_context('notebook', rc=rc)
 sns.set_style('darkgrid', rc=rc)
 sns.set_palette("deep", color_codes=True)
 
+# Import the project utils
+import sys
+sys.path.insert(0, '../../analysis/')
+
+import mwc_induction_utils as mwc
+
 #=============================================================================== 
 # define variables to use over the script
 date = 20160727
@@ -65,6 +71,9 @@ plt.tight_layout()
 plt.savefig('output/FSC_SSC.png')
 
 #=============================================================================== 
+# define the parameter alpha for the automatic gating
+alpha = 0.40
+
 # initialize the DataFrame to save the mean expression levels
 df = pd.DataFrame()
 # read the files and compute the mean YFP value
@@ -77,22 +86,16 @@ for i, operator in enumerate(operators):
             print(r_file)
             for repeat, filename in enumerate(r_file):
                 # read the csv file
-                data = pd.read_csv(filename)
-                # filter by side and front scattering
-                data = data[(data['SSC-A'] > ssc_range[0]) & \
-                        (data['FSC-A'] > fsc_range[0]) & \
-                        (data['SSC-A'] < ssc_range[1]) & \
-                        (data['FSC-A'] < fsc_range[1])]
-                # filter by excluding the bottom 2.5 and top 97.5 percentiles
-                percentile = np.percentile(data['FITC-A'], [2.5, 97.5])
-                data = data[(data['FITC-A'] > percentile[0]) & \
-                            (data['FITC-A'] < percentile[1])]
-
-            # compute the mean and append it to the data frame along the
+                dataframe = pd.read_csv(filename)
+                # apply an automatic bivariate gaussian gate to the log front
+                # and side scattering
+                data = mwc.auto_gauss_gate(dataframe, alpha, 
+                                           x_val='FSC-A', y_val='SSC-A',
+                                           log=True)
+                # compute the mean and append it to the data frame along the
                 # operator and strain
                 df = df.append([[date, username, operator, energies[i], 
-                            strain, repressors[j], 0,
-                            r,
+                            strain, repressors[j], 0, r,
                             data['FITC-A'].mean()]],
                             ignore_index=True)
 

@@ -92,11 +92,6 @@ for i, operator in enumerate(operators):
                 data = mwc.auto_gauss_gate(dataframe, alpha, 
                                            x_val='FSC-A', y_val='SSC-A',
                                            log=True)
-
-#                percentile = np.percentile(data['FITC-A'], [2.5, 97.5])
-#                data = data[(data['FITC-A'] > percentile[0]) & \
-#                            (data['FITC-A'] < percentile[1])]
-
                 # compute the mean and append it to the data frame along the
                 # operator and strain
                 df = df.append([[date, username, operator, energies[i], 
