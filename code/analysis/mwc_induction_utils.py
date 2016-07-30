@@ -4,8 +4,7 @@ import scipy.stats as sc
 import scipy
 
 # Jake VanderPlas package to fit a bivariate normal
-from astroML.stats import fit_bivariate_normal
-
+from fit_bivariate_gaussian_astroML import *
 
 def fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r):
     '''
@@ -57,6 +56,55 @@ def pact_log(IPTG, ea, ei, epsilon):
     pact = (1.0 + IPTG * np.exp(ea))**2.0 / \
     ((1.0 + IPTG * np.exp(ea))**2.0 + np.exp(-epsilon) * (1.0 + IPTG * np.exp(ei))**2.0)
     return pact
+
+#=============================================================================== 
+# datashader scatter plots
+#=============================================================================== 
+# Datashader to plot lots of datapoints
+import datashader as ds
+from datashader.bokeh_ext import InteractiveImage
+import bokeh.plotting
+
+def base_plot(df, x_col, y_col, log=False):
+    # Define the range to plot chekcing if it is a log scale or not
+    if log:
+        x_range = (np.min(np.log10(df[x_col])), 
+                   np.max(np.log10(df[x_col])))
+        y_range = (np.min(np.log10(df[y_col])), 
+                   np.max(np.log10(df[y_col])))
+    else:
+        x_range = (df[x_col].min(), df[x_col].max())
+        y_range = (df[y_col].min(), df[y_col].max())
+    # Initialize the Bokeh plot
+    p = bokeh.plotting.figure(
+        x_range=x_range,
+        y_range=y_range,
+        tools='save,pan,wheel_zoom,box_zoom,reset', 
+        plot_width=500, 
+        plot_height=500,
+    )
+    # Add all the features to the plot
+    p.xgrid.grid_line_color = '#a6a6a6'
+    p.ygrid.grid_line_color = '#a6a6a6'
+    p.ygrid.grid_line_dash = [6, 4]
+    p.xgrid.grid_line_dash = [6, 4]
+    p.xaxis.axis_label = x_col
+    p.yaxis.axis_label = y_col
+    p.xaxis.axis_label_text_font_size = '15pt'
+    p.yaxis.axis_label_text_font_size = '15pt'
+    p.background_fill_color = '#F4F3F6'
+    return p
+
+#=============================================================================== 
+
+def ds_plot(df, x_col, y_col, log=False):
+    if log:
+        data = np.log10(df[[x_col, y_col]])
+    else:
+        data = df[[x_col, y_col]]
+    p = base_plot(data, x_col, y_col)
+    pipeline = ds.Pipeline(data, ds.Point(x_col, y_col))
+    return p, pipeline
 
 #=============================================================================== 
 # Automatic gating of the flow cytometry data
@@ -161,7 +209,8 @@ def gauss_interval(df, mu, cov, x_val='FSC-A', y_val='SSC-A', log=False):
 
 #=============================================================================== 
 
-def auto_gauss_gate(df, alpha, x_val='FSC-A', y_val='SSC-A', log=False):
+def auto_gauss_gate(df, alpha, x_val='FSC-A', y_val='SSC-A', log=False,
+                    verbose=False):
     '''
     Function that applies an "unsupervised bivariate Gaussian gate" to the data
     over the channels x_val and y_val.
@@ -176,6 +225,12 @@ def auto_gauss_gate(df, alpha, x_val='FSC-A', y_val='SSC-A', log=False):
         name of the dataframe columns to be used in the function
     log : bool.
         indicate if the log of the data should be use for the fit or not 
+    verbose : bool.
+        indicate if the percentage of data kept should be print
+    Returns
+    -------
+    df_thresh : DataFrame
+        Pandas data frame to which the automatic gate was applied.
     '''
     data = df[[x_val, y_val]]
     # Fit the bivariate Gaussian distribution
@@ -183,8 +238,14 @@ def auto_gauss_gate(df, alpha, x_val='FSC-A', y_val='SSC-A', log=False):
 
     # Compute the statistic for each of the pair of log scattering data
     interval_array = gauss_interval(data, mu, cov, log=log)
-    
+        
     # Find which data points fall inside the interval
     idx = interval_array <= scipy.stats.chi2.ppf(alpha, 2)
-    
+
+    # print the percentage of data kept
+    if verbose:
+        print('''
+        with parameter alpha={0:0.2f}, percentage of data kept = {1:0.2f}
+        '''.format(alpha, np.sum(idx) / len(df)))
+
     return df[idx]
