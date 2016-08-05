@@ -36,7 +36,7 @@ def main():
     # get the ops and args
     ops, args = parser.parse_args()
     
-    # list files
+    # List files
     if (ops.inputdir == None) & (ops.filename == None):
         raise ValueError('no input directory/file provided! Please indicate\
                 the input directory that contains the fcs files')
@@ -78,7 +78,9 @@ def main():
             #Determine if they should be saved to an output directory or not.
             if ops.out == None:
                 fcs_data.to_csv(filename)
+
             else:
+                find_split = filename.rsplit('/', 1)
                 if len(find_split) != 1:
                     filename = filename.rsplit('/', 1)[1]
 
