@@ -6,14 +6,46 @@ import scipy
 # Jake VanderPlas package to fit a bivariate normal
 from fit_bivariate_gaussian_astroML import *
 
-def fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r):
+#=============================================================================== 
+# Generic thermodynamic functions
+#=============================================================================== 
+
+def pact_log(IPTG, ea, ei, epsilon):
     '''
+    Returns the probability of a repressor being active as described by the MWC
+    model.
+    Parameter
+    ---------
+    IPTG : array-like.
+        concentrations of inducer on which to evaluate the function
+    ea, ei : float.
+        minus log of the dissociation constants of the active and the inactive 
+        states respectively
+    epsilon : float.
+        energy difference between the active and the inactive state
+    Returns
+    -------
+    pact : float.
+        probability of a repressor of being in the active state. Active state is
+        defined as the state that can bind to the DNA.
+    '''
+    pact = (1 + IPTG * np.exp(ea))**2 / \
+    ((1 + IPTG * np.exp(ea))**2 + np.exp(-epsilon) * (1 + IPTG * np.exp(ei))**2)
+    return pact
+
+#=============================================================================== 
+
+def fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r):
+   '''
     Returns the gene expression fold change according to the thermodynamic model
     with the extension that takes into account the effect of the inducer.
     Parameter
     ---------
     IPTG : array-like.
         concentrations of inducer on which to evaluate the function
+    ea, ei : float.
+        minus log of the dissociation constants of the active and the inactive 
+        states respectively
     epsilon : float.
         energy difference between the active and the inactive state
     R : array-like.
@@ -32,30 +64,82 @@ def fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r):
     fold-change : float.
         gene expression fold change as dictated by the thermodynamic model.
    '''
-    return 1.0 / (1.0 + 2.0 * R / 5.0E6 * pact_log(IPTG, ea, ei, epsilon) * \
-            (1.0 + np.exp(-epsilon)) * np.exp(-epsilon_r))
+   return 1 / (1 + 2 * R / 5E6 * pact_log(IPTG, ea, ei, epsilon) * \
+            (1 + np.exp(-epsilon)) * np.exp(-epsilon_r))
 
+#=============================================================================== 
+# Non-linear regression
+#=============================================================================== 
 
-    # define a funciton to compute the fold change as a funciton of IPTG
-def pact_log(IPTG, ea, ei, epsilon):
+def log_post(param, indep_var, dep_var, epsilon=4.5):
     '''
-    Returns the probability of a repressor being active as described by the MWC
-    model.
-    Parameter
-    ---------
-    IPTG : array-like.
-        concentrations of inducer on which to evaluate the function
-    epsilon : float.
-        energy difference between the active and the inactive state
+    Computes the log posterior for a single set of parameters.
+    Parameters
+    ----------
+    param : array-like.
+        param[0] = epsilon_a
+        ]aram[1] = epsilon_i
+    indep_var : n x 3 array.
+        series of independent variables to compute the theoretical fold-change.
+        1st column : IPTG concentration
+        2nd column : repressor copy number
+        3rd column : repressor binding energy
+    dep_var : array-like
+        dependent variable, i.e. experimental fold-change. Then length of this
+        array should be the same as the number of rows in indep_var.
+        
     Returns
     -------
-    pact : float.
-        probability of a repressor of being in the active state. Active state is
-        defined as the state that can bind to the DNA.
+    log_post : float.
+        the log posterior probability
     '''
-    pact = (1.0 + IPTG * np.exp(ea))**2.0 / \
-    ((1.0 + IPTG * np.exp(ea))**2.0 + np.exp(-epsilon) * (1.0 + IPTG * np.exp(ei))**2.0)
-    return pact
+    # unpack parameters
+    ea, ei = param
+    
+    # unpack independent variables
+    IPTG, R, epsilon_r = indep_var[:, 0], indep_var[:, 1], indep_var[:, 2]
+    
+    # compute the theoretical fold-change
+    fc_theory = fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r)
+    
+    # return the log posterior
+    return -len(dep_var) / 2 * np.log(np.sum((dep_var - fc_theory)**2))
+
+#=============================================================================== 
+
+def resid(param, indep_var, dep_var):
+    '''
+    Residuals for the theoretical fold change.
+    
+    Parameters
+    ----------
+    param : array-like.
+        param[0] = epsilon_a
+        param[1] = epsilon_i
+    indep_var : n x 3 array.
+        series of independent variables to compute the theoretical fold-change.
+        1st column : IPTG concentration
+        2nd column : repressor copy number
+        3rd column : repressor binding energy
+    dep_var : array-like
+        dependent variable, i.e. experimental fold-change. Then length of this
+        array should be the same as the number of rows in indep_var.
+        
+    Returns
+    -------
+    fold-change_exp - fold-change_theory
+    '''
+    # unpack parameters
+    ea, ei = param
+    
+    # unpack independent variables
+    IPTG, R, epsilon_r = indep_var[:, 0], indep_var[:, 1], indep_var[:, 2]
+    
+    # compute the theoretical fold-change
+    fc_theory = fold_change_log(IPTG, ea, ei, 4.5, R, epsilon_r)
+    
+    # return the log posterior
+    return dep_var - fc_theory
 
 #=============================================================================== 
 # datashader scatter plots
