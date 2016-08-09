@@ -1,0 +1,325 @@
+% Template for PLoS
+% Version 3.0 December 2014
+
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=1.00in,footskip=0.75in]{geometry}
+
+% Use adjustwidth environment to exceed column width (see example table in text)
+\usepackage{changepage}
+
+% Use Unicode characters when possible
+\usepackage[utf8]{inputenc}
+
+% textcomp package and marvosym package for additional characters
+\usepackage{textcomp,marvosym}
+
+% fixltx2e package for \textsubscript
+\usepackage{fixltx2e}
+
+% amsmath and amssymb packages, useful for mathematical formulas and symbols
+\usepackage{amsmath,amssymb}
+
+% cite package, to clean up citations in the main text. Do not remove.
+\usepackage{cite}
+
+% Use nameref to cite supporting information files (see Supporting Information section for more info)
+\usepackage{nameref,hyperref}
+
+% line numbers
+\usepackage[right]{lineno}
+
+% ligatures disabled
+\usepackage{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+
+% rotating package for sideways tables
+\usepackage{rotating}
+
+% Remove comment for double spacing
+%\usepackage{setspace} 
+%\doublespacing
+
+% Text layout
+\raggedright
+\setlength{\parindent}{0.5cm}
+%\textwidth 5.25in 
+\textheight 8.75in
+
+% Bold the 'Figure #' in the caption and separate it from the title/caption with a period
+% Captions will be left justified
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
+
+% Use the PLoS provided BiBTeX style
+\bibliographystyle{plos2009}
+
+% Remove brackets from numbering in List of References
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+% Leave date blank
+\date{}
+
+% Header and Footer with logo
+\usepackage{lastpage,fancyhdr,graphicx}
+\pagestyle{myheadings}
+\pagestyle{fancy}
+\fancyhf{}
+%\lhead{\includegraphics[natwidth=1.3in,natheight=0.4in]{PLOSlogo.png}}
+\rfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
+%\fancyheadoffset[L]{1.00in}
+%\fancyfootoffset[L]{1.00in}
+%\lfoot{\sf PLOS}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% OPTIONAL MACRO DEFINITIONS %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand \foldchange{\operatorname{fold-change}}
+
+\newcommand\globalScalePlots{1}
+
+% For commenting
+\usepackage{color} % ULTIMATELY delete since I can't have colored text???\
+\usepackage[dvipsnames]{xcolor}
+\newcommand{\griffinComment}[1]{\textcolor{CadetBlue}{(GC:~#1)}}
+\newcommand{\manuelComment}[1]{\textcolor{ForestGreen}{(MR:~#1)}}
+\newcommand{\nathanComment}[1]{\textcolor{Emerald}{(MR:~#1)}}
+\newcommand{\stephanieComment}[1]{\textcolor{BrickRed}{(SB:~#1)}}
+\newcommand{\talComment}[1]{\textcolor{Plum}{(TE:~#1)}}
+\newcommand{\robComment}[1]{\textcolor{Orange}{(RP:~#1)}}
+
+% To define more useful LaTeX commands
+\usepackage{xparse}
+
+% Equation referencing
+\DeclareDocumentCommand \eref{oooo} {\IfNoValueTF{#2}{Eq.~(\ref{#1})}{\IfNoValueTF{#3}{Eqs.~(\ref{#1}) and (\ref{#2})}{\IfNoValueTF{#4}{Eqs.~(\ref{#1})-(\ref{#3})}{Eqs.~(\ref{#1})-(\ref{#4})}}}}
+
+\newcommand{\bareEq}[1]{(\ref{#1})} % Equations
+
+% Figure referencing
+\DeclareDocumentCommand \fref{ooo} {\IfNoValueTF{#2}{Fig.~\ref{#1}}{\IfNoValueTF{#3}{Figs.~\ref{#1} and \ref{#2}}{Figs.~\ref{#1}-\ref{#3}}}}
+
+% Letters for figure sub-parts
+\newcommand{\letter}[1]{#1} % For main text. Ex: As shown in Fig. 12A
+\newcommand{\letterParen}[1]{(#1)} % For captions. Ex: (A) Low limit and (B) high limit
+
+% Shortcuts for often-used symbols that may change notation
+\newcommand{\K}{K_{\text{DNA}}}
+
+%% END MACROS SECTION
+
+
+\begin{document}
+
+% import macro for the figures path
+% this will not be synchronized to the GitHub repository since each collaborator will adapt it to 
+%his/her own directory structure
+\input{graphicspath.tex}
+	
+\vspace*{0.35in}
+
+% Title must be 150 characters or less
+\begin{flushleft}
+{\Large
+\textbf\newline{Thermodynamics of Titration Induction}
+}
+%\newline
+%% Insert Author names, affiliations and corresponding author email.
+%\\
+%author 1
+%\\
+%author 2
+%\\
+%* phillips@pboc.caltech.edu
+\end{flushleft}
+
+
+% Please keep the abstract below 300 words
+\section*{Abstract} 
+
+Processes such as simple repression have been nailed down. Now we can build upon these simple models to understand more complicated interactions such as induction, which serve as the cornerstone for cell sensing and signaling.
+
+Role of prediction in biology, not just to characterize data but to predict future experiments.
+
+Use the Monod-Wyman-Changeux model of
+allostery to understand the data within a single, unified framework.
+
+
+
+% Please keep the Author Summary between 150 and 200 words
+% Use first person. PLOS ONE authors please skip this step.
+% Author Summary not valid for PLOS ONE submissions.
+\section*{Author Summary} 
+
+Simple explanation of project
+
+%\linenumbers
+
+\section*{Introduction}
+
+\talComment{We are amazing}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Results}
+
+\subsection*{The Monod-Wyman-Changeux (MWC) Model} 
+
+\talComment{Currently still in MWC Mutants form}
+This paper builds upon an extensive dialogue between theory and experiment in
+transcriptional regulation. A first round of experiments measured the dependence
+of gene expression on repressor copy number and binding strength
+\cite{Garcia2011}. A second round of experiments pushed beyond the ``independent
+promoter approximation'' to acknowledge the fact that different genes compete
+for the same regulatory apparatus. Here too we were able to show that
+theoretical predictions of this subtle effect were consistent with their
+measured counterparts, even permitting the collapse of data from multiple
+experiments onto master curves \cite{Brewster2014, Weinert2014a}. In the current
+paper, we consider yet another layer of complexity having to do with how
+signaling works in the context of transcription.
+
+It has been shown that removing the tetramerization region in wild type Lac
+repressor creates a functional dimeric repressor that: (1) can bind to DNA; (2)
+exists in both an active and inactive allosteric conformation; and (3) has two
+binding sites for the inducer IPTG - we shall refer to this truncated dimeric
+protein as ``the Lac repressor'' for the remainder of this paper
+\cite{Daber2011a, Daber2009}.
+
+As discussed previously, the behavior of the Lac repressor  as a regulatory
+protein is well characterized by an equilibrium model where the probability of
+each state of repressor and RNA polymerase occupancy is proportional to its
+Boltzmann weight \cite{Ackers1982, Buchler2003, Phillips2015a}. We begin with a
+summary of this model. Suppose there are \(P\) RNA polymerase (RNAP) and \(R\)
+repressor molecules in a cell. \(R_A\) repressors will be in the active state
+(the favored state when repressor is not bound to inducer; in this state the
+repressor binds tightly to DNA) and the remaining \(R_I\) repressors will be in
+the inactive state (the predominant state when repressor is bound to inducer; in
+this state the repressor binds weakly to DNA) so that \(R_A+R_I=R\).
+
+We first model the interaction between the Lac repressor and DNA by enumerating
+all possible states and their corresponding weights. As shown in
+\fref[figpolymeraseRepressorStates], the Lac promoter can either be empty,
+occupied by RNAP, or occupied by either an active or inactive repressor
+molecule. Assume that there are $N_{NS}$ non-specific sites on the DNA outside
+the Lac operator where RNAP or the Lac repressor can bind. \(\Delta\epsilon_{PD}\)
+represents the energy difference between RNAP bound to the Lac operator or bound
+elsewhere on the DNA; \(\Delta\epsilon _{RD,A}\) and \(\Delta\epsilon _{RD,I}\) equal the
+difference in energy when the Lac repressor is bound to the Lac operator
+compared to when it is bound non-specifically elsewhere on the DNA in the active
+and inactive state, respectively. $\beta = \frac{1}{k_BT}$ where $k_B$ is
+Boltzmann's constant and $T$ is the temperature of the system.
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{figure1.pdf}
+	\caption{{\bf States and weights for simple repression.} Both RNAP (light blue)
+		and repressor compete for DNA binding. There are $R_A$ repressors in the active
+		state (green, sharp) and $R_I$ repressors in the inactive state (green,
+		rounded), with the latter type typically bound to inducer (gold). The
+		difference in energy between a repressor bound to the Lac operator and to
+		another non-specific site on the DNA equals $\Delta\epsilon_{RD,A}$ in the
+		active state and $\Delta\epsilon_{RD,I}$ in the inactive state; the $P$ RNAP
+		have a corresponding energy difference $\Delta\epsilon_{PD}$. The number of
+		active repressors $R_A$ includes repressors that are unbound, singly bound, or
+		doubly bound to inducer, although the majority of active state repressors will
+		not be bound to inducer (which pushes them into the inactive state). Similarly,
+		the $R_I$ term includes all inactive state repressors bound to any number of
+		inducer molecules, with the most prevalent state shown in the figure.}
+	\label{figpolymeraseRepressorStates}
+\end{figure}
+
+In thermodynamic models of transcription, gene expression is proportional to the
+probability $p_{\text{bound}}$ that RNAP is bound to the Lac operator which is
+given by
+\begin{equation}\label{eq2}
+p_{\text{bound}}(R)=\frac{p}{1+r_A+r_I+p},
+\end{equation}
+where
+\begin{align}
+p &= \frac{P}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon _{PD}} \\
+r_A &= \frac{R_A}{N_{\text{NS}}}e^{-\beta \Delta\epsilon _{RD,A}} \\
+r_I &= \frac{R_I}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon _{RD,I}}.
+\end{align}
+
+Gene expression can be readily measured experimentally by exploiting the fold-change, 
+\begin{equation}\label{eq3}
+\foldchange\equiv \frac{p_{\text{bound}}(R)}{p_{\text{bound}}(0)}=\frac{1+p}{1+r_A+r_I+p}.
+\end{equation}
+We can simplify this expression using two well-justified approximations: \(p\ll
+1\) and \(r_I\ll r_A\). The first approximation is called the weak promoter
+approximation and is valid for the wild type Lac promoter \cite{Brewster2012}.
+The second approximation follows because $e^{-\beta  \Delta\epsilon _{RD,I}}$ is
+approximately 1000 times smaller than $e^{-\beta \Delta\epsilon _{RD,A}}$ for
+the Lac repressor \cite{Daber2011a}. Using these approximations, the fold-change
+reduces to the form
+\begin{equation}\label{eq4}
+\foldchange\approx \frac{1}{1+r_A}=\left(1+\frac{R_A}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon _{RD,A}}\right)^{-1}.
+\end{equation}
+
+We now introduce the role of inducer binding, which changes the number of
+repressors in the active and inactive allosteric states. We define \(p_A(c)
+\equiv \frac{R_A(c)}{R}\) to be the fraction of repressors in the active state
+given a concentration \(c\) of the inducer IPTG. We define \(V\) as the volume
+of an \textit{E. coli} cell, \([R]=\frac{R}{V}\) as the concentration of
+repressors, and \(\K=\frac{N_{\text{NS}}}{V}e^{\beta \Delta\epsilon _{RD,A}}\)
+as the dissociation constant of the active repressor binding to the Lac operator
+DNA. This last expression, which links the physical energies of the system with
+the language of dissociation constants and chemical rates, is discussed in
+detail in the Supplementary Information. With these definitions, \eref[eq4]
+becomes
+\begin{align}
+\foldchange &= \left( 1+\frac{p_A(c) [R] V}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon
+	_{RD,A}} \right)^{-1} \nonumber \\
+&= \left( 1+\frac{p_A(c) [R]}{\K} \right)^{-1}. \label{eq5}
+\end{align}
+
+As shown in \fref[figrepressorInducerStates], we can enumerate the relative
+likelihood of the eight possible conformations of the repressor (the repressor
+can be in an active or inactive state, and each of its two inducer binding sites
+can be empty or occupied), using the energy difference $\epsilon$ between a Lac
+repressor in the active and inactive state. From these eight states, we can
+compute the probability \(p_A(c)\) that a repressor will be in the active state
+as the sum of the weights of the active states divided by the sum of the weights
+of every possible state, namely,
+\begin{equation}\label{eq6}
+p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(1+\frac{c}{K_I}\right)^2}.
+\end{equation}
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{figure2.pdf}
+	\caption{{\bf The eight states of the Lac repressor.} The Lac repressor (green)
+		has an active conformation (left column) and inactive conformation (right
+		column), with the energy difference between these two states given by
+		$\epsilon$. In each conformation, the repressor can bind an inducer (gold) at
+		two sites. Each state is shown with its corresponding Boltzmann weight. If the
+		sum of the active state weights shown (bottom left) is greater than the sum of
+		the inactive state weights (bottom right), the repressor is more likely to be
+		in the active state.} \label{figrepressorInducerStates}
+\end{figure}
+
+Substituting this result into \eref[eq5] yields the complete formula
+\begin{equation}\label{eq7}
+\foldchange= \left(
+1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta
+		\epsilon }\left(1+\frac{c}{K_I}\right)^2}\frac{[R]}{\K} \right)^{-1},
+\end{equation}
+which predicts that given a concentration \([R]\) of Lac repressor and a
+concentration \(c\) of the inducer IPTG, the fold-change in gene expression will
+depend solely on 4 parameters: the DNA binding affinity of the repressor
+(\(\K\)), the inducer binding affinities for the repressor in the active state
+(\(K_A\)) and inactive state (\(K_I\)), and the difference in free energy
+between the active and inactive states of the repressor (\(\epsilon\)).
+
+\nolinenumbers
+
+%%%%%%%%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Compile your BiBTeX database using our plos2009.bst
+% style file and paste the contents of your .bbl file
+% here.
+
+\bibliography{library}
+
+
+\end{document}
+

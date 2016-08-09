@@ -39,6 +39,10 @@
 *.key
 *.pdf
 
+#Ignore LaTeX helper files
+*.blg
+*.out
+*.synctex.gz
 
 #Ignore various code garbage.
 *.pyc
