@@ -3,6 +3,8 @@ import scipy.special
 import scipy.stats as sc
 import scipy
 
+import numdifftools as ndt # to comput the Hessian matrix
+
 # Jake VanderPlas package to fit a bivariate normal
 from fit_bivariate_gaussian_astroML import *
 
@@ -107,7 +109,7 @@ def log_post(param, indep_var, dep_var, epsilon=4.5):
 
 #=============================================================================== 
 
-def resid(param, indep_var, dep_var):
+def resid(param, indep_var, dep_var, epsilon=4.5):
     '''
     Residuals for the theoretical fold change.
     
@@ -136,10 +138,91 @@ def resid(param, indep_var, dep_var):
     IPTG, R, epsilon_r = indep_var[:, 0], indep_var[:, 1], indep_var[:, 2]
     
     # compute the theoretical fold-change
-    fc_theory = fold_change_log(IPTG, ea, ei, 4.5, R, epsilon_r)
+    fc_theory = fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r)
     
     # return the log posterior
     return dep_var - fc_theory
+
+#=============================================================================== 
+
+def non_lin_reg_mwc(df, p0,
+                    indep_var=['IPTG_uM', 'repressors', 'binding_energy'],
+                    dep_var='fold_change_A', epsilon=4.5, diss_const=False):
+    '''
+    Performs a non-linear regression on the lacI IPTG titration data assuming
+    Gaussian errors with constant variance. Returns the parameters 
+    e_A == -ln(K_A)
+    e_I == -ln(K_I)
+    and it's corresponding error bars by approximating the posterior distribution
+    as Gaussian.
+    Parameters
+    ----------
+    df : DataFrame.
+        DataFrame containing all the titration information. It should at minimum
+        contain the IPTG concentration used, the repressor copy number for each
+        strain and the binding energy of such strain as the independent variables
+        and obviously the gene expression fold-change as the dependent variable.
+    p0 : array-like (length = 2).
+        Initial guess for the parameter values. The first entry is the guess for
+        e_A == -ln(K_A) and the second is the initial guess for e_I == -ln(K_I).
+    indep_var : array-like (length = 3).
+        Array of length 3 with the name of the DataFrame columns that contain
+        the following parameters:
+        1) IPTG concentration
+        2) repressor copy number
+        3) repressor binding energy to the operator
+    dep_var : str.
+        Name of the DataFrame column containing the gene expression fold-change.
+    epsilon : float.
+        Value of the allosteric parameter, i.e. the energy difference between
+        the active and the inactive state.
+    diss_const : bool.
+        Indicates if the dissociation constants should be returned instead of
+        the e_A and e_I parameteres.
+    Returns
+    -------
+    if diss_const  == True:
+        e_A : MAP for the e_A parameter.
+        de_A : error bar on the e_A parameter
+        e_I : MAP for the e_I parameter.
+        de_I : error bar on the e_I parameter
+    else:
+        K_A : MAP for the K_A parameter.
+        dK_A : error bar on the K_A parameter
+        K_I : MAP for the K_I parameter.
+        dK_I : error bar on the K_I parameter
+    '''
+    df_indep = df[indep_var]
+    df_dep = df[dep_var]
+    
+    # Extra arguments given as tuple 
+    args = (df_indep.values, df_dep.values, epsilon)
+
+    # Compute the MAP 
+    popt, _ = scipy.optimize.leastsq(resid, p0, args=args)
+
+    # Extract the values
+    ea, ei = popt
+    
+    # Instantiate a numdifftools Hessian object for the log posterior
+    hes_fun = ndt.Hessian(log_post)
+
+    # Compute the Hessian at the map
+    hes = hes_fun(popt, df_indep.values, df_dep.values)
+    
+    # Compute the covariance matrix
+    cov = -np.linalg.inv(hes) 
+
+    if diss_const:
+        # Get the values for the dissociation constants and their 
+        # respective error bars
+        Ka = np.exp(-ea)
+        Ki = np.exp(-ei)
+        deltaKa = np.sqrt(cov[0,0]) * Ka
+        deltaKi = np.sqrt(cov[1,1]) * Ki 
+        return Ka, deltaKa, Ki, deltaKi
+    else:
+        return ea, cov[0,0], ei, cov[1,1]
 
 #=============================================================================== 
 # datashader scatter plots
