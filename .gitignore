@@ -3,6 +3,8 @@
 #(such as .DS_store on mac). This .gitignore file will be common to all
 #repositories and should be the first file that is committed.
 
+#Everyone makes their own graphics path based on the location of Dropbox on their computer
+graphicspath.tex
 
 #Ignore trash dotfiles.
 *.DS_store
