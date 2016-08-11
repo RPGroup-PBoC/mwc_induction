@@ -55,3 +55,4 @@ graphicspath.tex
 #Ignore local copies of the raw data
 /data/flow
 /data/microscopy
+doc/induction_paper/graphicspath.tex
