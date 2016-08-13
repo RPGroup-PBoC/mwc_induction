@@ -55,8 +55,20 @@ def main():
     else:
         files.append(ops.filename)
 
+    # Test that the output directory exists and is empty. 
+    if ops.out != None:
+        if os.path.isdir(ops.out) == False:
+            os.mkdir(ops.out)
+            print("Made new ouptut directory %s. I hope that's okay..." %ops.out)
+        elif len(os.listdir(ops.out)) != None: 
+            if ops.force == True:
+                cont = 'y'
+            else:
+                cont = raw_input('Output directory is not empty! Continue? [y/n]: ')
+
+
     # loop through the files
-    for f in files: 
+    for i,f in enumerate(files):
         # consider only the fcs files
         if f.endswith('.fcs'):
             # read the file
@@ -71,35 +83,26 @@ def main():
             #parse the file name to change the extension
             filename  = re.sub('.fcs', '.csv', f)
             
-            #Deterimne if output should be printed.
-            if ops.verbose == True:
-                print(f + ' -> ' + filename)
 
             #Determine if they should be saved to an output directory or not.
             if ops.out == None:
                 fcs_data.to_csv(filename)
+                if ops.verbose == True:
+                    print(f + ' -> ' + filename)
 
             else:
                 find_split = filename.rsplit('/', 1)
                 if len(find_split) != 1:
                     filename = filename.rsplit('/', 1)[1]
-
-                #Determine if the output directory should be made.
-                if os.path.isdir(ops.out) == False:
-                    os.mkdir(ops.out)
-                    print("Made new output directory %s. Hope that's okay..."
-                            %ops.out)
-                    fcs_data.to_csv(ops.out + '/' + filename)
-
-                elif len(os.listdir(ops.out)) != None:
-                    if ops.force == True:
+                
+                # Determine how to save the file.
+                if len(os.listdir(ops.out)) != None:
+                    if cont.lower() == 'y':
                         fcs_data.to_csv(ops.out + '/' + filename)
+                    if ops.verbose == True:
+                        print(f + ' -> ' + ops.out + '/' + filename)
                     else:
-                        cont = raw_input('Output directory is not empty! Continue? [y/n] : ')
-                        if cont.lower() == 'y':
-                            fcs_data.to_csv(ops.out + '/' + filename)
-                        else:
-                            raise ValueError('output directory is not empty.')
+                        raise ValueError('output directory is not empty.')
     
 
 if __name__ == '__main__':
