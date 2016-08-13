@@ -416,3 +416,45 @@ def auto_gauss_gate(df, alpha, x_val='FSC-A', y_val='SSC-A', log=False,
         '''.format(alpha, np.sum(idx) / len(df)))
 
     return df[idx]
+
+#=============================================================================== 
+# MCMC useful functions
+#=============================================================================== 
+def hpd(trace, mass_frac) :
+    """
+    Returns highest probability density region given by
+    a set of samples.
+    CREDIT : Justin Bois BEBi103
+    http://bebi103.caltech.edu
+
+    Parameters
+    ----------
+    trace : array
+        1D array of MCMC samples for a single variable
+    mass_frac : float with 0 < mass_frac <= 1
+        The fraction of the probability to be included in
+        the HPD.  For example, `massfrac` = 0.95 gives a
+        95% HPD.
+        
+    Returns
+    -------
+    output : array, shape (2,)
+        The bounds of the HPD
+    """
+    # Get sorted list
+    d = np.sort(np.copy(trace))
+
+    # Number of total samples taken
+    n = len(trace)
+    
+    # Get number of samples that should be included in HPD
+    n_samples = np.floor(mass_frac * n).astype(int)
+    
+    # Get width (in units of data) of all intervals with n_samples samples
+    int_width = d[n_samples:] - d[:n-n_samples]
+    
+    # Pick out minimal interval
+    min_int = np.argmin(int_width)
+    
+    # Return interval
+    return np.array([d[min_int], d[min_int+n_samples]])
