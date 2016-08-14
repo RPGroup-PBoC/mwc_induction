@@ -53,8 +53,7 @@ graphicspath.tex
 *.ipynb_checkpoints*
 
 #Ignore local copies of the raw data
-/data/
 /data/flow/*
-/data/microscopy
+/data/microscopy/*
 /data/mcmc/*
 doc/induction_paper/graphicspath.tex
