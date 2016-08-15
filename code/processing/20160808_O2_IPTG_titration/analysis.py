@@ -46,6 +46,7 @@ for strain in rbs[np.array([r != 'auto' and r != 'delta' for r in rbs])]:
 plt.xscale('log')
 plt.xlabel('IPTG (M)')
 plt.ylabel('fold-change')
+plt.xlim([1E-8, 1E-2])
 plt.ylim([-0.01, 1.2])
 plt.legend(loc='upper left')
 plt.tight_layout()
