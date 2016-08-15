@@ -152,14 +152,74 @@ allostery to understand the data within a single, unified framework.
 % Author Summary not valid for PLOS ONE submissions.
 \section*{Author Summary} 
 
-Simple explanation of project
+\textit{Simple explanation of project}
 
 %\linenumbers
 
 \section*{Introduction}
 
-\talComment{We are amazing}
+The lactose (\textit{lac}) system, responsible for the metabolism of lactose in
+\textit{Escherichia coli}, is arguably one of the best studied genes of all time
+\cite{MullerHill1996a}. Due to its central importance in the areas of biology
+ranging from transcription to evolution to allostery \cite{Razo-Mejia2014}
+\talComment{More references!}, a vast amount of data has been collected for this
+system which has given rise to the many quantitative models.
 
+The Lac repressor, the key molecule which binds to the Lac promoter and inhibits
+gene expression, was isolated 50 years ago \cite{Gilbert1966}. It was quickly
+understood that the Lac repressor was allosteric, existing in two different
+conformations with different DNA binding affinities, with the transition between
+these two states mediated by an effector site separated by \_\_\_
+\talComment{Distance in amino acids and in 3D shortest-line distance?} from the
+DNA binding domai \talComment{cite the crap out of everything here}. This two
+state system was amenable to the Monod-Wyman-Changeux (MWC) model of allostery
+\cite{MONOD1965}.
+
+Since then, the Lac repressor's ability to inhibit gene expression has been carefully quantified
+as a function of repressor copy number and promoter affinity \cite{Garcia2011}
+as well as gene copy number and competitor binding sites \cite{Weinert2014}. All
+of these tunable parameters have been well characterized by statistical
+mechanical models grounded upon the MWC framework. But importantly, such models
+have allowed us to go beyond merely characterizing known data and have enabled
+us to predict \textit{a priori} the behavior of novel setups which were then
+experimentally tested and shown to conform to those predictions.
+
+This work aims to extend the above analysis to include another central aspect of
+simple repression, namely, the feedback mechanism by which the \textit{lac}
+system responds to changing levels of lactose \cite{JACOB1961}. Even in the
+absence of glucose, the Lac repressor will continue to bind to the \textit{lac}
+operon and block transcription unless bacterial cells are in the presence of
+lactose. When lactose is available, it occasionally gets transglycosylated by
+$\beta$-galactosidase into allolactose, an inducer which binds to the Lac
+repressor and hinders its ability to bind to DNA, thereby allowing the cell to
+transcribe the lactose-digesting machinery present in the \textit{lac} operon.
+In this work, we will study induction of the Lac repressor using isopropyl
+$\beta$-D-1-thiogalactopyranoside (IPTG), a non-hydrolyzable analog of
+allolactose.
+
+Specifically, we extend the previous thermodynamic models for simple repression
+to include the effects of an inducer. This introduces three new parameters into
+our model, namely the binding affinity of inducer to the Lac repressor in the
+two allosteric conformations as well as the difference in free energy between
+the repressor's allosteric states, and we discuss how these parameters can be
+fit to a single inducer titration curve. With these new parameters in hand, we
+can quantitatively predict the induction profile while tuning the other
+experimental knobs without no additional fit parameters. We create more than 20
+\textit{E. coli} mutants with different repressor copy numbers and promoter
+binding affinity and show that in each case, the theoretical predictions match
+the experimental measurements. Because these mutants are all governed by the
+same model of transcription, we can collapse all of the data onto a single
+master curve. This data collapse represents a statistical mechanical model
+provides a single, unifying framework with which to understand simple
+repression.
+
+These results demonstrate that thermodynamic models provide an important vantage
+to quantify the workings of the Lac repressor. Furthermore, we have shown that
+adding the additional feature of induction is consistent with previous results
+on other tunable parameters such as gene copy number and promoter binding
+affinity affect gene expression. This gives confidence that with a solid
+understanding of the fundamental building blocks, we can accurately model
+complex, multi-step systems.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
