@@ -7,3 +7,5 @@
 # IPTG concentrations:
 # 0uM, 1uM, 5uM, 10uM, 25uM, 50uM, 75uM, 100uM, 250uM, 500uM, 1000uM, 5000uM
 # Comments : 
+# The 250uM concentration was excluded from the analysis since we confused the tube and put the wrong
+# concentration.

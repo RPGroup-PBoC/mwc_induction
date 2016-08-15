@@ -48,7 +48,7 @@ energy = -13.9
 rbs = np.array(['auto', 'delta', 'RBS1L', 'RBS1', 'RBS1027', 'RBS446', 'RBS1147', 'HG104'])
 repressors = np.array([0, 0, 870, 610, 130, 62, 30, 11])
 
-concentrations = [0, 0.1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000] # uM IPTG
+concentrations = [0, 0.1, 5, 10, 25, 50, 75, 100, 500, 1000, 5000] # uM IPTG
 # define a dictionary that contains the number of well and the concentration
 
 #=============================================================================== 
