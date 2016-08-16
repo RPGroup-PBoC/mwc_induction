@@ -56,4 +56,5 @@ graphicspath.tex
 /data/flow/*
 /data/microscopy/*
 /data/mcmc/*
+/data/misc/*
 doc/induction_paper/graphicspath.tex
