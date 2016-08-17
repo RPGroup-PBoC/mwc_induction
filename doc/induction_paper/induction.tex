@@ -333,6 +333,22 @@ becomes
 The Lac repressor is a tetrameric protein, a dimer of dimers, with four
 identical binding sites for an inducer. It is unknown whether the two dimers are independently allosteric (i.e. whether one dimer can be active while the other is inactive) or allosterically linked. In this paper we adopt the former viewpoint.
 
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{figure2.pdf} \caption{{\bf
+			The eight states of the Lac repressor.} \talComment{Placeholder graphics, needs
+			to be updated to tetrameric form. I envision having the top dimer slightly
+			opaque since we don't want to needlessly write out all of its states as well.
+			We just have the 8 states for the bottom dimer and then state that the states
+			of the top dimer factor out when computing pActive.} The Lac repressor (green)
+		has an active conformation (left column) and inactive conformation (right
+		column), with the energy difference between these two states given by
+		$\epsilon$. In each conformation, the repressor can bind an inducer (gold) at
+		two sites. Each state is shown with its corresponding Boltzmann weight. If the
+		sum of the active state weights shown (bottom left) is greater than the sum of
+		the inactive state weights (bottom right), the repressor is more likely to be
+		in the active state.} \label{figrepressorInducerStates}
+\end{figure}
+
 As shown in \fref[figrepressorInducerStates], we can enumerate the relative
 likelihood of the eight possible conformations of the repressor (the repressor
 can be in an active or inactive state, and each of its two inducer binding sites
@@ -344,36 +360,34 @@ of every possible state, namely,
 \begin{equation}\label{eq6}
 p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(1+\frac{c}{K_I}\right)^2}.
 \end{equation}
-
-\begin{figure}[h]
-	\centering \includegraphics[scale=\globalScalePlots]{figure2.pdf}
-	\caption{{\bf The eight states of the Lac repressor.} \talComment{Placeholder graphics, needs to be updated to tetrameric form. I envision having the top dimer slightly opaque since we don't want to needlessly write out all of its states as well. We just have the 8 states for the bottom dimer and then state that the states of the top dimer factor out when computing pActive.} The Lac repressor (green)
-		has an active conformation (left column) and inactive conformation (right
-		column), with the energy difference between these two states given by
-		$\epsilon$. In each conformation, the repressor can bind an inducer (gold) at
-		two sites. Each state is shown with its corresponding Boltzmann weight. If the
-		sum of the active state weights shown (bottom left) is greater than the sum of
-		the inactive state weights (bottom right), the repressor is more likely to be
-		in the active state.} \label{figrepressorInducerStates}
-\end{figure}
-
-Substituting this result into \eref[eq5] yields the complete formula
+It is hypothesized that in the absence of inducer ($c=0$), all of the repressors
+are present in the active state, which implies $\beta \epsilon \gg 1$. As
+discussed in Appendix \ref{AppendixModel}, this assertion seems supported by the
+available data, but must ultimately be validated by direct measurement, as is
+possible by NMR \cite{Gardino2003, Boulton2016}. With this assumption,
+\eref[eq6] becomes
+\begin{equation}\label{eq6v2}
+p_A(c) \approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(\frac{c}{K_I}\right)^2} \equiv \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\tilde{K}_I}\right)^2},
+\end{equation}
+where $\tilde{K}_I = K_I e^{\beta  \epsilon/2}$. Substituting this result into \eref[eq5] yields the complete formula
 \begin{equation}\label{eq7}
 \foldchange= \left(
-1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta
-		\epsilon }\left(1+\frac{c}{K_I}\right)^2}\frac{2[R]}{\K} \right)^{-1},
+1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\tilde{K}_I}\right)^2}\frac{2[R]}{\K} \right)^{-1},
 \end{equation}
 which predicts that given a concentration \([R]\) of Lac repressor and a
 concentration \(c\) of the inducer IPTG, the fold-change in gene expression will
 depend solely on 4 parameters: the DNA binding affinity of the repressor
 (\(\K\)), the inducer binding affinities for the repressor in the active state
-(\(K_A\)) and inactive state (\(K_I\)), and the difference in free energy
-between the active and inactive states of the repressor (\(\epsilon\)).
+(\(K_A\)) and inactive state (\(\tilde{K}_I\)), with this latter quantity also
+incorporating the difference in free energy between the active and inactive
+states of the repressor.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{\textcolor{blue}{To Do}}
 
 \begin{enumerate}
+	\item Get repressor states and weights figured out before we send anything to Rob
+	
 	\item Discussion of $\epsilon$ parameter and the implications of its sloppiness. The other parameters are fixed once you nail down $\epsilon$. Introduce Rob Brewster's data  which shows (using Stephanie's version 1 or version 2) that it is probably at least $\epsilon > 0$, but this can not be determined exclusively. However, once you choose a parameter value, the other parameters will adjust to accommodate this.
 	\begin{enumerate}
 		\item Question: Will the mutants data be able to nail this down further?
@@ -395,6 +409,20 @@ between the active and inactive states of the repressor (\(\epsilon\)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%   APPENDIX   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Fold-Change Model} \label{AppendixModel}
+
+\talComment{Discussion of $p_{active} = \frac{1+\frac{O}{N_{NS}}e^{-\beta
+			\epsilon_{\text{DNA}}}}{1+\frac{O}{N_{NS}}e^{-\beta \epsilon_{\text{DNA}}} +
+		e^{-\beta \epsilon}}$ (although possibly in $K_D$ language to be consistent?) as
+	well as Hernan's actual DNA binding measurements $e^{-\beta
+		\epsilon_{\text{DNA}^{\text{measured}}}} = \frac{1}{1+e^{-\beta\epsilon}}
+	e^{-\beta \epsilon_{\text{DNA}}}$}
+
+Make some graphs showing how many $\epsilon$ values (given Brewster/Franz data)
+all have the same fit residuals and hence no value of $\epsilon$ can be
+distinguished. In addition, need to mention the sloppiness issue in Appendix \ref{AppendixSloppiness}, so that a value of $\epsilon$ has to be decided outside of the fitting mechanism. NMR measurements will settle the question.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Sloppiness} \label{AppendixSloppiness}
