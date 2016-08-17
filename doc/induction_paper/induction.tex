@@ -75,7 +75,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%% OPTIONAL MACRO DEFINITIONS %%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand \foldchange{\operatorname{fold-change}}
 
 \newcommand\globalScalePlots{1}
 
@@ -106,6 +105,8 @@
 
 % Shortcuts for often-used symbols that may change notation
 \newcommand{\K}{K_{\text{DNA}}}
+\newcommand \foldchange{\operatorname{fold-change}}
+\newcommand{\Rtot}{R_{\text{Tot}}}
 
 %% END MACROS SECTION
 
@@ -146,11 +147,8 @@ Use the Monod-Wyman-Changeux model of
 allostery to understand the data within a single, unified framework.
 
 
-
-% Please keep the Author Summary between 150 and 200 words
-% Use first person. PLOS ONE authors please skip this step.
-% Author Summary not valid for PLOS ONE submissions.
-\section*{Author Summary} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{eLife digest} 
 
 \textit{Simple explanation of project}
 
@@ -222,23 +220,12 @@ understanding of the fundamental building blocks, we can accurately model
 complex, multi-step systems.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Results}
 
 \subsection*{The Monod-Wyman-Changeux (MWC) Model} 
 
-\talComment{Currently still in MWC Mutants form}
-This paper builds upon an extensive dialogue between theory and experiment in
-transcriptional regulation. A first round of experiments measured the dependence
-of gene expression on repressor copy number and binding strength
-\cite{Garcia2011}. A second round of experiments pushed beyond the ``independent
-promoter approximation'' to acknowledge the fact that different genes compete
-for the same regulatory apparatus. Here too we were able to show that
-theoretical predictions of this subtle effect were consistent with their
-measured counterparts, even permitting the collapse of data from multiple
-experiments onto master curves \cite{Brewster2014, Weinert2014a}. In the current
-paper, we consider yet another layer of complexity having to do with how
-signaling works in the context of transcription.
+\talComment{Give some background on previous experiments on Lac repressor, and definitely mention the ones from our group: \cite{Garcia2011, Brewster2014, Weinert2014a}}
 
 It has been shown that removing the tetramerization region in wild type Lac
 repressor creates a functional dimeric repressor that: (1) can bind to DNA; (2)
@@ -272,20 +259,28 @@ and inactive state, respectively. $\beta = \frac{1}{k_BT}$ where $k_B$ is
 Boltzmann's constant and $T$ is the temperature of the system.
 
 \begin{figure}[h]
-	\centering \includegraphics[scale=\globalScalePlots]{figure1.pdf}
-	\caption{{\bf States and weights for simple repression.} Both RNAP (light blue)
-		and repressor compete for DNA binding. There are $R_A$ repressors in the active
-		state (green, sharp) and $R_I$ repressors in the inactive state (green,
-		rounded), with the latter type typically bound to inducer (gold). The
-		difference in energy between a repressor bound to the Lac operator and to
-		another non-specific site on the DNA equals $\Delta\epsilon_{RD,A}$ in the
-		active state and $\Delta\epsilon_{RD,I}$ in the inactive state; the $P$ RNAP
-		have a corresponding energy difference $\Delta\epsilon_{PD}$. The number of
-		active repressors $R_A$ includes repressors that are unbound, singly bound, or
-		doubly bound to inducer, although the majority of active state repressors will
-		not be bound to inducer (which pushes them into the inactive state). Similarly,
-		the $R_I$ term includes all inactive state repressors bound to any number of
-		inducer molecules, with the most prevalent state shown in the figure.}
+	\centering \includegraphics[scale=\globalScalePlots]{figure1v2.pdf}
+	\caption{{\bf States and weights for simple repression.} 
+		\talComment{Placeholder figure and caption. Need a good representation of the Lac repressor with two binding sites on each dimer. We should also probably make both of the dimers inactive in the bottom state to prevent confusion (in the next figure we can show all states as needed)}
+		States and weights for an empty, RNAP-bound, and
+		active/inactive-repressor-bound Lac promoter. Note the factor of 2 in the
+		repressor weights. Not all possible repressor states are shown, but they are
+		all accounted for by the numbers $R_A$ and $R_I$ of active and inactive
+		repressors, respectively.
+%		Both RNAP (light blue)
+%		and repressor compete for DNA binding. There are $R_A$ repressors in the active
+%		state (green, sharp) and $R_I$ repressors in the inactive state (green,
+%		rounded), with the latter type typically bound to inducer (gold). The
+%		difference in energy between a repressor bound to the Lac operator and to
+%		another non-specific site on the DNA equals $\Delta\epsilon_{RD,A}$ in the
+%		active state and $\Delta\epsilon_{RD,I}$ in the inactive state; the $P$ RNAP
+%		have a corresponding energy difference $\Delta\epsilon_{PD}$. The number of
+%		active repressors $R_A$ includes repressors that are unbound, singly bound, or
+%		doubly bound to inducer, although the majority of active state repressors will
+%		not be bound to inducer (which pushes them into the inactive state). Similarly,
+%		the $R_I$ term includes all inactive state repressors bound to any number of
+%		inducer molecules, with the most prevalent state shown in the figure.
+		}
 	\label{figpolymeraseRepressorStates}
 \end{figure}
 
@@ -371,7 +366,7 @@ depend solely on 4 parameters: the DNA binding affinity of the repressor
 (\(K_A\)) and inactive state (\(K_I\)), and the difference in free energy
 between the active and inactive states of the repressor (\(\epsilon\)).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{\textcolor{blue}{To Do}}
 
 \begin{enumerate}
@@ -389,6 +384,125 @@ between the active and inactive states of the repressor (\(\epsilon\)).
 	
 	\item Get proper error on fit parameters. MCMC to get credible region (it would be interesting if this is significantly different from the confidence interval)?
 \end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   APPENDIX   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sloppiness} \label{AppendixSloppiness}
+
+\talComment{An initial discussion of sloppiness and the $\epsilon$ parameter. Needs to be updated with one of our actual data sets. Perhaps if we have enough data sets this sloppiness will go away?}
+
+We have all seen by now that we can wiggle the best fit parameters around and still get good fitting. To better visualize the problem, I took Stephanie's 2016-06-18 data for HG 104 and RBS 1027 and fit it to the form \eref[AppendixSloppinessEq1], forcing the $\beta \epsilon_R$ to vary between -10 and 10. \fref[SIfig1] shows the results.
+\begin{figure}[h]
+	\centering \includegraphics{SIfigure1.pdf}
+	\caption{{\bf Many best fit parameters generate good fits.} \letterParen{A} I forced $\beta \epsilon_R$ to take on a particular value and fit $K_A$ and $K_I$ to the data using \eref[AppendixSloppinessEq1]. All of the resulting fit curves look good. \letterParen{B} The best fit $K_A$ and $K_I$ values. This graph seemed quite provacative to me, since the values of $K_A$ and $K_I$ seem to be linear curves on this logarithmic plot.}
+	\label{SIfig1}
+\end{figure}
+
+Rather than continuing to beat around the bush, I thought it was time to tackle this issue head on. The following analysis is for the following $n=2$
+exponent form,
+\begin{align} \label{AppendixSloppinessEq1}
+\foldchange &= \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2 \left(1 + e^{-\beta \epsilon_R} \right)}{\left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \epsilon_R} \left( 1 + \frac{c}{K_I} \right)^2} \frac{2 \Rtot}{N_{NS}} e^{-\beta \Delta\epsilon_{\text{O2}}^{(\text{Hernan})}}}\nonumber\\
+&\equiv \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2 \left(1 + e^{-\beta \epsilon_R} \right)}{\left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \epsilon_R} \left( 1 + \frac{c}{K_I} \right)^2} r},
+\end{align}
+where for notational convenience I have defined $r = \frac{2 \Rtot}{N_{NS}}
+e^{-\beta \Delta\epsilon_{\text{O2}}^{(\text{Hernan})}}$ (with $r \approx 1$ for
+HG 104, using Hernan's values). Recall that $K_I < K_A$, since the inducer makes
+the repressor more likely to assume the inactive state. I will analyze this
+fold-change equation in the two limits: $e^{-\beta \epsilon_R} \ll 1$ and
+$e^{-\beta \epsilon_R} \gg 1$.
+
+\subsection{$\boldsymbol{e^{-\beta \epsilon_R} \ll 1}$}
+
+In the limit $e^{-\beta \epsilon_R} \ll 1$, the fold-change equation becomes
+\begin{align} \label{AppendixSloppinessEq2}
+\foldchange &= \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2}{\left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \epsilon_R} \left(\frac{c}{K_I} \right)^2} r} \nonumber\\
+&\equiv \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2}{\left( 1 + \frac{c}{K_A} \right)^2 + \left(\frac{c}{\widetilde{K}_I} \right)^2} r}.
+\end{align}
+where we have defined $\widetilde{K}_I = K_I e^{\beta \epsilon_R/2}$. This
+suggests that what we are actually fitting $K_A$ and $\widetilde{K}_I$ in this
+regime, as confirmed by \fref[SIfig2] in the region $e^{-\beta \epsilon_R} \ll 1$ (note that the $K_I e^{\beta \epsilon_R/2}$ values do not change).
+%where we have made two approximations. First, we assumed $\left(1 + e^{-\beta
+% \epsilon_R} \right) \approx 1$ in the numerator. Second, we used $\left( 1 +
+% \frac{c}{K_A} \right)^2 + e^{-\beta \epsilon_R} \left( 1 + \frac{c}{K_I}
+% \right)^2 \approx \left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \epsilon_R}
+% \left(\frac{c}{K_I} \right)^2$ in the denominator because the $e^{-\beta
+% \epsilon_R} \left(1 + \frac{c}{K_I} \right)^2$ term
+\begin{figure}[h]
+	\centering \includegraphics{SIfigure2.pdf} \caption{{\bf The altered
+			form of $K_I$ we are actually fitting when $\boldsymbol{e^{-\beta \epsilon_R}
+				\ll 1}$.} Redrawing of \fref[SIfig1]\letter{B} showing $K_I$ and $\widetilde{K}_I
+		= K_I e^{\beta \epsilon_R/2}$, the latter forming a straight line when
+		$e^{-\beta \epsilon_R} \ll 1$.} \label{SIfig2}
+\end{figure}
+
+With only two effective parameters, you should be able to figure out their
+values without doing any fitting. To do this, consider three important
+characteristics of a titration curve: (1) the \textit{leakiness} equals the fold-change
+when $c=0$; (2) the \textit{dynamic range} equals the difference between the maximal
+fold-change at $c\to\infty$ and $c=0$; and $[EC_{50}]$ equals the concentration at
+which fold-change reaches halfway between its minimum and maximum values.
+
+Using \eref[AppendixSloppinessEq1], 
+\begin{align}
+\lim_{c = 0}\foldchange &= \frac{1}{1+r}\\
+\lim_{c \to \infty}\foldchange &= \frac{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1}{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1+r}
+\end{align}
+so that
+\begin{align}
+\text{leakiness} &= \frac{1}{1+r} \label{eq3} \\
+\text{dynamic range} &= \frac{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1}{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1+r} - \frac{1}{1+r}. \label{eq4}
+\end{align}
+Since you can read the leakiness and dynamic range straight off the data, \eref[eq4] already gives us one relationship for $K_A$ and $\widetilde{K}_I$,
+\begin{equation} \label{eq5}
+\frac{K_A}{\widetilde{K}_I} = \left( \left(1+r\right) \frac{\text{dynamic range} - \frac{1}{1+r}}{1-\text{dynamic range}} \right)^{1/2}.
+\end{equation}
+
+We next solve for $[EC_{50}]$, showing first an exact formula and then an approximation that can be achieved by noting that $\widetilde{K}_I < K_A$ and that $r \approx 1$,
+\begin{align}
+[EC_{50}] &= \frac{K_A \widetilde{K}_I^2 \left(1+r\right) + \sqrt{K_A^2 \widetilde{K}_I^2 \left(1+r\right) \left(K_A^2 + 2 \widetilde{K}_I^2 \left(1+r\right) \right)}}{K_A^2 + \widetilde{K}_I^2 \left(1+r\right)}\nonumber\\
+&\approx \widetilde{K}_I \left(1+r\right)^{1/2}.
+\end{align}
+Combining this formula with \eref[eq5], we can directly find the value of our two parameters without resorting to fitting,
+\begin{align}
+\widetilde{K}_I &= \frac{[EC_{50}]}{\left(1+r\right)^{1/2}}\\
+K_A &= [EC_{50}] \left(\frac{\text{dynamic range} - \frac{1}{1+r}}{1-\text{dynamic range}} \right)^{1/2}.
+\end{align}
+
+
+\subsection{$\boldsymbol{e^{-\beta \epsilon_R} \gg 1}$}
+
+In this limit, \eref[AppendixSloppinessEq1] becomes 
+\begin{equation}
+\foldchange = \frac{1}{1+\left(\frac{1 + \frac{c}{K_A}}{1 + \frac{c}{K_I}}\right)^2 r},
+\end{equation}
+since in the numerator $\left( 1 + e^{-\beta \epsilon_R} \right) \approx
+e^{-\beta \epsilon_R}$ while in the denominator the
+$\left(1+\frac{c}{K_A}\right)^2$ term is always smaller than the $e^{-\beta
+	\epsilon_R} \left(1+\frac{c}{K_I}\right)^2$ term. In this case, we are also
+fitting only two parameters (only $K_A$ and $K_I$), and we see that the $\beta
+\epsilon_R$ value should not influence these parameters, as is confirmed in
+\fref[SIfig1]\letter{B}.
+
+You can play the same game as in the previous section to get the values of these two parameters from the dynamic range and $[EC_{50}]$. For now, I skip the details and just write the results,
+\begin{align}
+K_I &= \frac{[EC_{50}]}{\left(2+r\right)^{1/2}-1}\\
+K_A &= [EC_{50}] \frac{r^{1/2}}{\left(2+r\right)^{1/2}-1} \left(\frac{\text{dynamic range}}{1-\text{dynamic range}}\right).
+\end{align}
+
+\subsection{Thoughts}
+
+It appears that in either regime, we are really fitting two parameters, and a
+third parameter is ``going along for the ride.'' I am not sure how to determine
+whether $e^{-\beta \epsilon_R} \ll 1$ or $e^{-\beta \epsilon_R} \gg 1$, since
+both regimes yield great (and very similar) fits. However, within the two
+regimes I now think that I understand exactly what $K_A$ and $K_I$ parameters
+will come out of fitting. We need another insight to get us the sign of $\beta
+\epsilon$, and then I think the sloppiness in our best-fit parameters will be
+much more under control.
 
 \nolinenumbers
 
