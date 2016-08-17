@@ -225,25 +225,23 @@ complex, multi-step systems.
 
 \subsection*{The Monod-Wyman-Changeux (MWC) Model} 
 
-\talComment{Give some background on previous experiments on Lac repressor, and definitely mention the ones from our group: \cite{Garcia2011, Brewster2014, Weinert2014a}}
+\talComment{Give some background on previous experiments on Lac repressor, and definitely mention the ones from our group: \cite{Garcia2011, Brewster2014, Weinert2014}. Must also quote Mitch Lewis: \cite{Daber2011a, Daber2009}}
 
-It has been shown that removing the tetramerization region in wild type Lac
-repressor creates a functional dimeric repressor that: (1) can bind to DNA; (2)
-exists in both an active and inactive allosteric conformation; and (3) has two
-binding sites for the inducer IPTG - we shall refer to this truncated dimeric
-protein as ``the Lac repressor'' for the remainder of this paper
-\cite{Daber2011a, Daber2009}.
+\textit{Mention at some point:} The repressor fluctuates between two
+allosteric conformations, an active state which binds strongly to the Lac
+operator and an inactive state with weak DNA affinity.
 
-As discussed previously, the behavior of the Lac repressor  as a regulatory
-protein is well characterized by an equilibrium model where the probability of
-each state of repressor and RNA polymerase occupancy is proportional to its
-Boltzmann weight \cite{Ackers1982, Buchler2003, Phillips2015a}. We begin with a
-summary of this model. Suppose there are \(P\) RNA polymerase (RNAP) and \(R\)
-repressor molecules in a cell. \(R_A\) repressors will be in the active state
-(the favored state when repressor is not bound to inducer; in this state the
-repressor binds tightly to DNA) and the remaining \(R_I\) repressors will be in
-the inactive state (the predominant state when repressor is bound to inducer; in
-this state the repressor binds weakly to DNA) so that \(R_A+R_I=R\).
+\talComment{Continue to modify text below!} The ability of the the Lac repressor
+to regulate transcription has been previously characterized by an equilibrium
+model where the probability of each state of repressor and RNA polymerase
+occupancy is proportional to its Boltzmann weight \cite{Daber2011a,
+	Phillips2015a}. We begin with a summary of this model. Suppose there are \(P\)
+RNA polymerase (RNAP) and \(R\) repressor molecules in a cell. \(R_A\)
+repressors will be in the active state (the favored state when repressor is not
+bound to inducer; in this state the repressor binds tightly to DNA) and the
+remaining \(R_I\) repressors will be in the inactive state (the predominant
+state when repressor is bound to inducer; in this state the repressor binds
+weakly to DNA) so that \(R_A+R_I=R\).
 
 We first model the interaction between the Lac repressor and DNA by enumerating
 all possible states and their corresponding weights. As shown in
@@ -284,11 +282,13 @@ Boltzmann's constant and $T$ is the temperature of the system.
 	\label{figpolymeraseRepressorStates}
 \end{figure}
 
+\talComment{I am personally advocating shoving this derivation to an Appendix. Introducing terms such as $p$, $r_A$, $r_I$ which the reader will never see again is just wasting brain space in their attempt to understand the paper. We should just quote the definition of fold-change and then skip to the result, with the details in an Appendix.}
+
 In thermodynamic models of transcription, gene expression is proportional to the
 probability $p_{\text{bound}}$ that RNAP is bound to the Lac operator which is
 given by
 \begin{equation}\label{eq2}
-p_{\text{bound}}(R)=\frac{p}{1+r_A+r_I+p},
+p_{\text{bound}}(R)=\frac{p}{1+2r_A+2r_I+p},
 \end{equation}
 where
 \begin{align}
@@ -296,10 +296,11 @@ p &= \frac{P}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon _{PD}} \\
 r_A &= \frac{R_A}{N_{\text{NS}}}e^{-\beta \Delta\epsilon _{RD,A}} \\
 r_I &= \frac{R_I}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon _{RD,I}}.
 \end{align}
-
-Gene expression can be readily measured experimentally by exploiting the fold-change, 
+Note the factor of 2 in the repressor states, which arises from the possibility
+that either repressor dimer may bind to DNA. Gene expression can be readily
+measured experimentally by exploiting the fold-change,
 \begin{equation}\label{eq3}
-\foldchange\equiv \frac{p_{\text{bound}}(R)}{p_{\text{bound}}(0)}=\frac{1+p}{1+r_A+r_I+p}.
+\foldchange\equiv \frac{p_{\text{bound}}(R)}{p_{\text{bound}}(0)}=\frac{1+p}{1+2r_A+2r_I+p}.
 \end{equation}
 We can simplify this expression using two well-justified approximations: \(p\ll
 1\) and \(r_I\ll r_A\). The first approximation is called the weak promoter
@@ -309,7 +310,7 @@ approximately 1000 times smaller than $e^{-\beta \Delta\epsilon _{RD,A}}$ for
 the Lac repressor \cite{Daber2011a}. Using these approximations, the fold-change
 reduces to the form
 \begin{equation}\label{eq4}
-\foldchange\approx \frac{1}{1+r_A}=\left(1+\frac{R_A}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon _{RD,A}}\right)^{-1}.
+\foldchange\approx \frac{1}{1+2r_A}=\left(1+\frac{2R_A}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon _{RD,A}}\right)^{-1}.
 \end{equation}
 
 We now introduce the role of inducer binding, which changes the number of
@@ -324,10 +325,13 @@ the language of dissociation constants and chemical rates, is discussed in
 detail in the Supplementary Information. With these definitions, \eref[eq4]
 becomes
 \begin{align}
-\foldchange &= \left( 1+\frac{p_A(c) [R] V}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon
+\foldchange &= \left( 1+\frac{2p_A(c) [R] V}{N_{\text{NS}}}e^{-\beta  \Delta\epsilon
 	_{RD,A}} \right)^{-1} \nonumber \\
-&= \left( 1+\frac{p_A(c) [R]}{\K} \right)^{-1}. \label{eq5}
+&= \left( 1+\frac{2p_A(c) [R]}{\K} \right)^{-1}. \label{eq5}
 \end{align}
+
+The Lac repressor is a tetrameric protein, a dimer of dimers, with four
+identical binding sites for an inducer. It is unknown whether the two dimers are independently allosteric (i.e. whether one dimer can be active while the other is inactive) or allosterically linked. In this paper we adopt the former viewpoint.
 
 As shown in \fref[figrepressorInducerStates], we can enumerate the relative
 likelihood of the eight possible conformations of the repressor (the repressor
@@ -343,7 +347,7 @@ p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-
 
 \begin{figure}[h]
 	\centering \includegraphics[scale=\globalScalePlots]{figure2.pdf}
-	\caption{{\bf The eight states of the Lac repressor.} The Lac repressor (green)
+	\caption{{\bf The eight states of the Lac repressor.} \talComment{Placeholder graphics, needs to be updated to tetrameric form. I envision having the top dimer slightly opaque since we don't want to needlessly write out all of its states as well. We just have the 8 states for the bottom dimer and then state that the states of the top dimer factor out when computing pActive.} The Lac repressor (green)
 		has an active conformation (left column) and inactive conformation (right
 		column), with the energy difference between these two states given by
 		$\epsilon$. In each conformation, the repressor can bind an inducer (gold) at
@@ -357,7 +361,7 @@ Substituting this result into \eref[eq5] yields the complete formula
 \begin{equation}\label{eq7}
 \foldchange= \left(
 1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta
-		\epsilon }\left(1+\frac{c}{K_I}\right)^2}\frac{[R]}{\K} \right)^{-1},
+		\epsilon }\left(1+\frac{c}{K_I}\right)^2}\frac{2[R]}{\K} \right)^{-1},
 \end{equation}
 which predicts that given a concentration \([R]\) of Lac repressor and a
 concentration \(c\) of the inducer IPTG, the fold-change in gene expression will
@@ -374,6 +378,8 @@ between the active and inactive states of the repressor (\(\epsilon\)).
 	\begin{enumerate}
 		\item Question: Will the mutants data be able to nail this down further?
 	\end{enumerate}
+	
+	\item We should also test the model of what happens if the two repressor dimers are allosterically linked, so that one cannot be active while the other is inactive. Would this still be consistent with the data? If so, maybe need to add an Appendix section with these types of fits. If not, maybe need to add an Appendix section detailing why the data negates this hypothesis.
 	
 	\item \talComment{I think the derivations should be relegated to the Appendix, but probably not initially}
 	
@@ -453,11 +459,11 @@ Using \eref[AppendixSloppinessEq1],
 \end{align}
 so that
 \begin{align}
-\text{leakiness} &= \frac{1}{1+r} \label{eq3} \\
-\text{dynamic range} &= \frac{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1}{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1+r} - \frac{1}{1+r}. \label{eq4}
+\text{leakiness} &= \frac{1}{1+r} \label{AppendixSloppinessEq3} \\
+\text{dynamic range} &= \frac{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1}{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1+r} - \frac{1}{1+r}. \label{AppendixSloppinessEq4}
 \end{align}
-Since you can read the leakiness and dynamic range straight off the data, \eref[eq4] already gives us one relationship for $K_A$ and $\widetilde{K}_I$,
-\begin{equation} \label{eq5}
+Since you can read the leakiness and dynamic range straight off the data, \eref[AppendixSloppinessEq4] already gives us one relationship for $K_A$ and $\widetilde{K}_I$,
+\begin{equation} \label{AppendixSloppinessEq5}
 \frac{K_A}{\widetilde{K}_I} = \left( \left(1+r\right) \frac{\text{dynamic range} - \frac{1}{1+r}}{1-\text{dynamic range}} \right)^{1/2}.
 \end{equation}
 
@@ -466,7 +472,7 @@ We next solve for $[EC_{50}]$, showing first an exact formula and then an approx
 [EC_{50}] &= \frac{K_A \widetilde{K}_I^2 \left(1+r\right) + \sqrt{K_A^2 \widetilde{K}_I^2 \left(1+r\right) \left(K_A^2 + 2 \widetilde{K}_I^2 \left(1+r\right) \right)}}{K_A^2 + \widetilde{K}_I^2 \left(1+r\right)}\nonumber\\
 &\approx \widetilde{K}_I \left(1+r\right)^{1/2}.
 \end{align}
-Combining this formula with \eref[eq5], we can directly find the value of our two parameters without resorting to fitting,
+Combining this formula with \eref[AppendixSloppinessEq5], we can directly find the value of our two parameters without resorting to fitting,
 \begin{align}
 \widetilde{K}_I &= \frac{[EC_{50}]}{\left(1+r\right)^{1/2}}\\
 K_A &= [EC_{50}] \left(\frac{\text{dynamic range} - \frac{1}{1+r}}{1-\text{dynamic range}} \right)^{1/2}.
