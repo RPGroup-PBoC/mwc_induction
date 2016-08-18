@@ -41,7 +41,7 @@ def main():
     fname_temp = pd.read_csv(ops.temp, header=None)
     
     #Read the old files that contain the file_extension pattern.
-    old_files = np.array(os.listdir(ops.targ))
+    old_files = np.array(sorted(os.listdir(ops.targ)))
 
     if ops.pattern != None:
     #Identify all of the target files which contain the proper file extension
