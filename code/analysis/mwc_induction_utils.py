@@ -458,3 +458,92 @@ def hpd(trace, mass_frac) :
     
     # Return interval
     return np.array([d[min_int], d[min_int+n_samples]])
+
+#=============================================================================== 
+# Homoscedastic Gaussian likelihood
+
+def log_likelihood_mcmc(param, indep_var, dep_var, epsilon=4.5):
+    """
+    Computes the log likelihood probability.
+    Parameteres
+    -----------
+    param : data-frame.
+        The parameters to be fit by the MCMC. This must be an array of length 3
+        with the following entries
+        param[0] = ea == -lnKa
+        param[1] = ei == -lnKi
+        param[2] = sigma. Homoscedastic error associated with the Gaussian 
+        likelihood.
+    indep_var : n x 3 array.
+        series of independent variables to compute the theoretical fold-change.
+        1st column : IPTG concentration
+        2nd column : repressor copy number
+        3rd column : repressor binding energy
+    dep_var : array-like
+        dependent variable, i.e. experimental fold-change. Then length of this
+        array should be the same as the number of rows in indep_var.
+    epsilon : float.
+        Energy difference between the active and inactive state of the repressor.
+    Returns
+    -------
+    log_like : float.
+        the log likelihood.
+    """
+    # unpack parameters
+    ea, ei, sigma = param
+    
+    # unpack independent variables
+    IPTG, R, epsilon_r = indep_var.iloc[:, 0],\
+                         indep_var.iloc[:, 1],\
+                         indep_var.iloc[:, 2]
+    
+    # compute the theoretical fold-change
+    fc_theory = fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r)
+   
+    log_like =  np.sum((fc_theory - dep_var)**2) / 2 / sigma**2
+    return log_like
+
+#=============================================================================== 
+   
+def log_post_mcmc(param, indep_var, dep_var, epsilon=4.5,
+             ea_range=[6 -6], ei_range=[6, -6], sigma_range=[0, 1]):
+    '''
+    Computes the log posterior probability.
+    Parameters
+    ----------
+    param : array-like.
+        The parameters to be fit by the MCMC. This must be an array of length 3
+        with the following entries
+        param[0] = ea == -lnKa
+        param[1] = ei == -lnKi
+        param[2] = sigma. Homoscedastic error associated with the Gaussian 
+        likelihood.
+    indep_var : n x 3 array.
+        Series of independent variables to compute the theoretical fold-change.
+        1st column : IPTG concentration
+        2nd column : repressor copy number
+        3rd column : repressor binding energy
+    dep_var : array-like
+        Dependent variable, i.e. experimental fold-change. Then length of this
+        array should be the same as the number of rows in indep_var.
+    ea_range : array-like.
+        Range of variables to use in the prior as boundaries for the ea parameter.
+    ei_range : array-like.
+        Range of variables to use in the prior as boundaries for the ei parameter.
+    sigma_range : array-like.
+        Range of variables to use in the prior as boundaries for the sigma param.
+    epsilon : float.
+        Energy difference between the active and inactive state of the repressor.
+    '''
+    # unpack parameters
+    ea, ei, sigma = param
+    
+    # Set the prior boundaries. Since the variables have a Jeffreys prior, in
+    # the log probability they have a uniform prior
+    if ea > np.max(ea_range) or ea < np.min(ea_range)\
+    or ei > np.max(ei_range) or ei < np.min(ei_range)\
+    or sigma > np.max(sigma_range) or sigma < np.min(sigma_range):
+        return -np.inf
+    
+    return -(len(indep_var) + 1) * np.log(sigma) \
+    - log_likelihood_mcmc(param, indep_var, dep_var, epsilon)
