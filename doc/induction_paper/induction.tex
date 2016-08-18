@@ -107,6 +107,7 @@
 \newcommand{\K}{K_{\text{DNA}}}
 \newcommand \foldchange{\operatorname{fold-change}}
 \newcommand{\Rtot}{R_{\text{Tot}}}
+\newcommand{\KIeff}{\tilde{K}_I} % Effective KI constant
 
 %% END MACROS SECTION
 
@@ -219,7 +220,7 @@ affinity affect gene expression. This gives confidence that with a solid
 understanding of the fundamental building blocks, we can accurately model
 complex, multi-step systems.
 
-
+\pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Results}
 
@@ -231,7 +232,9 @@ complex, multi-step systems.
 allosteric conformations, an active state which binds strongly to the Lac
 operator and an inactive state with weak DNA affinity.
 
-\talComment{Continue to modify text below!} The ability of the the Lac repressor
+\talComment{Continue to modify text below!} 
+
+The ability of the the Lac repressor
 to regulate transcription has been previously characterized by an equilibrium
 model where the probability of each state of repressor and RNA polymerase
 occupancy is proportional to its Boltzmann weight \cite{Daber2011a,
@@ -257,14 +260,14 @@ and inactive state, respectively. $\beta = \frac{1}{k_BT}$ where $k_B$ is
 Boltzmann's constant and $T$ is the temperature of the system.
 
 \begin{figure}[h]
-	\centering \includegraphics[scale=\globalScalePlots]{figure1v2.pdf}
-	\caption{{\bf States and weights for simple repression.} 
-		\talComment{Placeholder figure and caption. Need a good representation of the Lac repressor with two binding sites on each dimer. We should also probably make both of the dimers inactive in the bottom state to prevent confusion (in the next figure we can show all states as needed)}
+	\centering \includegraphics[scale=\globalScalePlots]{figure1v3.pdf}
+	\caption{{\bf States and weights for simple repression.}
 		States and weights for an empty, RNAP-bound, and
-		active/inactive-repressor-bound Lac promoter. Note the factor of 2 in the
-		repressor weights. Not all possible repressor states are shown, but they are
-		all accounted for by the numbers $R_A$ and $R_I$ of active and inactive
-		repressors, respectively.
+		active/inactive-repressor-bound Lac promoter. The factor of 2 in the
+		repressor weights comes from the ability of either dimer to bind to DNA. 
+%		Not all possible repressor states are shown, but they are
+%		all accounted for by the numbers $R_A$ and $R_I$ of active and inactive
+%		repressors, respectively.
 %		Both RNAP (light blue)
 %		and repressor compete for DNA binding. There are $R_A$ repressors in the active
 %		state (green, sharp) and $R_I$ repressors in the inactive state (green,
@@ -281,8 +284,6 @@ Boltzmann's constant and $T$ is the temperature of the system.
 		}
 	\label{figpolymeraseRepressorStates}
 \end{figure}
-
-\talComment{I am personally advocating shoving this derivation to an Appendix. Introducing terms such as $p$, $r_A$, $r_I$ which the reader will never see again is just wasting brain space in their attempt to understand the paper. We should just quote the definition of fold-change and then skip to the result, with the details in an Appendix.}
 
 In thermodynamic models of transcription, gene expression is proportional to the
 probability $p_{\text{bound}}$ that RNAP is bound to the Lac operator which is
@@ -334,19 +335,19 @@ The Lac repressor is a tetrameric protein, a dimer of dimers, with four
 identical binding sites for an inducer. It is unknown whether the two dimers are independently allosteric (i.e. whether one dimer can be active while the other is inactive) or allosterically linked. In this paper we adopt the former viewpoint.
 
 \begin{figure}[h]
-	\centering \includegraphics[scale=\globalScalePlots]{figure2.pdf} \caption{{\bf
-			The eight states of the Lac repressor.} \talComment{Placeholder graphics, needs
-			to be updated to tetrameric form. I envision having the top dimer slightly
-			opaque since we don't want to needlessly write out all of its states as well.
-			We just have the 8 states for the bottom dimer and then state that the states
-			of the top dimer factor out when computing pActive.} The Lac repressor (green)
-		has an active conformation (left column) and inactive conformation (right
-		column), with the energy difference between these two states given by
+	\centering \includegraphics[scale=\globalScalePlots]{figure2v2.pdf}
+	\caption{{\bf The eight states of a Lac repressor dimer.} The Lac repressor has
+		an active conformation (green, left column) and inactive conformation (red,
+		right column), with the energy difference between these two states given by
 		$\epsilon$. In each conformation, the repressor can bind an inducer (gold) at
-		two sites. Each state is shown with its corresponding Boltzmann weight. If the
-		sum of the active state weights shown (bottom left) is greater than the sum of
-		the inactive state weights (bottom right), the repressor is more likely to be
-		in the active state.} \label{figrepressorInducerStates}
+		two sites. Each state is shown with its corresponding Boltzmann weight. The top
+		dimer can be in the active or inactive state independent of the bottom dimer.
+		The top dimer is drawn partly opaque because its different states will not
+		effect the probability that the bottom dimer is active. %		If the sum of the
+		% active state weights shown (bottom left) is greater than the sum of
+		%		the inactive state weights (bottom right), the repressor is more likely to be
+		%		in the active state.
+	} \label{figrepressorInducerStates}
 \end{figure}
 
 As shown in \fref[figrepressorInducerStates], we can enumerate the relative
@@ -360,6 +361,17 @@ of every possible state, namely,
 \begin{equation}\label{eq6}
 p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(1+\frac{c}{K_I}\right)^2}.
 \end{equation}
+
+Note that in the \fref[figrepressorInducerStates] states and weights, we assumed
+that within the Lac tetramer, each Lac dimer could be active or inactive
+independently of the other dimer. An alternative model presumes that . While no
+direct experimental measurements have been yet been carried out to definitively
+distinguish between these two models, in Appendix \ref{AppendixAllostery} we
+describe a simple experiment where upon removing the tetramerization region of
+the Lac repressor we can distinguish between these two models. \talComment{Rob,
+	this is super cool!!! If you agree with the theory in this Appendix, let us know
+	if you approve of us carrying out this experiment!}
+
 It is hypothesized that in the absence of inducer ($c=0$), all of the repressors
 are present in the active state, which implies $\beta \epsilon \gg 1$. As
 discussed in Appendix \ref{AppendixModel}, this assertion seems supported by the
@@ -367,21 +379,24 @@ available data, but must ultimately be validated by direct measurement, as is
 possible by NMR \cite{Gardino2003, Boulton2016}. With this assumption,
 \eref[eq6] becomes
 \begin{equation}\label{eq6v2}
-p_A(c) \approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(\frac{c}{K_I}\right)^2} \equiv \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\tilde{K}_I}\right)^2},
+p_A(c) \approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(\frac{c}{K_I}\right)^2} \equiv \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2},
 \end{equation}
-where $\tilde{K}_I = K_I e^{\beta  \epsilon/2}$. Substituting this result into \eref[eq5] yields the complete formula
+where we have introduced the effective dissociation constant $\KIeff = K_I
+e^{\beta  \epsilon/2}$. Substituting this result into \eref[eq5] yields the
+complete formula
 \begin{equation}\label{eq7}
 \foldchange= \left(
-1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\tilde{K}_I}\right)^2}\frac{2[R]}{\K} \right)^{-1},
+1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2}\frac{2[R]}{\K} \right)^{-1},
 \end{equation}
 which predicts that given a concentration \([R]\) of Lac repressor and a
 concentration \(c\) of the inducer IPTG, the fold-change in gene expression will
 depend solely on 4 parameters: the DNA binding affinity of the repressor
 (\(\K\)), the inducer binding affinities for the repressor in the active state
-(\(K_A\)) and inactive state (\(\tilde{K}_I\)), with this latter quantity also
+(\(K_A\)) and inactive state (\(\KIeff\)), with this latter quantity also
 incorporating the difference in free energy between the active and inactive
 states of the repressor.
 
+\pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{\textcolor{blue}{To Do}}
 
@@ -395,7 +410,7 @@ states of the repressor.
 	
 	\item We should also test the model of what happens if the two repressor dimers are allosterically linked, so that one cannot be active while the other is inactive. Would this still be consistent with the data? If so, maybe need to add an Appendix section with these types of fits. If not, maybe need to add an Appendix section detailing why the data negates this hypothesis.
 	
-	\item \talComment{I think the derivations should be relegated to the Appendix, but probably not initially}
+	\item \talComment{I am personally advocating shoving the model derivation to an Appendix. Introducing terms such as $p$, $r_A$, $r_I$ which the reader will never see again is just wasting brain space in their attempt to understand the paper. We should just quote the definition of fold-change and then skip to the result, with the details in an Appendix.}
 	
 	\item How do we deal with the $\epsilon$ parameter? State that to ultimately nail this down, NMR has become the standard tool to directly measure the $\epsilon$ parameter \cite{Gardino2003, Boulton2016}.
 	\begin{itemize}
@@ -424,6 +439,100 @@ Make some graphs showing how many $\epsilon$ values (given Brewster/Franz data)
 all have the same fit residuals and hence no value of $\epsilon$ can be
 distinguished. In addition, need to mention the sloppiness issue in Appendix \ref{AppendixSloppiness}, so that a value of $\epsilon$ has to be decided outside of the fitting mechanism. NMR measurements will settle the question.
 
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Allostery within the Lac Repressor} \label{AppendixAllostery}
+
+\fref[figrepressorInducerStates] in the main text shows the possible states and
+weights for a Lac repressor tetramer assuming that both dimers within the Lac
+repressor can independently be active or inactive. Using this model, the
+probability that one of the dimers is in the active state is given by
+\begin{equation}\label{AppendixEq1}
+p_A^{\text{dimer}}(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(1+\frac{c}{K_I}\right)^2},
+\end{equation}
+which yields the formula for fold-change,
+\begin{equation}\label{AppendixEq2}
+\foldchange= \left(
+1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \epsilon }\left(1+\frac{c}{K_I}\right)^2}\frac{2[R]}{\K} \right)^{-1}.
+\end{equation}
+Now suppose that the tetramerization region within the Lac repressor gene is
+removed, which creates a functional dimeric repressor that: (1) can bind to DNA;
+(2) exists in both an active and inactive allosteric conformation; and (3) has
+two binding sites for the inducer IPTG \cite{Daber2011a, Daber2009}. This
+construct would have the same states and weights shown in
+\fref[figrepressorInducerStates], so that its probability of being active is
+still given by \eref[AppendixEq1]. Furthermore, since the Lac repressor
+ribosomal binding site has not been modified, there would now be twice as many
+Lac repressor dimers as there were Lac repressor tetramers, but unlike in
+tetramer case each dimer could only bind with one orientation to the DNA. These
+two factors cancel each other, so that the states and weights for the dimeric
+repressor binding to DNA would be identical to
+\fref[figpolymeraseRepressorStates] and the fold-change equation would still be
+given by \eref[AppendixEq2]. In other words, within this model where the Lac
+repressor tetramer consists of two dimers which can be independently active or
+inactive, removing the tetramerization region should not alter fold-change. Note
+that throughout this analysis, we have assumed that removing the tetramerization
+region does not alter the thermodynamic parameter $K_A$, $K_I$, and $\epsilon$.
+
+We now turn to a second model of the Lac tetramer, where the two dimers must
+either both be active or inactive. In other words, the repressor as a whole
+would either be active or inactive. In such a case, the Lac repressor can be
+viewed as an allosteric receptor with four identical inducer binding sites,
+which implies that the probability that the Lac repressor is active is given by
+\begin{equation}\label{AppendixEq3}
+p_A^{\text{tetramer}}(c)=\frac{\left(1+\frac{c}{K_A}\right)^4}{\left(1+\frac{c}{K_A}\right)^4+e^{-\beta  \epsilon }\left(1+\frac{c}{K_I}\right)^4}.
+\end{equation}
+The corresponding formula for fold-change will now have these fourth powers,
+\begin{equation}\label{AppendixEq4}
+\foldchange= \left(
+1+\frac{\left(1+\frac{c}{K_A}\right)^4}{\left(1+\frac{c}{K_A}\right)^4+e^{-\beta  \epsilon }\left(1+\frac{c}{K_I}\right)^4}\frac{2[R]}{\K} \right)^{-1}.
+\end{equation}
+Now suppose that the tetramerization region were removed within this model. Once
+again, there would be twice as many dimers, each able to bind to DNA in only one
+configuration, so that these two factors cancel each other. But now each dimers
+must necessarily be active or inactive independently of all other dimers, and
+therefore the probability of a repressor being active and the corresponding
+equation fold-change would be given by \eref[AppendixEq1][AppendixEq2],
+respectively. 
+
+Thus, by measuring the fold-change of a Lac repressor with the tetramerization
+region removed, we can immediately distinguish these two models.
+\fref[figAllosteryModels1]\letter{A} shows fold-change data for the O2 operator.
+As in the main text, we use the RBS 1027 data set to determine the thermodynamic
+parameters and then predict the remaining data sets with no further fitting.
+After removing the tetramerization region, we would predict that the fold-change
+curves shown in \fref[figAllosteryModels1]\letter{B} would result. In contrast,
+if the independent dimer model is correct, we would expect the fold-change
+curves to remain stationary when the tetramerization region is removed. These
+plots demonstrate the need to use theoretical models not merely to characterize
+known data, but to \textit{predict} the results of novel experiments. 
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{SIfigure4.pdf}
+	\caption{{\bf Effects of removing tetramerization region of Lac repressor.}
+		\letterParen{A} Fold-change of Lac repressor with a tetramerization region binding to the O2 operator. Assuming that both repressor dimers are simultaneously active or inactive, \eref[AppendixEq4], the best fit parameters are $K_A = 45 \times 10^{-6}\,\text{M}$, $K_I = 3 \times 10^{-6}\,\text{M}$, and $\beta \epsilon = 4.5$. While these thermodynamic parameters are different from the corresponding values found from the independent dimer model, \eref[AppendixEq2], the resulting curves fit the data well. \letterParen{B} Once the tetramerization region is removed, the predicted fold-change is given by \eref[AppendixEq2]. Opaque dots \textit{do not} represent data, but only server as a reference point for the theoretical curves.
+	}
+	\label{figAllosteryModels1}
+\end{figure}
+
+Another interesting aspect of removing the tetramerization region is that the
+shift in the fold-change curves depends upon the $\epsilon$ parameter.
+\fref[figAllosteryModels2] shows the corresponding predictions assuming that
+the repressor dimers are not independent and using the larger value $\beta
+\epsilon = 0$. In this case, the corresponding shift upon removing the
+tetramerization is noticeably smaller. Hence, if a shift is observed in the
+fold-change curves, the size of the shift would be an indirect measurement of
+$\epsilon$.
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{SIfigure3.pdf}
+	\caption{{\bf Dependence of tetramerization region removal on $\boldsymbol{\epsilon}$.}
+		\letterParen{A} As in \fref[figAllosteryModels1], we fit fold-change of Lac repressor with a tetramerization region binding to the O2 operator, but this time forcing $\beta \epsilon = 0$. Using \eref[AppendixEq4], the best fit parameters are $K_A = 60 \times 10^{-6}\,\text{M}$, $K_I = 10 \times 10^{-6}\,\text{M}$, and $\beta \epsilon = 0$. \letterParen{B} With this smaller $\beta \epsilon$ value, the corresponding theoretical predictions exhibit a much larger fold-change than those in \fref[figAllosteryModels1]\letter{B}.
+	}
+	\label{figAllosteryModels2}
+\end{figure}
+
+\pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Sloppiness} \label{AppendixSloppiness}
 
