@@ -1,0 +1,247 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   APPENDIX   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Fold-Change Model} \label{AppendixModel}
+
+\talComment{Discussion of $p_{active} = \frac{1+\frac{O}{N_{NS}}e^{-\beta
+			\varepsilon_{\text{DNA}}}}{1+\frac{O}{N_{NS}}e^{-\beta \varepsilon_{\text{DNA}}} +
+		e^{-\beta \varepsilon}}$ (although possibly in $K_D$ language to be consistent?) as
+	well as Hernan's actual DNA binding measurements $e^{-\beta
+		\varepsilon_{\text{DNA}^{\text{measured}}}} = \frac{1}{1+e^{-\beta\varepsilon}}
+	e^{-\beta \varepsilon_{\text{DNA}}}$}
+
+Make some graphs showing how many $\varepsilon$ values (given Brewster/Franz data)
+all have the same fit residuals and hence no value of $\varepsilon$ can be
+distinguished. In addition, need to mention the sloppiness issue in Appendix \ref{AppendixSloppiness}, so that a value of $\varepsilon$ has to be decided outside of the fitting mechanism. NMR measurements will settle the question.
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Allostery within the Lac Repressor} \label{AppendixAllostery}
+
+\fref[figrepressorInducerStates] in the main text shows the possible states and
+weights for a Lac repressor tetramer assuming that both dimers within the Lac
+repressor can independently be active or inactive. Using this model, the
+probability that one of the dimers is in the active state is given by
+\begin{equation}\label{AppendixEq1}
+p_A^{\text{dimer}}(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^2},
+\end{equation}
+which yields the formula for fold-change,
+\begin{equation}\label{AppendixEq2}
+\foldchange= \left(
+1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^2}\frac{2 R}{N_{\text{NS}}}e^{-\beta \Delta\varepsilon_{RD,A}} \right)^{-1}.
+\end{equation}
+%\begin{equation}\label{AppendixEq2}
+%\foldchange= \left(
+%1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^2}\frac{2[R]}{\K} \right)^{-1}.
+%\end{equation}
+Now suppose that the tetramerization region within the Lac repressor gene is
+removed, which creates a functional dimeric repressor that: (1) can bind to DNA;
+(2) exists in both an active and inactive allosteric conformation; and (3) has
+two binding sites for the inducer IPTG \cite{Daber2011a, Daber2009}. This
+construct would have the same states and weights shown in
+\fref[figrepressorInducerStates], so that its probability of being active is
+still given by \eref[AppendixEq1]. Furthermore, since the Lac repressor
+ribosomal binding site has not been modified, there would now be twice as many
+Lac repressor dimers as there were Lac repressor tetramers; however, whereas
+each tetramer could originally bind to DNA in two configurations (with each of
+its dimers), the now-disjoint Lac repressor dimers can only bind to the DNA in
+one configuration. These two factors cancel each other, so that the states and
+weights for the dimeric repressor binding to DNA would be identical to
+\fref[figpolymeraseRepressorStates] and the fold-change equation would still be
+given by \eref[AppendixEq2]. In other words, within this model where the Lac
+repressor tetramer consists of two dimers which can be independently active or
+inactive, fold-change measurements will not be affected at all by removing the
+tetramerization region. Note that throughout this analysis, we have assumed that
+removing the tetramerization region does not alter the thermodynamic parameter
+$K_A$, $K_I$, and $\varepsilon$.
+
+We now turn to a second model of the Lac tetramer, where the two dimers must
+either simultaneously active or simultaneously inactive. In other words, the
+repressor as a whole is either active or inactive. In such a case, the Lac
+repressor can be viewed as an allosteric receptor with four identical inducer
+binding sites, which implies that the probability that the Lac repressor is
+active is given by
+\begin{equation}\label{AppendixEq3}
+p_A^{\text{tetramer}}(c)=\frac{\left(1+\frac{c}{K_A}\right)^4}{\left(1+\frac{c}{K_A}\right)^4+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^4}.
+\end{equation}
+The corresponding formula for fold-change will now have these fourth powers,
+\begin{equation}\label{AppendixEq4}
+\foldchange= \left(
+1+\frac{\left(1+\frac{c}{K_A}\right)^4}{\left(1+\frac{c}{K_A}\right)^4+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^4}\frac{2 R}{N_{\text{NS}}}e^{-\beta \Delta\varepsilon_{RD,A}} \right)^{-1}.
+\end{equation}
+%\begin{equation}\label{AppendixEq4}
+%\foldchange= \left(
+%1+\frac{\left(1+\frac{c}{K_A}\right)^4}{\left(1+\frac{c}{K_A}\right)^4+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^4}\frac{2[R]}{\K} \right)^{-1}.
+%\end{equation}
+Now suppose that the tetramerization region was removed within this model. Once
+again, there would be twice as many dimers, each able to bind to DNA in only one
+configuration, so that these two factors cancel each other. But now each dimers
+must necessarily be active or inactive independently of all other dimers, and
+therefore the probability of a repressor being active and the corresponding
+equation fold-change would be given by \eref[AppendixEq1][AppendixEq2],
+respectively. Upon changing the fourth powers to second powers, we expect that
+the fold-change curves will dramatically shift.
+
+Thus, by comparing fold-change measurements of a Lac repressor with and without
+the tetramerization region, we can immediately distinguish between these two
+models. \fref[figAllosteryModels1]\letter{A} shows fold-change data for the O2
+operator. As in the main text, we use the RBS 1027 data set to determine the
+thermodynamic parameters and then predict the remaining data sets with no
+further fitting. After removing the tetramerization region, we would predict
+that the fold-change curves shown in \fref[figAllosteryModels1]\letter{B} would
+result. In contrast, if the independent dimer model is correct, we would expect
+the fold-change curves to remain stationary when the tetramerization region is
+removed. These plots demonstrate the need to use theoretical models not merely
+to characterize known data, but to \textit{predict} the results of novel
+experiments.
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{SIfigure4.pdf}
+	\caption{{\bf Effects of removing tetramerization region of Lac repressor.}
+		\letterParen{A} Fold-change of tetrameric Lac repressor binding to the O2
+		operator. Assuming that both repressor dimers are simultaneously active or
+		inactive, \eref[AppendixEq4], the best fit parameters are $K_A = 45 \times
+		10^{-6}\,\text{M}$, $K_I = 3 \times 10^{-6}\,\text{M}$, and $\beta \varepsilon
+		= 4.5$. While these thermodynamic parameters are different from the
+		corresponding values found from the independent dimer model,
+		\eref[AppendixEq2], the resulting curves fit the data well. \letterParen{B}
+		Once the tetramerization region is removed, the predicted fold-change is given
+		by \eref[AppendixEq2] using these same thermodynamic parameters. The new
+		fold-change curves are markedly different from the original curves. The opaque
+		dots \textit{do not} represent data \talComment{not yet!}, but only server as a
+		reference point for the theoretical curves. } \label{figAllosteryModels1}
+\end{figure}
+
+Another interesting aspect of removing the tetramerization region is that the
+shift in the fold-change curves depends upon the $\varepsilon$ parameter.
+\fref[figAllosteryModels2] shows the corresponding predictions assuming that
+the repressor dimers are not independent and using the larger value $\beta
+\varepsilon = 0$. In this case, the corresponding shift upon removing the
+tetramerization is noticeably smaller. Hence, if a shift is observed in the
+fold-change curves, the size of the shift would be an indirect measurement of
+$\varepsilon$.
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{SIfigure3.pdf}
+	\caption{{\bf Dependence of tetramerization region removal on $\boldsymbol{\varepsilon}$.}
+		\letterParen{A} As in \fref[figAllosteryModels1], we fit fold-change of Lac repressor with a tetramerization region binding to the O2 operator, but this time forcing $\beta \varepsilon = 0$. Using \eref[AppendixEq4], the best fit parameters are $K_A = 60 \times 10^{-6}\,\text{M}$, $K_I = 10 \times 10^{-6}\,\text{M}$, and $\beta \varepsilon = 0$. \letterParen{B} With this smaller $\beta \varepsilon$ value, the corresponding theoretical predictions exhibit a much larger fold-change than those in \fref[figAllosteryModels1]\letter{B}.
+	}
+	\label{figAllosteryModels2}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sloppiness} \label{AppendixSloppiness}
+
+\talComment{An initial discussion of sloppiness and the $\varepsilon$ parameter. Needs to be updated with one of our actual data sets. Perhaps if we have enough data sets this sloppiness will go away?}
+
+We have all seen by now that we can wiggle the best fit parameters around and still get good fitting. To better visualize the problem, I took Stephanie's 2016-06-18 data for HG 104 and RBS 1027 and fit it to the form \eref[AppendixSloppinessEq1], forcing the $\beta \varepsilon_R$ to vary between -10 and 10. \fref[SIfig1] shows the results.
+\begin{figure}[h]
+	\centering \includegraphics{SIfigure1.pdf}
+	\caption{{\bf Many best fit parameters generate good fits.} \letterParen{A} I forced $\beta \varepsilon_R$ to take on a particular value and fit $K_A$ and $K_I$ to the data using \eref[AppendixSloppinessEq1]. All of the resulting fit curves look good. \letterParen{B} The best fit $K_A$ and $K_I$ values. This graph seemed quite provacative to me, since the values of $K_A$ and $K_I$ seem to be linear curves on this logarithmic plot.}
+	\label{SIfig1}
+\end{figure}
+
+Rather than continuing to beat around the bush, I thought it was time to tackle this issue head on. The following analysis is for the following $n=2$
+exponent form,
+\begin{align} \label{AppendixSloppinessEq1}
+\foldchange &= \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2 \left(1 + e^{-\beta \varepsilon_R} \right)}{\left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \varepsilon_R} \left( 1 + \frac{c}{K_I} \right)^2} \frac{2 \Rtot}{N_{NS}} e^{-\beta \Delta\varepsilon_{\text{O2}}^{(\text{Hernan})}}}\nonumber\\
+&\equiv \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2 \left(1 + e^{-\beta \varepsilon_R} \right)}{\left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \varepsilon_R} \left( 1 + \frac{c}{K_I} \right)^2} r},
+\end{align}
+where for notational convenience I have defined $r = \frac{2 \Rtot}{N_{NS}}
+e^{-\beta \Delta\varepsilon_{\text{O2}}^{(\text{Hernan})}}$ (with $r \approx 1$ for
+HG 104, using Hernan's values). Recall that $K_I < K_A$, since the inducer makes
+the repressor more likely to assume the inactive state. I will analyze this
+fold-change equation in the two limits: $e^{-\beta \varepsilon_R} \ll 1$ and
+$e^{-\beta \varepsilon_R} \gg 1$.
+
+\subsection{$\boldsymbol{e^{-\beta \varepsilon_R} \ll 1}$}
+
+In the limit $e^{-\beta \varepsilon_R} \ll 1$, the fold-change equation becomes
+\begin{align} \label{AppendixSloppinessEq2}
+\foldchange &= \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2}{\left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \varepsilon_R} \left(\frac{c}{K_I} \right)^2} r} \nonumber\\
+&\equiv \frac{1}{1+\frac{\left( 1 + \frac{c}{K_A} \right)^2}{\left( 1 + \frac{c}{K_A} \right)^2 + \left(\frac{c}{\widetilde{K}_I} \right)^2} r}.
+\end{align}
+where we have defined $\widetilde{K}_I = K_I e^{\beta \varepsilon_R/2}$. This
+suggests that what we are actually fitting $K_A$ and $\widetilde{K}_I$ in this
+regime, as confirmed by \fref[SIfig2] in the region $e^{-\beta \varepsilon_R} \ll 1$ (note that the $K_I e^{\beta \varepsilon_R/2}$ values do not change).
+%where we have made two approximations. First, we assumed $\left(1 + e^{-\beta
+% \varepsilon_R} \right) \approx 1$ in the numerator. Second, we used $\left( 1 +
+% \frac{c}{K_A} \right)^2 + e^{-\beta \varepsilon_R} \left( 1 + \frac{c}{K_I}
+% \right)^2 \approx \left( 1 + \frac{c}{K_A} \right)^2 + e^{-\beta \varepsilon_R}
+% \left(\frac{c}{K_I} \right)^2$ in the denominator because the $e^{-\beta
+% \varepsilon_R} \left(1 + \frac{c}{K_I} \right)^2$ term
+\begin{figure}[h]
+	\centering \includegraphics{SIfigure2.pdf} \caption{{\bf The altered
+			form of $K_I$ we are actually fitting when $\boldsymbol{e^{-\beta \varepsilon_R}
+				\ll 1}$.} Redrawing of \fref[SIfig1]\letter{B} showing $K_I$ and $\widetilde{K}_I
+		= K_I e^{\beta \varepsilon_R/2}$, the latter forming a straight line when
+		$e^{-\beta \varepsilon_R} \ll 1$.} \label{SIfig2}
+\end{figure}
+
+With only two effective parameters, you should be able to figure out their
+values without doing any fitting. To do this, consider three important
+characteristics of a titration curve: (1) the \textit{leakiness} equals the fold-change
+when $c=0$; (2) the \textit{dynamic range} equals the difference between the maximal
+fold-change at $c\to\infty$ and $c=0$; and $[EC_{50}]$ equals the concentration at
+which fold-change reaches halfway between its minimum and maximum values.
+
+Using \eref[AppendixSloppinessEq1], 
+\begin{align}
+\lim_{c = 0}\foldchange &= \frac{1}{1+r}\\
+\lim_{c \to \infty}\foldchange &= \frac{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1}{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1+r}
+\end{align}
+so that
+\begin{align}
+\text{leakiness} &= \frac{1}{1+r} \label{AppendixSloppinessEq3} \\
+\text{dynamic range} &= \frac{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1}{\left(\frac{K_A}{\widetilde{K}_I}\right)^2 + 1+r} - \frac{1}{1+r}. \label{AppendixSloppinessEq4}
+\end{align}
+Since you can read the leakiness and dynamic range straight off the data, \eref[AppendixSloppinessEq4] already gives us one relationship for $K_A$ and $\widetilde{K}_I$,
+\begin{equation} \label{AppendixSloppinessEq5}
+\frac{K_A}{\widetilde{K}_I} = \left( \left(1+r\right) \frac{\text{dynamic range} - \frac{1}{1+r}}{1-\text{dynamic range}} \right)^{1/2}.
+\end{equation}
+
+We next solve for $[EC_{50}]$, showing first an exact formula and then an approximation that can be achieved by noting that $\widetilde{K}_I < K_A$ and that $r \approx 1$,
+\begin{align}
+[EC_{50}] &= \frac{K_A \widetilde{K}_I^2 \left(1+r\right) + \sqrt{K_A^2 \widetilde{K}_I^2 \left(1+r\right) \left(K_A^2 + 2 \widetilde{K}_I^2 \left(1+r\right) \right)}}{K_A^2 + \widetilde{K}_I^2 \left(1+r\right)}\nonumber\\
+&\approx \widetilde{K}_I \left(1+r\right)^{1/2}.
+\end{align}
+Combining this formula with \eref[AppendixSloppinessEq5], we can directly find the value of our two parameters without resorting to fitting,
+\begin{align}
+\widetilde{K}_I &= \frac{[EC_{50}]}{\left(1+r\right)^{1/2}}\\
+K_A &= [EC_{50}] \left(\frac{\text{dynamic range} - \frac{1}{1+r}}{1-\text{dynamic range}} \right)^{1/2}.
+\end{align}
+
+
+\subsection{$\boldsymbol{e^{-\beta \varepsilon_R} \gg 1}$}
+
+In this limit, \eref[AppendixSloppinessEq1] becomes 
+\begin{equation}
+\foldchange = \frac{1}{1+\left(\frac{1 + \frac{c}{K_A}}{1 + \frac{c}{K_I}}\right)^2 r},
+\end{equation}
+since in the numerator $\left( 1 + e^{-\beta \varepsilon_R} \right) \approx
+e^{-\beta \varepsilon_R}$ while in the denominator the
+$\left(1+\frac{c}{K_A}\right)^2$ term is always smaller than the $e^{-\beta
+	\varepsilon_R} \left(1+\frac{c}{K_I}\right)^2$ term. In this case, we are also
+fitting only two parameters (only $K_A$ and $K_I$), and we see that the $\beta
+\varepsilon_R$ value should not influence these parameters, as is confirmed in
+\fref[SIfig1]\letter{B}.
+
+You can play the same game as in the previous section to get the values of these two parameters from the dynamic range and $[EC_{50}]$. For now, I skip the details and just write the results,
+\begin{align}
+K_I &= \frac{[EC_{50}]}{\left(2+r\right)^{1/2}-1}\\
+K_A &= [EC_{50}] \frac{r^{1/2}}{\left(2+r\right)^{1/2}-1} \left(\frac{\text{dynamic range}}{1-\text{dynamic range}}\right).
+\end{align}
+
+\subsection{Thoughts}
+
+It appears that in either regime, we are really fitting two parameters, and a
+third parameter is ``going along for the ride.'' I am not sure how to determine
+whether $e^{-\beta \varepsilon_R} \ll 1$ or $e^{-\beta \varepsilon_R} \gg 1$, since
+both regimes yield great (and very similar) fits. However, within the two
+regimes I now think that I understand exactly what $K_A$ and $K_I$ parameters
+will come out of fitting. We need another insight to get us the sign of $\beta
+\varepsilon$, and then I think the sloppiness in our best-fit parameters will be
+much more under control.

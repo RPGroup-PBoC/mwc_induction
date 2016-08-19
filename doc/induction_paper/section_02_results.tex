@@ -1,0 +1,200 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Results}
+
+\subsection*{The Monod-Wyman-Changeux (MWC) Model} 
+
+This paper builds upon an extensive dialogue between theory and experiment in
+transcriptional regulation. A first round of experiments measured the dependence
+of gene expression on repressor copy number and binding strength
+\cite{Garcia2011}. A second round of experiments pushed beyond the ``independent
+promoter approximation'' to acknowledge the fact that different genes compete
+for the same regulatory apparatus. Here too we were able to show that
+theoretical predictions of this subtle effect were consistent with their
+measured counterparts, even permitting the collapse of data from multiple
+experiments onto master curves \cite{Brewster2014, Weinert2014}. In the current
+paper, we consider yet another layer of complexity by analyzing signaling in the
+context of transcription.
+
+The ability of the the Lac repressor
+to regulate transcription has been previously characterized by an equilibrium
+model where the probability of each state of repressor and RNA polymerase
+occupancy is proportional to its Boltzmann weight \cite{Daber2011a,
+	Phillips2015a}. We begin with a summary of this model. Suppose there are \(P\)
+RNA polymerase (RNAP) and \(R\) repressor molecules in a cell. \(R_A\)
+repressors will be in the active state (the favored state when repressor is not
+bound to inducer; in this state the repressor binds tightly to DNA) and the
+remaining \(R_I\) repressors will be in the inactive state (the predominant
+state when repressor is bound to inducer; in this state the repressor binds
+weakly to DNA) so that \(R_A+R_I=R\).
+
+We first model the interaction between the Lac repressor and DNA by enumerating
+all possible states and their corresponding weights. As shown in
+\fref[figpolymeraseRepressorStates], the Lac promoter can either be empty,
+occupied by RNAP, or occupied by either an active or inactive repressor
+molecule. Assume that there are $N_{\text{NS}}$ non-specific sites on the DNA outside
+the Lac operator where RNAP or the Lac repressor can bind. \(\Delta\varepsilon_{PD}\)
+represents the energy difference between RNAP bound to the Lac operator or bound
+elsewhere on the DNA; \(\Delta\varepsilon_{RD,A}\) and \(\Delta\varepsilon_{RD,I}\) equal the
+difference in energy when the Lac repressor is bound to the Lac operator
+compared to when it is bound non-specifically elsewhere on the DNA in the active
+and inactive state, respectively. $\beta = \frac{1}{k_BT}$ where $k_B$ is
+Boltzmann's constant and $T$ is the temperature of the system.
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{figure1v3.pdf}
+	\caption{{\bf States and weights for simple repression.} Both RNAP (light blue)
+		and repressor compete for DNA binding. There are $R_A$ repressors in the active
+		state (green) and $R_I$ repressors in the inactive state (red), with the latter
+		type typically bound to inducer (gold). The difference in energy between a
+		repressor bound to the Lac operator and to another non-specific site on the DNA
+		equals $\Delta\epsilon_{RD,A}$ in the active state and $\Delta\epsilon_{RD,I}$
+		in the inactive state; the $P$ RNAP have a corresponding energy difference
+		$\Delta\epsilon_{PD}$. The number of active repressors $R_A$ includes
+		repressors that are unbound, singly bound, or doubly bound to inducer, although
+		the majority of active state repressors will not be bound to inducer (which
+		pushes them into the inactive state). Similarly, the $R_I$ term includes all
+		inactive state repressors bound to any number of inducer molecules, with the
+		most prevalent state shown in the figure. The factor of 2 in the repressor
+		weights comes from the ability of either repressor dimer to bind to DNA. }
+	\label{figpolymeraseRepressorStates}
+\end{figure}
+
+In thermodynamic models of transcription, gene expression is proportional to the
+probability $p_{\text{bound}}$ that RNAP is bound to the Lac operator which is
+given by
+\begin{equation}\label{eq2}
+p_{\text{bound}}(R)=\frac{p}{1+2r_A+2r_I+p},
+\end{equation}
+where
+\begin{align}
+p &= \frac{P}{N_{\text{NS}}}e^{-\beta  \Delta\varepsilon_{PD}} \\
+r_A &= \frac{R_A}{N_{\text{NS}}}e^{-\beta \Delta\varepsilon_{RD,A}} \\
+r_I &= \frac{R_I}{N_{\text{NS}}}e^{-\beta  \Delta\varepsilon_{RD,I}}.
+\end{align}
+Note the factor of 2 in the repressor states, which arises from the possibility
+that either repressor dimer may bind to DNA. Gene expression can be readily
+measured experimentally by exploiting the fold-change,
+\begin{equation}\label{eq3}
+\foldchange\equiv \frac{p_{\text{bound}}(R)}{p_{\text{bound}}(0)}=\frac{1+p}{1+2r_A+2r_I+p}.
+\end{equation}
+We can simplify this expression using two well-justified approximations: \(p\ll
+1\) and \(r_I\ll r_A\). The first approximation is called the weak promoter
+approximation and is valid for the wild type Lac promoter \cite{Brewster2012}.
+The second approximation follows because $e^{-\beta  \Delta\varepsilon_{RD,I}}$ is
+approximately 1000 times smaller than $e^{-\beta \Delta\varepsilon_{RD,A}}$ for
+the Lac repressor \cite{Daber2011a}. Using these approximations, the fold-change
+reduces to the form
+\begin{equation}\label{eq4}
+\foldchange\approx \frac{1}{1+2r_A}=\left(1+\frac{2R_A}{N_{\text{NS}}}e^{-\beta  \Delta\varepsilon_{RD,A}}\right)^{-1}.
+\end{equation}
+
+We now introduce the role of inducer binding, which changes the number of
+repressors in the active and inactive allosteric states. We begin by defining
+\(p_A(c) \equiv \frac{R_A(c)}{R}\) to be the fraction of repressors in the
+active state given a concentration \(c\) of the inducer IPTG, so that %We define
+% \(V\) as the volume
+%of an \textit{E. coli} cell, \([R]=\frac{R}{V}\) as the concentration of
+%repressors, and \(\K=\frac{N_{\text{NS}}}{V}e^{\beta
+% \Delta\varepsilon_{RD,A}}\)
+%as the dissociation constant of the active repressor binding to the Lac
+% operator
+%DNA. This last expression, which links the physical energies of the system with
+%the language of dissociation constants and chemical rates, is discussed in
+%detail in the Supplementary Information.
+\eref[eq4] becomes
+\begin{equation}
+\foldchange = \left( 1+p_A(c) \frac{2 R}{N_{\text{NS}}}e^{-\beta 
+	\Delta\varepsilon_{RD,A}} \right)^{-1}. \label{eq5}
+\end{equation}
+%\begin{align}
+%\foldchange &= \left( 1+\frac{2p_A(c) [R] V}{N_{\text{NS}}}e^{-\beta  \Delta\varepsilon
+%	_{RD,A}} \right)^{-1} \nonumber \\
+%&= \left( 1+\frac{2p_A(c) [R]}{\K} \right)^{-1}. \label{eq5}
+%\end{align}
+
+The Lac repressor is a tetrameric protein, a dimer of dimers, with four
+identical binding sites for an inducer. It is unknown whether the two dimers are
+allosterically independent (i.e. whether one dimer can be active while the other
+is inactive) or allosterically linked (with both dimers being either
+simultaneously active or simultaneously inactive). While no direct measurements
+have as of yet been carried out to definitively distinguish between these two
+models, in Appendix \ref{AppendixAllostery} we describe a simple experiment
+which can do precisely this. \talComment{Rob, this is super cool! If you agree
+	with this theory and approve of the simple experiment, we plan to do it!}. In
+this paper, we proceed with the assumption that the two repressor dimers are
+allosterically independent.
+
+\begin{figure}[h]
+	\centering \includegraphics[scale=\globalScalePlots]{figure2v2.pdf}
+	\caption{{\bf The eight states of a Lac repressor dimer.} The Lac repressor has
+		an active conformation (green, left column) and inactive conformation (red,
+		right column), with the energy difference between these two states given by
+		$\varepsilon$. In each conformation, the repressor can bind an inducer (gold) at
+		two sites. Each state is shown with its corresponding Boltzmann weight. The top
+		dimer can be in the active or inactive state independent of the bottom dimer.
+		The top dimer is drawn partly opaque because its different states will not
+		effect the probability that the bottom dimer is active. %		If the sum of the
+		% active state weights shown (bottom left) is greater than the sum of
+		%		the inactive state weights (bottom right), the repressor is more likely to be
+		%		in the active state.
+	} \label{figrepressorInducerStates}
+\end{figure}
+
+As shown in \fref[figrepressorInducerStates], we can enumerate the relative
+likelihood of the eight possible conformations of a repressor dimer (the dimer
+can be in an active or inactive state, and each of its two inducer binding sites
+can be empty or occupied), using the difference in energy $\varepsilon$ between a
+Lac repressor dimer in the active and inactive state. From these eight states, we can
+compute the probability \(p_A(c)\) that a dimer will be in the active state
+as the sum of the weights of the active states divided by the sum of the weights
+of every possible state, namely,
+\begin{equation}\label{eq6}
+p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^2}.
+\end{equation}
+
+%Note that in the \fref[figrepressorInducerStates] states and weights, we assumed
+%that within the Lac tetramer, each Lac dimer could be active or inactive
+%independently of the other dimer. An alternative model presumes that . While no
+%direct experimental measurements have been yet been carried out to definitively
+%distinguish between these two models, in Appendix \ref{AppendixAllostery} we
+%describe a simple experiment where upon removing the tetramerization region of
+%the Lac repressor we can distinguish between these two models. \talComment{Rob,
+%	this is super cool!!! If you agree with the theory in this Appendix, let us know
+%	if you approve of us carrying out this experiment!}
+
+It is hypothesized that in the absence of inducer ($c=0$), all of the repressors
+are present in the active state, which implies $\beta \varepsilon \gg 1$. As
+discussed in Appendix \ref{AppendixModel}, this assertion seems supported by the
+available data, but must ultimately be validated by direct measurement, as is
+possible by NMR \cite{Gardino2003, Boulton2016}. Given $\beta \varepsilon \gg
+1$, we can approximate the term $e^{-\beta \varepsilon}
+\left(1+\frac{c}{K_I}\right)^2 \approx e^{-\beta  \varepsilon
+}\left(\frac{c}{K_I}\right)^2$ in the denominator of \eref[eq6]. To see this,
+note that both expressions are negligible compared to
+$\left(1+\frac{c}{K_A}\right)^2$ for small $c$; on the other hand, the term
+$e^{-\beta \varepsilon} \left(1+\frac{c}{K_I}\right)^2$ becomes non-negligible
+once $e^{-\beta \varepsilon }\left(\frac{c}{K_I}\right)^2 \gtrsim 1$, in which
+case $\frac{c}{K_I} \gg 1$ so that our approximation is again valid. Therefore,
+we can approximate the probability that a repressor dimer is active as
+\begin{equation}\label{eq6v2}
+p_A(c) \approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(\frac{c}{K_I}\right)^2} \equiv \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2},
+\end{equation}
+where we have introduced the effective dissociation constant $\KIeff = K_I
+e^{\beta  \varepsilon/2}$. Substituting this result into \eref[eq5] yields the
+complete formula
+\begin{equation}\label{eq7}
+\foldchange= \left(
+1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2}\frac{2 R}{N_{\text{NS}}}e^{-\beta \Delta\varepsilon_{RD,A}} \right)^{-1},
+\end{equation}
+%\begin{equation}\label{eq7}
+%\foldchange= \left(
+%1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2}\frac{2[R]}{\K} \right)^{-1},
+%\end{equation}
+which predicts that given a concentration \(c\) of the inducer IPTG, \(R\)
+copies of the Lac repressor, and the $N_{\text{NS}} = 4.6 \times 10^6$
+non-specific binding sites on the \textit{E. coli} genome, the fold-change in
+gene expression will depend solely on 3 parameters: the DNA binding affinity of
+the repressor ($\Delta\varepsilon_{RD,A}$) and the inducer binding affinities
+for the repressor in the active state (\(K_A\)) and inactive state (\(\KIeff\)),
+with this latter quantity also incorporating the difference in free energy
+between the active and inactive states of the repressor.

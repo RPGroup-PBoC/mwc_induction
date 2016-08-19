@@ -1,0 +1,20 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{\textcolor{blue}{To Do}}
+
+\begin{enumerate}
+	\item Get repressor states and weights figured out before we send anything to Rob
+	
+	\item Stephanie's latest idea: Recast the Franz/Brewster data in terms of the summation scheme rather than the neat formula (which does not account for small copy numbers of operator or large copy numbers of repressor). See paper ``Statistical mechanical model of coupled transcription from multiple promoters due to transcription factor titration''
+	\begin{itemize}
+		\item It would be great to be able to also use the $x$-measurement error in the fit to Rob's data!
+	\end{itemize}
+	
+	\item Discussion of $\varepsilon$ parameter and the implications of its sloppiness. The other parameters are fixed once you nail down $\varepsilon$. Introduce Rob Brewster's data  which shows (using Stephanie's version 1 or version 2) that it is probably at least $\varepsilon > 0$, but this can not be determined exclusively. However, once you choose a parameter value, the other parameters will adjust to accommodate this.
+	\begin{enumerate}
+		\item Question: Will the mutants data be able to nail this down further?
+	\end{enumerate}
+	
+	\item \talComment{I am personally advocating shoving the model derivation to an Appendix. Introducing terms such as $p$, $r_A$, $r_I$ which the reader will never see again is just wasting brain space in their attempt to understand the paper. We should just quote the definition of fold-change and then skip to the result, with the details in an Appendix.}
+	
+	\item Get proper error on fit parameters. MCMC to get credible region (it would be interesting if this is significantly different from the confidence interval)?
+\end{enumerate}
