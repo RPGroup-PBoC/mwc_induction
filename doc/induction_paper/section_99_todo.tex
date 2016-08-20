@@ -1,20 +1,52 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{\textcolor{Green}{Points do discuss with Rob at next Meeting}}
+\begin{itemize}
+	\item \robComment{Please remind me about the number of binding sites. Are there
+		two binding sites for the dimer or the tetramer?}
+	
+	\item \robComment{Do we believe that removing the tetramerization region will
+		not alter $K_A$, $K_I$, or $e^{\beta \epsilon}$? I understand that within the
+		MWC framework it does what you are saying, but the worry has to be that there
+		are changes to the protein that are not within the framework of the MWC model.
+		We can discuss this further.} \talComment{I feel like such an approximation is
+		in line with our thinking on the mutants. It may ultimately be wrong, but let's
+		see how far we can go with it.}
+\end{itemize}
+
 \section*{\textcolor{blue}{To Do}}
 
 \begin{enumerate}
-	\item Get repressor states and weights figured out before we send anything to Rob
-	
-	\item Stephanie's latest idea: Recast the Franz/Brewster data in terms of the summation scheme rather than the neat formula (which does not account for small copy numbers of operator or large copy numbers of repressor). See paper ``Statistical mechanical model of coupled transcription from multiple promoters due to transcription factor titration''
-	\begin{itemize}
-		\item It would be great to be able to also use the $x$-measurement error in the fit to Rob's data!
+	\item Stephanie's latest idea: Recast the Franz/Brewster data in terms of the
+	summation scheme rather than the neat formula (which does not account for small
+	copy numbers of operator or large copy numbers of repressor). See paper
+	``Statistical mechanical model of coupled transcription from multiple promoters
+	due to transcription factor titration'' \begin{itemize} \item It would be great
+		to be able to also use the $x$-measurement error in the fit to Rob's data!
 	\end{itemize}
 	
-	\item Discussion of $\varepsilon$ parameter and the implications of its sloppiness. The other parameters are fixed once you nail down $\varepsilon$. Introduce Rob Brewster's data  which shows (using Stephanie's version 1 or version 2) that it is probably at least $\varepsilon > 0$, but this can not be determined exclusively. However, once you choose a parameter value, the other parameters will adjust to accommodate this.
-	\begin{enumerate}
-		\item Question: Will the mutants data be able to nail this down further?
-	\end{enumerate}
+	\item Discussion of $\varepsilon$ parameter and the implications of its
+	sloppiness. The other parameters are fixed once you nail down $\varepsilon$.
+	Introduce Rob Brewster's data  which shows (using Stephanie's version 1 or
+	version 2) that it is probably at least $\varepsilon > 0$, but this can not be
+	determined exclusively. However, once you choose a parameter value, the other
+	parameters will adjust to accommodate this. \begin{enumerate} \item Question:
+		Will the mutants data be able to nail this down further? \end{enumerate}
 	
-	\item \talComment{I am personally advocating shoving the model derivation to an Appendix. Introducing terms such as $p$, $r_A$, $r_I$ which the reader will never see again is just wasting brain space in their attempt to understand the paper. We should just quote the definition of fold-change and then skip to the result, with the details in an Appendix.}
+	\item \talComment{Thoughts on presenting our O1, O2, O3, Oid data. We should
+		distinguish the O2 RBS 1027 curve in some way (perhaps make it dashed) so that
+		we can clearly state that: ``only a \textit{single} dataset (O2 RBS 1027,
+		dashed) was used to fit the thermodynamic parameters, after which all of the
+		remaining titration curves for all other O2 strains as well as all the O1, O3,
+		Oid strains became completely constrained predictions without any further
+		fitting.``}
 	
-	\item Get proper error on fit parameters. MCMC to get credible region (it would be interesting if this is significantly different from the confidence interval)?
+	\item \talComment{I am personally advocating shoving the model derivation to an
+		Appendix. Introducing terms such as $p$, $r_A$, $r_I$ which the reader will
+		never see again is just wasting brain space in their attempt to understand the
+		paper. We should just quote the definition of fold-change and then skip to the
+		result, with the details in an Appendix.}
+	
+	\item Get proper error on fit parameters. MCMC to get credible region (it would
+	be interesting if this is significantly different from the confidence
+	interval)?
 \end{enumerate}
