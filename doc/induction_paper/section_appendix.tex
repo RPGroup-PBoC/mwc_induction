@@ -234,13 +234,80 @@ K_I &= \frac{[EC_{50}]}{\left(2+r\right)^{1/2}-1}\\
 K_A &= [EC_{50}] \frac{r^{1/2}}{\left(2+r\right)^{1/2}-1} \left(\frac{\text{dynamic range}}{1-\text{dynamic range}}\right).
 \end{align}
 
-\subsection{Thoughts}
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Detailed Explanation of the Sloppiness Approximation}
 
-It appears that in either regime, we are really fitting two parameters, and a
-third parameter is ``going along for the ride.'' I am not sure how to determine
-whether $e^{-\beta \varepsilon_R} \ll 1$ or $e^{-\beta \varepsilon_R} \gg 1$, since
-both regimes yield great (and very similar) fits. However, within the two
-regimes I now think that I understand exactly what $K_A$ and $K_I$ parameters
-will come out of fitting. We need another insight to get us the sign of $\beta
-\varepsilon$, and then I think the sloppiness in our best-fit parameters will be
-much more under control.
+In this section, we show that the approximation 
+\begin{equation}
+p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta \epsilon }\left(1+\frac{c}{K_I}\right)^2}\approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta
+		\epsilon }\left(\frac{c}{K_I}\right)^2}
+\end{equation}
+is valid provided \(\beta \epsilon \gg 1\). In terms of the dimensionless
+parameters \(\tilde{c}=\frac{c}{K_A}\) and \(\tilde{K}=\frac{K_I}{K_A}\), the
+exact and approximate forms become
+\begin{equation} \label{AppendixEqSloppiness}
+p_A\left(\tilde{c}\right)=\frac{\left(1+\tilde{c}\right)^2}{\left(1+\tilde{c}\right)^2+e^{-\beta \epsilon }\left(1+\frac{\tilde{c}}{\tilde{K}}\right)^2}\approx
+\frac{\left(1+\tilde{c}\right)^2}{\left(1+\tilde{c}\right)^2+e^{-\beta \epsilon }\left(\frac{\tilde{c}}{\tilde{K}}\right)^2}.
+\end{equation}
+
+To give a sense of the parameters, our standard fitting methods predicted
+\(K_A=45 \times 10^{-6}\,\text{M}\), \(K_I=3 \times 10^{-6}\,\text{M}\), and
+\(\beta \epsilon =4.5\) using data in the range \(c\in
+\left[10^{-7},10^{-2}\right]\text{M}\). This corresponds to the dimensionless parameter
+\(\tilde{K}=\frac{1}{15}\) and the dimensionless range of concentrations \(\tilde{c}\in \left[10^{-3},10^3\right]\). \fref[SIfigSloppiness] shows a plot of both forms of
+$p_A(\tilde{c})$ from \eref[AppendixEqSloppiness] using these values,
+demonstrating visually that the approximation is valid.
+
+\begin{figure}[h]
+	\centering \includegraphics{sloppinessExplanation.pdf} \caption{{\bf An
+			approximation of the probability \(\boldsymbol{p_A\left(\tilde{c}\right)}\) that the Lac
+			repressor will be active.} Using \(\beta \epsilon =4.5\) and
+		\(\tilde{K}=\frac{1}{15}\), the approximate form in \eref[AppendixEqSloppiness]
+		is nearly identical to the exact form.} \label{SIfigSloppiness}
+\end{figure}
+
+To demonstrate the validity of this approximation analytically, we first rewrite \(p_A\left(\tilde{c}\right)\) as 
+\begin{equation}
+p_A\left(\tilde{c}\right)=\frac{1}{1+e^{-\beta \epsilon }\frac{\left(1+\frac{\tilde{c}}{\tilde{K}}\right)^2}{\left(1+\tilde{c}\right)^2}}
+\end{equation}
+and then expand each term in the numerator,
+\begin{equation}
+p_A\left(\tilde{c}\right)=\frac{1}{1+e^{-\beta \epsilon }\frac{1}{\left(1+\tilde{c}\right)^2}+2e^{-\beta \epsilon }\frac{\frac{\tilde{c}}{\tilde{K}}}{\left(1+\tilde{c}\right)^2}+e^{-\beta
+		\epsilon }\frac{\left(\frac{\tilde{c}}{\tilde{K}}\right)^2}{\left(1+\tilde{c}\right)^2}}.
+\end{equation}
+
+First, note that the term \(e^{-\beta \epsilon }\frac{1}{\left(1+\tilde{c}\right)^2}\) satisfies
+\begin{equation}
+e^{-\beta \epsilon }\frac{1}{\left(1+\tilde{c}\right)^2}<e^{-\beta \epsilon }\ll 1
+\end{equation}
+and can therefore be dropped from the denominator since it is overwhelmed by the
+\(1\) term preceding it. Next, consider the term \(2e^{-\beta \epsilon
+}\frac{\frac{\tilde{c}}{\tilde{K}}}{\left(1+\tilde{c}\right)^2}\). For small
+\(\tilde{c}\) (when $e^{-\beta \epsilon }\frac{\tilde{c}}{\tilde{K}}\lesssim 1$),
+this term is dominated by the 1 term. The opposite limit of large $\tilde{c}$
+(when \(e^{-\beta \epsilon }\frac{\tilde{c}}{\tilde{K}}\gtrsim 1\)), necessarily
+implies \(\frac{\tilde{c}}{\tilde{K}}\gg 1\) by virtue of \(e^{-\beta \epsilon }\ll
+1\). But if
+\(\frac{\tilde{c}}{\tilde{K}}\gg 1\), then the \(2e^{-\beta \epsilon
+}\frac{\frac{\tilde{c}}{\tilde{K}}}{\left(1+\tilde{c}\right)^2}\) term is
+dominated by the \(e^{-\beta \epsilon
+}\frac{\left(\frac{\tilde{c}}{\tilde{K}}\right)^2}{\left(1+\tilde{c}\right)^2}\)
+term. In other words, regardless of the value of \(\tilde{c}\), this term can be
+neglected due to one of the other terms,
+\begin{equation}
+\begin{cases} 
+2e^{-\beta \epsilon }\frac{\frac{\tilde{c}}{\tilde{K}}}{\left(1+\tilde{c}\right)^2}\ll 1 & e^{-\beta \epsilon }\frac{\tilde{c}}{\tilde{K}}\lesssim 1 \\
+2e^{-\beta \epsilon }\frac{\frac{\tilde{c}}{\tilde{K}}}{\left(1+\tilde{c}\right)^2}\ll e^{-\beta \epsilon }\frac{\left(\frac{\tilde{c}}{\tilde{K}}\right)^2}{\left(1+\tilde{c}\right)^2} & e^{-\beta \epsilon }\frac{\tilde{c}}{\tilde{K}}\gtrsim 1.
+\end{cases}
+\end{equation}
+After dropping this term, we arrive at the desired form of \(p_A\left(\tilde{c}\right)\), namely,
+\begin{equation}
+p_A\left(\tilde{c}\right)=\frac{1}{1+e^{-\beta \epsilon }\frac{\left(\frac{\tilde{c}}{\tilde{K}}\right)^2}{\left(1+\tilde{c}\right)^2}}=\frac{\left(1+\tilde{c}\right)^2}{\left(1+\tilde{c}\right)^2+e^{-\beta
+		\epsilon }\left(\frac{\tilde{c}}{\tilde{K}}\right)^2}.
+\end{equation}
+
+Of course, the real benefit of this form is that it permits us to absorb \(\beta \epsilon\) into \(\tilde{K}\), thereby removing all sloppiness from
+our model!
+
+\pagebreak
