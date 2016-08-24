@@ -70,6 +70,37 @@ def fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r):
             (1 + np.exp(-epsilon)) * np.exp(-epsilon_r))
 
 #=============================================================================== 
+
+def bohr_fn(df, ea, ei, epsilon=4.5):
+    '''
+    Computes the Bohr parameter for the data in a DataFrame df as a function
+    of the MWC parameters ea and ei
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame containing all the data for which to calculate the bohr
+        parameter
+    ea, ei : float.
+        Minus log of the dissociation constants of the active and the inactive 
+        states respectively.
+    epsilon : float.
+        energy difference between the active and the inactive state.
+    
+    Returns
+    -------
+    bohr : array-like.
+        Array with all the calculated Bohr parameters.
+    '''
+    bohr_param = []
+    for i in range(len(df)):
+        pact = pact_log(IPTG=df.iloc[i].IPTG_uM, ea=ea, ei=ei,
+                            epsilon=epsilon)
+        F = -np.log(2 * df.iloc[i].repressors / 4.6E6 * pact * \
+                (1 + np.exp(-4.5)) * np.exp(-df.iloc[i].binding_energy))
+        bohr_param.append(F)
+    return bohr_param 
+
+#=============================================================================== 
 # Non-linear regression
 #=============================================================================== 
 
