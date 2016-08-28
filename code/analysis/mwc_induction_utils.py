@@ -622,3 +622,44 @@ def mcmc_cred_region(IPTG, flatchain, R, epsilon_r,
         cred_region[:, i] = hpd(fc, mass_frac)
     
     return cred_region
+
+#=============================================================================== 
+
+def mcmc_cred_reg_error_prop(IPTG, flatchain, mass_frac=.95, epsilon=4.5):
+    '''
+    This function takes every element in the MCMC flatchain and computes the
+    fold-change for each IPTG concentration returning at the end the indicated
+    mass_frac fraction of the fold change.
+    Parameters
+    ----------
+    IPTG : array-like.
+        IPTG concentrations on which evaluate the fold change
+    flatchain : array-like.
+        MCMC traces for the two MWC parameteres.
+        flatchain[:,0] = ea flat-chain
+        flatchain[:,1] = ei flat-chain
+        flatchain[:,2] = R flat-chain
+        flatchain[:,3] = epsilon_r flat-chain
+    mass_frac : float with 0 < mass_frac <= 1
+        The fraction of the probability to be included in
+        the HPD.  For example, `massfrac` = 0.95 gives a
+        95% HPD.
+    epsilon : float.
+        Energy difference between active and inactive state.
+    Returns
+    -------
+    cred_region : array-like
+        array of 2 x len(IPTG) with the upper and the lower fold-change HPD 
+        bound for each IPTG concentration
+    '''
+    # initialize the array to save the credible region
+    cred_region = np.zeros([2, len(IPTG)])
+    
+    # loop through IPTG concentrations, compute all the fold changes and
+    # save the HPD for each concentration
+    for i, c in enumerate(IPTG):
+        fc = fold_change_log(c, flatchain[:,0], flatchain[:, 1], epsilon,
+                flatchain[:,2], flatchain[:,3])
+        cred_region[:, i] = hpd(fc, mass_frac)
+    
+    return cred_region
