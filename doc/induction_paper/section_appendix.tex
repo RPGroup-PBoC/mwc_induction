@@ -151,7 +151,7 @@ In the absence of inducer ($c = 0$), we can rewrite this equation as
 1+\frac{1}{1+e^{-\beta \epsilon}}\frac{2 R}{N_{\text{NS}}}e^{-\beta \Delta\varepsilon_{RD,A}} \right)^{-1} = \left(
 1+\frac{2 R}{N_{\text{NS}}}e^{-\beta \left( \Delta\tilde{\varepsilon}_{RD,A} \right) } \right)^{-1},
 \end{equation}
-where we have defined $\Delta\tilde{\varepsilon}_{RD,A} = \Delta\varepsilon_{RD,A} + \frac{1}{\beta} \log \left( 1 + e^{-\beta \epsilon} \right) $. Historically, the DNA binding energy $\Delta\varepsilon_{RD,A}$ was measured by fitting fold-change of multiple strains at $c = 0$, using measured values of $R$ (from quantitative PCR) and $N_{\text{NS}} = 4.6
+where we have defined $\Delta\tilde{\varepsilon}_{RD,A} = \Delta\varepsilon_{RD,A} + \frac{1}{\beta} \log \left( 1 + e^{-\beta \epsilon} \right) $. Historically, the DNA binding energy $\Delta\varepsilon_{RD,A}$ was measured by fitting fold-change of multiple strains at $c = 0$, using measured values of $R$ (from quantitative Western blots) and $N_{\text{NS}} = 4.6
 \times 10^6$ from the \textit{E. coli} genome size \cite{Garcia2011}. The value $\Delta\tilde{\varepsilon}_{RD,A}$ can be extracted from the data, but it was assumed that nearly all Lac repressors were active ($\beta \epsilon \gg 1$) so that $\Delta\tilde{\varepsilon}_{RD,A} \approx \Delta\varepsilon_{RD,A}$. In the following analysis, we will relax this assumption so that the full form of fold-change, incorporating all of the known parameter values, becomes
 \begin{equation} \label{SIFullFoldChangeExpression}
 \foldchange= \left(
@@ -166,7 +166,7 @@ sections.
 \subsection{Degeneracy or Sloppiness in Parameter Values}
 
 Non-linear regression (using least-squares or MCMC) is a standard tool to
-extract thermodynamic parameters from data. However, care must be taken when
+extract parameters from data. However, care must be taken when
 degenerate sets of parameters yield identical curves, since it may be impossible
 to determine the correct choice of ``best-fit parameters'' from the spectrum of
 potential candidates \cite{Transtrum2015}. This phenomenon, sometimes dubbed
@@ -216,7 +216,7 @@ $1/(1+e^{-\beta\epsilon})$ of active repressors in the absence of IPTG
 \cite{Gardino2003, Boulton2016}.
 
 To make further analytic progress, we will assume that $e^{- \beta \epsilon} \ll
-1$. This assumption must ultimately be validated by a measurement of $\beta
+1$. \manuelComment{Can we use Stephanie's insight to get the $e^{-\beta \epsilon} \ll  1$ assumption? \talComment{I don't think so. Not only does that ignore her new insight on the operator copy number mattering, but I also don't know how definitive the 1st version analysis was (i.e. I know that $\beta \epsilon = 4.5$ emerged out of it, but I don't know how much better that is than lower $\beta \epsilon$ values.)}} This assumption must ultimately be validated by a measurement of $\beta
 \epsilon$, but we note since wild type \textit{E. coli} has $R=11$ repressors
 total, negative $\beta \epsilon$ would imply that at most five repressors are
 active in the absence of IPTG.
@@ -231,7 +231,7 @@ In the regime $e^{- \beta \epsilon} \ll
 \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left( e^{-\beta \epsilon/2}\frac{c}{K_I}\right)^2}.\label{eqSIstep3}
 \end{align}
 In the first step we approximated the numerator as $1 + e^{-\beta \epsilon}
-\approx 1$. In the second step, we note that $\left(1+\frac{c}{K_A}\right)^2 >
+\approx 1$. In the second step, we note that $\left(1+\frac{c}{K_A}\right)^2 \ge
 1$ so that adding the small $e^{-\beta \epsilon/2}$ term to $e^{-\beta
 	\epsilon/2}\frac{c}{K_I}$ before squaring will make little difference. This last
 assumption will be rigorously analyzed in the following section, where we
@@ -239,7 +239,7 @@ quantify the error in going from \eref[eqSIstep2] to \eref[eqSIstep3]. For now,
 we note that inserting the fractional form \eref[eqSIstep3] back into the
 fold-change equation \eref[SIFullFoldChangeExpression] yields,
 \begin{equation} \label{SIFullFoldChangeExpressionSloppiless}
-\foldchange \left(
+\foldchange = \left(
 1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2}\frac{2 R}{N_{\text{NS}}}e^{-\beta \Delta\tilde{\varepsilon}_{RD,A}} \right)^{-1},
 \end{equation}
 where we have introduced the new parameter $\KIeff = K_I e^{\beta \epsilon/2}$. In this form, it is clear that only $K_A$ and the parameter combination $\KIeff$ can be extracted from fold-change data.
@@ -276,8 +276,7 @@ obtain
 \begin{equation}
 c^* \approx \frac{K_I}{2 K_A} \left( \sqrt{1+4\frac{1-\frac{K_I}{K_A}}{\left( \frac{K_I}{K_A} \right)^2 + 2 e^{- \beta \epsilon}}} - 1 \right).
 \end{equation}
-This formula yields $c^* \approx 0\,\,\mu\text{M}$ which is the correct order of
-magnitude. We now substitute $c=c^*$ to obtain the difference between the exact
+We now substitute $c=c^*$ to obtain the difference between the exact
 and approximate expressions, \eref[eqSIstep2][eqSIstep3], taking another Taylor
 series about $e^{- \beta \epsilon} \ll 1$ to obtain the maximum difference in
 our approximation,
