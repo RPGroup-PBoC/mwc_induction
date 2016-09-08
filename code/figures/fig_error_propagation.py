@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 
 # Import the project utils
+import sys
+sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 
 # Import matplotlib stuff for plotting
@@ -59,16 +61,24 @@ df = pd.concat(pd.read_csv(f, comment='#') for f in read_files)
 df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 
 #=============================================================================== 
-# O2 RBS1027
+# Load MCMC flatchain
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/' + '20160815' + \
-                  '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
+with open('../../data/mcmc/' + '20160905' + \
+                  '_error_prop_pool_data_larger_sigma.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     
+# Generate a Pandas Data Frame with the mcmc chain
+columns = np.concatenate([['ea', 'ei', 'sigma'],\
+          [df[df.repressors==r].rbs.unique()[0] for r in \
+              np.sort(df.repressors.unique())],
+          [df[df.binding_energy==o].operator.unique()[0] for o in \
+              np.sort(df.binding_energy.unique())]])
+
+mcmc_df = pd.DataFrame(gauss_flatchain, columns=columns)
 # map value of the parameters
-ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
+map_param = dict(mcmc_df.mean())
 
 #=============================================================================== 
 # Plot the theory vs data for all 4 operators with the credible region
@@ -80,7 +90,7 @@ IPTG = np.logspace(-8, -2, 100)
 colors = sns.color_palette(n_colors=7)
 
 # Define the operators and their respective energies
-operators = ['O2', 'O1', 'O3', 'Oid']
+operators = ['O1', 'O2', 'O3'] #, 'O3', 'Oid']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize subplots
@@ -94,17 +104,18 @@ for i, op in enumerate(operators):
     for j, rbs in enumerate(df.rbs.unique()):
         # plot the theory using the parameters from the fit.
         ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
-            ea=ea, ei=ei, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op]),
+            ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
+            R=map_param[rbs],
+            epsilon_r=map_param[op]),
             color=colors[j])
-        # plot 95% HPD region using the variability in the MWC parameters
-        cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
+
+        # plot 95% HPD region using the variability in the parameters
+        flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
+        cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6, 
+            flatchain, epsilon=4.5)
         ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
                         alpha=0.3, color=colors[j])
+
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
@@ -122,70 +133,4 @@ for i, op in enumerate(operators):
     ax[i].set_title(op)
 ax[0].legend(loc='upper left', title='repressors / cell')
 plt.tight_layout()
-plt.savefig(output + '/fig_theory_vs_data_O2_RBS1027_fit.pdf')
-
-#=============================================================================== 
-# O2 Global minus wild-type fit
-#=============================================================================== 
-# Load the flat-chain
-with open('../../data/mcmc/' + '20160815' + \
-                  '_gauss_homoscedastic_pool_data.pkl', 'rb') as file:
-    unpickler = pickle.Unpickler(file)
-    gauss_flatchain = unpickler.load()
-    
-# map value of the parameters
-ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
-
-#=============================================================================== 
-# Plot the theory vs data for all 4 operators with the credible region
-#=============================================================================== 
-# Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-8, -2, 100)
-
-# Set the colors for the strains
-colors = sns.color_palette(n_colors=7)
-
-# Define the operators and their respective energies
-operators = ['O2', 'O1', 'O3', 'Oid']
-energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
-
-# Initialize subplots
-fig, ax = plt.subplots(2, 2, figsize=(11, 8))
-ax = ax.ravel()
-
-# Loop through operators
-for i, op in enumerate(operators):
-    data = df[df.operator==op]
-    # loop through RBS mutants
-    for j, rbs in enumerate(df.rbs.unique()):
-        # plot the theory using the parameters from the fit.
-        ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
-            ea=ea, ei=ei, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op]),
-            color=colors[j])
-        # plot 95% HPD region using the variability in the MWC parameters
-        cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j])
-        # compute the mean value for each concentration
-        fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
-        # compute the standard error of the mean
-        fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
-        np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
-        
-        # plot the experimental data
-        ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-            yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
-            color=colors[j])
-    ax[i].set_xscale('log')
-    ax[i].set_xlabel('IPTG (M)')
-    ax[i].set_ylabel('fold-change')
-    ax[i].set_ylim([-0.01, 1.2])
-    ax[i].set_title(op)
-ax[0].legend(loc='upper left', title='repressors / cell')
-plt.tight_layout()
-plt.savefig(output + '/fig_theory_vs_data_O2_pool_data_fit.pdf')
+plt.savefig(output + '/fig_error_propagation.pdf')

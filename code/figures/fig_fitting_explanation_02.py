@@ -39,7 +39,7 @@ dropbox = open('../../doc/induction_paper/graphicspath.tex')
 output = dropbox.read()
 output = re.sub('\\graphicspath{{', '', output)
 output = output[1::]
-output = re.sub('}}\n', '', output)
+output = re.sub('}}\n', '', output + '/extra_figures')
 
 #=============================================================================== 
 # Read the data
@@ -62,21 +62,13 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 # O2 RBS1027
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/' + '20160827' + \
-                  '_error_prop_pool_data.pkl', 'rb') as file:
+with open('../../data/mcmc/' + '20160815' + \
+                  '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     
-# Generate a Pandas Data Frame with the mcmc chain
-columns = np.concatenate([['ea', 'ei', 'sigma'],\
-          [df[df.repressors==r].rbs.unique()[0] for r in \
-              np.sort(df.repressors.unique())],
-          [df[df.binding_energy==o].operator.unique()[0] for o in \
-              np.sort(df.binding_energy.unique())]])
-
-mcmc_df = pd.DataFrame(gauss_flatchain, columns=columns)
 # map value of the parameters
-map_param = dict(mcmc_df.mean())
+ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
 
 #=============================================================================== 
 # Plot the theory vs data for all 4 operators with the credible region
@@ -88,47 +80,50 @@ IPTG = np.logspace(-8, -2, 100)
 colors = sns.color_palette(n_colors=7)
 
 # Define the operators and their respective energies
-operators = ['O1', 'O2'] #, 'O3', 'Oid']
+operators = ['O2']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize subplots
-fig, ax = plt.subplots(1, 2, figsize=(11, 4))
-#ax = ax.ravel()
+fig = plt.figure()
+ax = plt.subplot(111)
 
 # Loop through operators
 for i, op in enumerate(operators):
     data = df[df.operator==op]
     # loop through RBS mutants
     for j, rbs in enumerate(df.rbs.unique()):
-        # plot the theory using the parameters from the fit.
-        ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
-            ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
-            R=map_param[rbs],
-            epsilon_r=map_param[op]),
-            color=colors[j])
+        # Plot only for RBS1027
+        if rbs=='RBS1027':
+            # plot the theory using the parameters from the fit.
+            ax.plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
+                ea=ea, ei=ei, epsilon=4.5,
+                R=df[(df.rbs == rbs)].repressors.unique(),
+                epsilon_r=energies[op]),
+                color=colors[j])
+            # plot 95% HPD region using the variability in the MWC parameters
+            cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
+                gauss_flatchain, epsilon=4.5,
+                R=df[(df.rbs == rbs)].repressors.unique(),
+                epsilon_r=energies[op])
+            ax.fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                            alpha=0.3, color=colors[j])
+            # compute the mean value for each concentration
+            fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
+            # compute the standard error of the mean
+            fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
+            np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
+            
+            # plot the experimental data
+            ax.errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
+                yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
+                color=colors[j])
 
-        # plot 95% HPD region using the variability in the parameters
-        flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
-        cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6, 
-            flatchain, epsilon=4.5)
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j])
-
-        # compute the mean value for each concentration
-        fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
-        # compute the standard error of the mean
-        fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
-        np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
-        
-        # plot the experimental data
-        ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-            yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
-            color=colors[j])
-    ax[i].set_xscale('log')
-    ax[i].set_xlabel('IPTG (M)')
-    ax[i].set_ylabel('fold-change')
-    ax[i].set_ylim([-0.01, 1.2])
-    ax[i].set_title(op)
-ax[0].legend(loc='upper left', title='repressors / cell')
+ax.set_xscale('log')
+ax.set_xlabel('IPTG (M)')
+ax.set_ylabel('fold-change')
+ax.set_ylim([-0.01, 1.2])
+ax.set_xlim([1E-8, 1E-2])
+ax.set_title(op)
+ax.legend(loc='upper left', title='repressors / cell')
 plt.tight_layout()
-plt.savefig(output + '/fig_error_propagation.pdf')
+plt.savefig(output + '/fig_fit_explanation_02.pdf')
