@@ -71,6 +71,45 @@ def fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r):
 
 #=============================================================================== 
 
+def fold_change_log_rnap(IPTG, ea, ei, epsilon, R, epsilon_r, P, epsilon_p):
+   '''
+    Returns the gene expression fold change according to the thermodynamic model
+    with the extension that takes into account the effect of the inducer.
+    Parameter
+    ---------
+    IPTG : array-like.
+        concentrations of inducer on which to evaluate the function
+    ea, ei : float.
+        minus log of the dissociation constants of the active and the inactive 
+        states respectively
+    epsilon : float.
+        energy difference between the active and the inactive state
+    R : array-like.
+        repressor copy number for each of the strains. The length of this array
+        should be equal to the IPTG array. If only one value of the repressor is
+        given it is asssume that all the data points should be evaluated with
+        the same repressor copy number
+    epsilon_r : array-like
+        repressor binding energy. The length of this array
+        should be equal to the IPTG array. If only one value of the binding
+        energy is given it is asssume that all the data points 
+        should be evaluated with the same repressor copy number
+    P : float.
+        Number of RNAP per cell.
+    epsilon_p : float.
+        RNAP binding energy
+    Returns
+    -------
+    fold-change : float.
+        gene expression fold change as dictated by the thermodynamic model.
+   '''
+   return (1 + P / 4.6E6 * np.exp(-epsilon_p)) / \
+           (1 + P / 4.6E6 * np.exp(-epsilon_p) + \
+           2 * R / 4.6E6 * pact_log(IPTG, ea, ei, epsilon) * \
+            (1 + np.exp(-epsilon)) * np.exp(-epsilon_r))
+
+#=============================================================================== 
+
 def bohr_fn(df, ea, ei, epsilon=4.5):
     '''
     Computes the Bohr parameter for the data in a DataFrame df as a function
@@ -619,6 +658,54 @@ def mcmc_cred_region(IPTG, flatchain, R, epsilon_r,
     for i, c in enumerate(IPTG):
         fc = fold_change_log(c, flatchain[:,0], flatchain[:, 1], epsilon,
                                 R, epsilon_r)
+        cred_region[:, i] = hpd(fc, mass_frac)
+    
+    return cred_region
+
+#=============================================================================== 
+
+def mcmc_cred_region_rnap(IPTG, flatchain, R, epsilon_r, P, epsilon_p,
+                     mass_frac=.95, epsilon=4.5):
+    '''
+    This function takes every element in the MCMC flatchain and computes the
+    fold-change for each IPTG concentration returning at the end the indicated
+    mass_frac fraction of the fold change.
+    Parameters
+    ----------
+    IPTG : array-like.
+        IPTG concentrations on which evaluate the fold change
+    flatchain : array-like.
+        MCMC traces for the two MWC parameteres.
+        flatchain[:,0] = ea flat-chain
+        flatchain[:,1] = ei flat-chain
+    R : float.
+        Mean repressor copy number.
+    epsilon_r : float.
+        Repressor binding energy.
+    P : float.
+        Mean RNAP copy number
+    epsilon_p : float.
+        RNAP binding energy
+    mass_frac : float with 0 < mass_frac <= 1
+        The fraction of the probability to be included in
+        the HPD.  For example, `massfrac` = 0.95 gives a
+        95% HPD.
+    epsilon : float.
+        Energy difference between active and inactive state.
+    Returns
+    -------
+    cred_region : array-like
+        array of 2 x len(IPTG) with the upper and the lower fold-change HPD 
+        bound for each IPTG concentration
+    '''
+    # initialize the array to save the credible region
+    cred_region = np.zeros([2, len(IPTG)])
+    
+    # loop through IPTG concentrations, compute all the fold changes and
+    # save the HPD for each concentration
+    for i, c in enumerate(IPTG):
+        fc = fold_change_log_rnap(c, flatchain[:,0], flatchain[:, 1], epsilon,
+                                R, epsilon_r, P, epsilon_p)
         cred_region[:, i] = hpd(fc, mass_frac)
     
     return cred_region
