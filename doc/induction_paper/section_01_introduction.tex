@@ -2,29 +2,64 @@
 \section*{Introduction \stephanieComment{Stephanie's Section!}}
 
 The \textit{lac} operon, which is responsible for the metabolism of lactose in
-\textit{Escherichia coli}, is arguably one of the best studied sets of genes genes of all time
-\cite{MullerHill1996a}. Due to its central importance in areas of biology
-ranging from transcription to evolution to allostery \cite{Oehler1994, Razo-Mejia2014, Daber2008, Lakshmi2009, Swint-Kruse2009, Garcia2010, Boedicker2013, Brewster2014, Kuhlman2007}, a vast amount of data has been collected for this
-system which has given rise to many quantitative models. 
+\textit{Escherichia coli}, is arguably one of the best studied sets of genes
+genes of all time \cite{MullerHill1996a}. Due to its central importance in areas
+of biology ranging from transcription to evolution to allostery
+\cite{Oehler1994, Razo-Mejia2014, Daber2008, Lakshmi2009, Swint-Kruse2009,
+	Garcia2010, Boedicker2013, Brewster2014, Kuhlman2007}, a vast amount of data has
+been collected for this system which has given rise to many quantitative models.
 
-The Lac repressor (LacI) is the key molecule which binds to the \textit{lac} promoter and inhibits gene expression in the absence of effector. When glucose is absent and lactose is available, lactose is converted to allolactose by $\beta$-galactosidase. When allolactose binds to the effector-binding pocket of LacI, LacI assumes a conformation with significantly reduced DNA-binding affinity. This allows the \textit{lac} operon to be transcribed, enabling lactose metabolism.
+The Lac repressor (LacI) is the key molecule which binds to the \textit{lac}
+promoter and inhibits gene expression in the absence of effector. When glucose
+is absent and lactose is available, lactose is converted to allolactose by
+$\beta$-galactosidase. When allolactose binds to the effector-binding pocket of
+LacI, LacI assumes a conformation with significantly reduced DNA-binding
+affinity. This allows the \textit{lac} operon to be transcribed, enabling
+lactose metabolism.
 
-Shortly after LacI's isolation 50 years ago \cite{Gilbert1966}, efforts began to thoroughly characterize its interactions with DNA operators and small-molecule effectors \cite{Riggs1970I, Riggs1970II, Riggs1970III, Jobe1972}. During this time it was discovered that although allolactose is the natural effector of LacI, other small molecules could behave as effectors as well, the most notable among them being isopropyl
-$\beta$-D-1-thiogalactopyranoside (IPTG). As an allosteric protein with two distinct binding states, it was soon realized that LacI could be described well using the Monod-Wyman-Changeux (MWC) model of allostery \cite{MONOD1965}. LacI has proven to be a rich model for understanding the nature of allostery within the MWC framework \cite{Daly1986, Dunaway1980, Meyer2013, Daber2007, Daber2009, Muller-Hartmann1996, OGorman1980, Sharp2011, Taraban2008, Wilson2007}.
+Shortly after LacI's isolation 50 years ago \cite{Gilbert1966}, efforts began to
+thoroughly characterize its interactions with DNA operators and small-molecule
+effectors \cite{Riggs1970I, Riggs1970II, Riggs1970III, Jobe1972}. During this
+time it was discovered that although allolactose is the natural effector of
+LacI, other small molecules could behave as effectors as well, the most notable
+among them being isopropyl $\beta$-D-1-thiogalactopyranoside (IPTG). As an
+allosteric protein with two distinct binding states, it was soon realized that
+LacI could be described well using the Monod-Wyman-Changeux (MWC) model of
+allostery \cite{MONOD1965}. LacI has proven to be a rich model for understanding
+the nature of allostery within the MWC framework \cite{Daly1986, Dunaway1980,
+	Meyer2013, Daber2007, Daber2009, Muller-Hartmann1996, OGorman1980, Sharp2011,
+	Taraban2008, Wilson2007}.
 
-In recent years, the Lac repressor's ability to inhibit gene expression has been carefully quantified
-as a function of repressor copy number and promoter affinity \cite{Garcia2011},
-as well as gene copy number and competitor binding sites \cite{Weinert2014}. All
-of these tunable parameters have been well characterized by statistical
-mechanical models \cite{Bintu2005a, Bintu2005b}. Importantly, such models
-allow us to go beyond merely characterizing known data and enable
-us to predict \textit{a priori} the behavior of novel transcriptional architectures that can then be tested against experimental data.
+In recent years, the Lac repressor's ability to inhibit gene expression has been
+carefully quantified as a function of repressor copy number and promoter
+affinity \cite{Garcia2011}, as well as gene copy number and competitor binding
+sites \cite{Weinert2014}. All of these tunable parameters have been well
+characterized by statistical mechanical models \cite{Bintu2005a, Bintu2005b}.
+Importantly, such models allow us to go beyond merely characterizing known data
+and enable us to predict \textit{a priori} the behavior of novel transcriptional
+architectures that can then be tested against experimental data.
 
-Although statistical mechanical models of the \textit{lac} operon have deepened our understanding of many of the parameters controlling transcriptional regulation, these models have remained largely agnostic of allostery in the Lac repressor. This work aims to extend our statistical mechanical models to include this central aspect of
-allosteric transcription factors by examining the feedback mechanism by which the \textit{lac}
-system responds to changing levels of lactose \cite{JACOB1961}. We extend the previous thermodynamic models for simple repression
-to include the effects of an inducer. This introduces three new parameters into
-our model: the binding affinity of inducer to LacI in the
-"active" or DNA-binding conformation, the binding affinity of inducer to LacI in the "inactive" or non-DNA-binding conformation, and the free energy difference between these two conformations. We discuss how these parameters can be inferred by fitting our model to repression data acquired under varying concentrations of IPTG. With these new parameters in hand, we quantitatively predict the induction profile for other strains in which operator affinity and LacI copy number have been varied. We analyze more than 20 such mutants and show that in each case, the theoretical predictions match
-the experimental measurements. In addition, we show that the mechanisms governing fold-change in each mutant are systematically equivalent by identifying the "natural parameter" governing IPTG induction; when plotted against this natural parameter, the fold-change values for all of the mutants fall on the same curve. In this way, we demonstrate the power of quantitative modeling as a tool for achieving deep understanding of biological systems. 
+Although statistical mechanical models of the \textit{lac} operon have deepened
+our understanding of many of the parameters controlling transcriptional
+regulation, these models have remained largely agnostic of allostery in the Lac
+repressor. This work aims to extend our statistical mechanical models to include
+this central aspect of allosteric transcription factors by examining the
+feedback mechanism by which the \textit{lac} system responds to changing levels
+of lactose \cite{JACOB1961}. We extend the previous thermodynamic models for
+simple repression to include the effects of an inducer. This introduces three
+new parameters into our model: the binding affinity of inducer to LacI in the
+``active'' or DNA-binding conformation, the binding affinity of inducer to LacI
+in the ``inactive'' or non-DNA-binding conformation, and the free energy
+difference between these two conformations. We discuss how these parameters can
+be inferred by fitting our model to repression data acquired under varying
+concentrations of IPTG. With these new parameters in hand, we quantitatively
+predict the induction profile for other strains in which operator affinity and
+LacI copy number have been varied. We analyze more than 20 such mutants and show
+that in each case, the theoretical predictions match the experimental
+measurements. In addition, we show that the mechanisms governing fold-change in
+each mutant are systematically equivalent by identifying the ``natural
+parameter'' governing IPTG induction; when plotted against this natural
+parameter, the fold-change values for all of the mutants fall on the same curve.
+In this way, we demonstrate the power of quantitative modeling as a tool for
+achieving deep understanding of biological systems.
 
