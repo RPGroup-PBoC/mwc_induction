@@ -97,8 +97,8 @@ def median_sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
     where 0.7413 ~ 1 / (2 sqrt(2) erf^-1(0.5))
     """
     q25, median, q75 = np.nanpercentile(a, [25, 50, 75],
-                                     axis=axis,
-                                     overwrite_input=overwrite_input)
+                                        axis=axis,
+                                        overwrite_input=overwrite_input)
     sigmaG = sigmaG_factor * (q75 - q25)
 
     if keepdims:
@@ -154,8 +154,8 @@ def sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
     where 0.7413 ~ 1 / (2 sqrt(2) erf^-1(0.5))
     """
     q25, q75 = np.nanpercentile(a, [25, 75],
-                             axis=axis,
-                             overwrite_input=overwrite_input)
+                                axis=axis,
+                                overwrite_input=overwrite_input)
     sigmaG = sigmaG_factor * (q75 - q25)
 
     if keepdims:
@@ -228,11 +228,11 @@ def fit_bivariate_normal(x, y, robust=False):
     sigma_xy = r_xy * sigma_x * sigma_y
     alpha = 0.5 * np.arctan2(2 * sigma_xy, sigma_x ** 2 - sigma_y ** 2)
 
-    sigma1 = np.sqrt((0.5 * (sigma_x ** 2 + sigma_y ** 2)
-                      + np.sqrt(0.25 * (sigma_x ** 2 - sigma_y ** 2) ** 2
-                                + sigma_xy ** 2)))
-    sigma2 = np.sqrt((0.5 * (sigma_x ** 2 + sigma_y ** 2)
-                      - np.sqrt(0.25 * (sigma_x ** 2 - sigma_y ** 2) ** 2
-                                + sigma_xy ** 2)))
+    sigma1 = np.sqrt((0.5 * (sigma_x ** 2 + sigma_y ** 2) +
+                     np.sqrt(0.25 * (sigma_x ** 2 - sigma_y ** 2) ** 2 +
+                     sigma_xy ** 2)))
+    sigma2 = np.sqrt((0.5 * (sigma_x ** 2 + sigma_y ** 2) -
+                     np.sqrt(0.25 * (sigma_x ** 2 - sigma_y ** 2) ** 2 +
+                     sigma_xy ** 2)))
 
     return [mu_x, mu_y], sigma1, sigma2, alpha
