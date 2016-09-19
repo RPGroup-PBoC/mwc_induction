@@ -123,6 +123,14 @@ for axis in axes:
 
 ax = ax.ravel()
 
+#For some horrible and annoying reason, not all parameters can be
+#changed through the rc, but have to be changed piecewise. Those are
+#here.
+plt.rc('legend', fontsize=14) 
+#The below is needed for sans serif math display.
+plt.rc('text.latex', preamble=r'\usepackage{sfmath}')
+plt.rc('mathtext', fontset='stixsans', sf='sans')
+
 # Loop through operators
 for i, op in enumerate(operators):
     data = df[df.operator==op]
@@ -141,88 +149,15 @@ for i, op in enumerate(operators):
             epsilon_r=energies[op])
         ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
                         alpha=0.3, color=colors[j])
-        # compute the mean value for each concentration
-        fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
-        # compute the standard error of the mean
-        fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
-        np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
-        
-        # plot the experimental data
-        ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-            yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
-            color=colors[j])
     ax[i].set_xscale('log')
     ax[i].set_xlabel('IPTG (M)')
     ax[i].set_ylabel('fold-change')
     ax[i].set_ylim([-0.01, 1.2])
     ax[i].set_title(op)
 ax[0].legend(loc='upper left', title='repressors / cell')
-ax[3].set_axis_off()
-plt.tight_layout()
-plt.savefig(output + '/fig_theory_vs_data_O2_RBS1027_fit.pdf')
 
-##=============================================================================== 
-## O2 Global minus wild-type fit
-##=============================================================================== 
-## Load the flat-chain
-#with open('../../data/mcmc/' + '20160815' + \
-#                  '_gauss_homoscedastic_pool_data.pkl', 'rb') as file:
-#    unpickler = pickle.Unpickler(file)
-#    gauss_flatchain = unpickler.load()
-#    
-## map value of the parameters
-#ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
-#
-##=============================================================================== 
-## Plot the theory vs data for all 4 operators with the credible region
-##=============================================================================== 
-## Define the IPTG concentrations to evaluate
-#IPTG = np.logspace(-8, -2, 100)
-#
-## Set the colors for the strains
-#colors = sns.color_palette(n_colors=7)
-#
-## Define the operators and their respective energies
-#operators = ['O2', 'O1', 'O3', 'Oid']
-#energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
-#
-## Initialize subplots
-#fig, ax = plt.subplots(2, 2, figsize=(11, 8))
-#ax = ax.ravel()
-#
-## Loop through operators
-#for i, op in enumerate(operators):
-#    data = df[df.operator==op]
-#    # loop through RBS mutants
-#    for j, rbs in enumerate(df.rbs.unique()):
-#        # plot the theory using the parameters from the fit.
-#        ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
-#            ea=ea, ei=ei, epsilon=4.5,
-#            R=df[(df.rbs == rbs)].repressors.unique(),
-#            epsilon_r=energies[op]),
-#            color=colors[j])
-#        # plot 95% HPD region using the variability in the MWC parameters
-#        cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
-#            gauss_flatchain, epsilon=4.5,
-#            R=df[(df.rbs == rbs)].repressors.unique(),
-#            epsilon_r=energies[op])
-#        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-#                        alpha=0.3, color=colors[j])
-#        # compute the mean value for each concentration
-#        fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
-#        # compute the standard error of the mean
-#        fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
-#        np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
-#        
-#        # plot the experimental data
-#        ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-#            yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
-#            color=colors[j])
-#    ax[i].set_xscale('log')
-#    ax[i].set_xlabel('IPTG (M)')
-#    ax[i].set_ylabel('fold-change')
-#    ax[i].set_ylim([-0.01, 1.2])
-#    ax[i].set_title(op)
-#ax[0].legend(loc='upper left', title='repressors / cell')
-#plt.tight_layout()
-#plt.savefig(output + '/fig_theory_vs_data_O2_pool_data_fit.pdf')
+# Remove plot from the Oid placeholder
+ax[3].set_axis_off()
+
+plt.tight_layout()
+plt.savefig(output + '/fig_theory_predictions_O2_RBS1027_fit.pdf')
