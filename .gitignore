@@ -28,8 +28,8 @@ graphicspath.tex
 *.hdr
 
 #Ignore movies and audio
-*.mp4 
-*.mov 
+*.mp4
+*.mov
 *.avi
 *.wav
 *.mp3
@@ -58,3 +58,7 @@ graphicspath.tex
 /data/mcmc/*
 /data/misc/*
 doc/induction_paper/graphicspath.tex
+
+#Ignore stupid latex-mk garbage
+*.fdb_latexmk
+*.fls
