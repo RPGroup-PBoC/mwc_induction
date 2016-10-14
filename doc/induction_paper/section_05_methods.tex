@@ -2,37 +2,121 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Methods \griffinComment{Griffin's Section!}}
 
-\subsection{Creation of LacI RBS and Operator mutants}
-Strains were created as is described in \citep{Garcia2011}. Briefly, xxx.
+\subsection{Bacterial Strains and DNA Constructs}
+All strains used in these experiments were adapted from those created and
+described in \citep{Garcia2011}. Briefly, the operator mutants and YFP reporter
+gene were cloned into a pZS25 background which contains a \textit{lacUV5}
+promoter which drives expression as is shown in \ref{fig:S1}. The ribosomal
+binding site mutants were cloned into a pZS3*1 plasmid backbone. Expression of
+the \textit{lacI} transcript was driven by a P_\mathrm{LtetO-1} promoter
+\cite{Lutz1997}. The ribosomal binding site mutants were made as described in
+\citep{Salis2009} using site-directed mutagenesis (Quickchange II; Stratagene)
+and is described in detail in \citep{Garcia2011}.
+
+A subset of strains in these experiments were measured using fluorescence
+microscopy for validation of the flow cytometry data and results. To aid in the
+high-fidelity segmentation of individual cells, the above strains were
+modified to constitutively express an mCherry fluorophore. This reporter was
+cloned into a pZS4*1 backbone in which mCherry is driven by the \textit{lacUV5} promoter.
+All microscopy and flow-cytometry experiments were performed using these
+strains. For detailed information on plasmid construction, please the
+supplementary information and supplemental table \ref{table:S1}.
+
 
 \subsection{Growth conditions for flow cytometry measurements.}
-For detailed growth and measurement conditions, please see the supplementary
-text. Briefly, overnight 500mL cultures of Lysogeny Broth (BD LB DETAILS)
-\textit{E. coli} strains (as is described above in section [XX]), were
-inoculated from a 50\% glycerol frozen stock and were grown overnight in a 2mL
-96-deep-well plate sealed with a breatheable nylon cover (XXX) with rapid
-agitation for aeration. After approximately 12 - 15 hours, the cultures had
-reached saturation. The cells were diluted 1000-fold into 500mL of M9 minimal
-media (XXX) containing 0.5\% w/v glucose (XXX) and were sealed with a
-breatheable cover and allowed to grow for approximately eight hours unless
-otherwise noted. Cells were then diluted ten-fold into a round-bottom 96 well
-plate (XXX) containing 90µL of M9 minimal media supplemented with 0.5\% w/v
-glucose along with the corresponding IPTG concentrations. These samples were
-then analyzed using flow cytometry.
+All measurements unless otherwise noted were peformed on \textit{E. coli} cells
+grown to mid-exponential phase in standard M9 minimal media supplemented with
+0.5\% (w/v) glucose. Briefly, overnight 500mL cultures of Lysogeny Broth (LB
+Miller Powder, BD Medical) \textit{E. coli} strains (as is described previously
+in section [XX]), were inoculated from a 50\% glycerol frozen stock
+(-80$^\circ$) and were grown overnight in a 2mL 96-deep-well plate sealed with
+a breatheable nylon cover (Lab Pak - Nitex Nylon, Sefar America Inc.) with
+rapid agitation for proper aeration. After approximately 12 - 15 hours, the
+cultures had reached saturation and were diluted 1000-fold into 500mL of M9
+minimal media containing 0.5\% w/v glucose (anhydrous D-Glucose, Macron
+Chemicals) and the appropriate concentration of IPTG (Isopropyl $\beta$-D-1
+thiogalactopyranoside Dioxane Free, Resarch products International), were
+sealed with a breatheable cover, and were allowed to grow for approximately
+eight hours unless otherwise noted. Cells were then diluted ten-fold into a
+round-bottom 96-well plates (XXX) containing 90µL of M9 minimal media
+supplemented with 0.5\% w/v glucose along with the corresponding IPTG
+concentrations. A stock of 100-fold concentrated IPTG in double-distiled water
+was prepared and partitioned into 100\textmu L aliquots. The same parent stock
+was used for all experiments described in this work.
+
+\subsection{Single-Cell Microscopy.}
+Previous studies which make quantiative measurements of fold-change in gene
+expression have typically been performed using single-cell microscopy
+\cite{Brewster2014, Jones2014} or bulk-measurment methods such as the LacZ
+Miller assay or plate-reader fluorescence measurements \cite{Garcia2011,
+Razo-Mejia2014}. However, to our knowledge, no such measurement has been made
+with high-throughput single-cell  measurment techniques such as flow-cytometry.
+To confirm our flow-cytometry results, we performed a subset of the previously
+described experments using  single-cell microscopy in conjuction with flow-
+cytometry.
+
+The data analysis pipeline is described in detail in the supplementary text. In
+short, the bacterial strains were grown in the same manner as described
+previously. However, immediately before measurement using flow-cytometry, a
+small aliquot of cell suspension (less than 10\textmu L) was removed and was
+added to a 2\% (w/v) agarose immobilization substrate composed of M9 minimal
+media supplemented with 0.5\% (w/v) glucose. The immobilized cells were
+attached to a 1mm glass-bottom microscopy dish (Wilco Dish, Ted Pella USA) and
+imaged on a Nikon TI-Eclipse widefield epifluorescence microscope.
+
+\griffinComment{Make note of how excitation wavelengths were generated and how
+a uniform field was generated. This is probably better for the SI.}
 
 \subsection{Flow cytometry.}
+Unless explicity mentioned, all fold-change measurements were collected on a
+Miltenyi Biotec MACSquant Analyzer 10 Flow Cytometer graciously provided by the
+Pamela Bj\"{o}rkman lab at Caltech. Detailed information regarding the voltage
+and gain  settings of the photo-multiplier detectors can be found in
+supplementary table \ref{table:S2}. Prior to each days experiments, the
+analyzer was calibrated using MACSQuant Calibration Beads (CAT NO. 130-093-607)
+such that day-to-day experiments could be comparable. All YFP fluorescence
+measurements were collected via 488nm laser excitation  coupled with a 525/50
+nm emission filter. Unless specified, all measurments were  taken over the
+course of two to three hours using automated sampling from a 96-well plated
+kept at approximately 4$^\circ$ - 10$^\circ$ C \griffinComment(Include the
+ice-block-thing name). Cells were diluted to a final concentration of
+approximately 4$\times 10^{4}$ cells per microliter which corresponded to a
+flow rate of 5,000 - 10,000 measurements per second. Once completed, the data
+was extracted and immediately  processed.
 
 \subsection{Unsupervised gating of flow cytometry data.}
+The process of restricting the collected data set to those data determined to
+be  "real" is commonly referred to as gating. These gates are typically drawn
+manually \cite{Maecker2005} and restrict the data set to those data which
+desplay a high degree of linear correlation  between their forward-scatter
+(FSC) and side-scatter (SSC). The development of unbiased and unspervised
+methods of drawing these gates is an active area of research
+\cite{Agaheepour2013, Lo2008}. In these methods, however, the rare events are
+often the subject of interest. For our purposes, we assume that the
+fluorescence level of the population should be normally distributed about some
+mean value. With this  assumption in place, we developed a method that allows
+us to restrict the data used  to compute the mean fluorescence intensity of the
+population to smallest two-dimensional  region of the $\log(\mathrm{FSC})$ vs.
+$\log(\mathrm{SSC})$ space in which 40\% of the data is found. This  was
+performed by fitting a bivariate Gaussian distribution and restricting the
+data used for calculation as those that reside within the 40th percentile.
+\griffinComment(Let's make sure that the Jupyter notebook for this gating is
+crystal clear and well rendered. I feel that this is going to be a serious
+sticking point for any fc expert reviewers.) This procedure is  described in
+more detail in the supplementary information as well as in a  Jupyter notebook
+located on this paper's GitHub repository
+\texttt{https://www.github.com/rpgroup-pboc/mwc_induction/analysis/unsupervised_gating.ipynb}.
 
 \subsection{Parameter estimation and fitting.}
 
 \subsection{Data curation.}
 All data was collected, stored, and preserved using the Git version control
 software in combination with off-site storage and hosting website GitHub. Code
-used to generate all figures and complete all analyses are available on the GitHub
-repository. Many analysis files are stored as instructive Jupyter Notebooks. The
-scientific community is invited to fork our repositories and open constructive issues
-on the repository which can be located at \texttt{https://www.github.com/rpgroup-pboc/mwc_induction}.
+used to generate all figures and complete all processing stepas and analyses
+are available on the GitHub repository. Many analysis files are stored as
+instructive Jupyter Notebooks. The scientific community is invited to fork our
+repositories and open constructive issues on the repository which can be
+located at \texttt{https://www.github.com/rpgroup-pboc/mwc_induction}.
 
 Raw flow cytometery data files (\texttt{.fcs} and \texttt{.csv}) files were
 stored on-site under redundant storage. Due to size limitations, all raw data

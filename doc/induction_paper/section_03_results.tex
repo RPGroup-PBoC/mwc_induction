@@ -2,12 +2,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{IPTG Titration \nathanComment{Nathan's Section!}}
 
-Big picture: 
-\begin{itemize}
-	\item We first fit the thermodynamic parameters to RBS 1027 (see \fref[figNathanChooseDescriptionHere1]).
-	\item We used this single curve to make parameter-free predictions for all 23 other strains (see \fref[figNathanChooseDescriptionHere2]). Zero fitting required!
-	\item We collapse all of this data onto one master curve (see \fref[figNathanChooseDescriptionHere3]), showing that we are totally boss and that the MWC provides a single unified framework to model all of these thermodynamic parameters.
-\end{itemize}
+To exploit \eref[eq7], we used a set of simple repression constructs based on the \textit{lacUV5} promoter with a single binding site for Lac repressor. The operators were placed at the native wild-type position of O1 and were chromosomally integrated \cite{garcia et al.}. Each construct bore either Oid, O1, O2, or O3 as an operator and controlled the expression of yellow fluorescent protein (YFP). Flow cytometry was used to measure the fold change in gene expression of our contructs as the concentration of IPTG was titrated between Y and Z $\mu M$. In addition a subset of these strains were also examined by single cell microscopy, particularly those expected to be at the limit of sensitivity by the flow cytometer. 
+
+\textbf{Determination of the In Vivo MWC Parameters.}
+
+The binding energies $\Delta\varepsilon_{RD,A}}$ and repressor copy number have previously been measured using either single-cell microscopy or bulk measurement \cite{OOehler1994,Vilar and Leibler 2003, Garcia2011, Brewster and Weinert}. This leaves us with two free parameters in \eref[eq7] that are unknown, $\KIeff$ and $\K_{A}$. To estimate these parameters we applied Bayesian Markov chain Monte Carlo parameter estimation to our experimental data. In doing so we could consider taking several different approaches to estimate the parameters from that data. Since these parameters are dependent on the properies of Lac repressor and its interaction with inducer \testit{in vivo}, and not on the specific regulatory context, any subset of the data should be suitable to use for our estimation of $\KIeff$ and $\K_{A}$. Hence, we could use fold change expression data from a single strain as inducer concentration is varied. We can then use our estimate of $\KIeff$ and $\K_{A}$ along with the known binding energies and repressor copy numbers to \testit{predict} expression for our 23 other strains. Agreement between the predictions and the experimental data for these 23 other strains will allow us to consider the validity of our MWC model. An alternative approach in estimating this parameters would be to take all the data from the 24 different strains and perform a global fit. We consider each of these in turn.
+
+Taking the first approach, we performed a parameter estimation with our strain RBS1027 (repressor copy number of 130 per cell) bearing the O2 operator. The measured fold change expression levels are shown in \fref[figNathanChooseDescriptionHere1] as a function of inducer concentration. We found $\KIeff$ and $\K_{A}$ to be equal to X and Y, respectively, and plot \eref[eq7] alongside the data in \fref[figNathanChooseDescriptionHere1]. 
 
 \begin{figure}[h]
 	\centering \includegraphics[scale=\globalScalePlots]{placeholder1.png}
@@ -15,14 +16,51 @@ Big picture:
 	\label{figNathanChooseDescriptionHere1}
 \end{figure}
 
+\textbf{MWC Model can be used to Prediction Expression Levels as Operator Binding Energy and Repressor concentration is varied.}
+
+Using the parameters we found for $\KIeff$ and $\K_{A}$ we then predicted the expression level as a function of IPTG concentration for our 23 other strains. \fref[figNathanChooseDescriptionHere2] shows the measured fold change plotted along with the parameter-free predictions for these other strains. We find good agreement between the theoretical predictions and the experimental fold change measurements for these other strains. Of course, we could have used any of the strains to estimate our parameters and we consider a more extensive analysis between parameter estiamtes of the different datasets in the supplemental information. 
+
 \begin{figure}[h]
 	\centering \includegraphics[scale=\globalScalePlots]{placeholder2.png}
 	\caption{{\bf Short description.} Full, detailed description. Go Nathan!!!}
 	\label{figNathanChooseDescriptionHere2}
 \end{figure}
 
+While the above approach enabled us to estimate $\KIeff$ and $\K_{A}$ and then ask how well our model performed as a function of changing repressor copy number and operator binding energy, it is also possible to use all of our data and perform a global fit. By taking this approach we find $\KIeff$ and $\K_{A}$ to be equal to X2 and Y2, respectively and is in agreement with our previous estimate (Supplemental information Section Z).
+
+We can also rewrite \eref[eq7] in a way that enables us to collapse the predictions for our 24 different strains onto a single master curve. Specifically, if we write fold-change in the following form,
+
+\begin{equation}\label{eq9}
+\foldchange= \frac{1}{1+e^{-\beta F(c)}}
+\end{equation}
+
+Where we call $F(c)$ the Bohr parameter \cite{Phillips2016} and is a more natural scaling variable to plot our fold change expression data against. Here $F(c)$ is given by
+
+\begin{equation}\label{eq8}
+F(c) =  \frac{1}{\beta} log p_A(c)
+- \Delta\varepsilon_{RD,A}} 
+log \frac{2R}{N_{\text{NS}}} 
+\end{equation}
+
+From \eref[eq6v2] we can rewrite this as
+
+\begin{equation}\label{eq8}
+F(c) \approx \frac{1}{\beta} log \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2} - \Delta\varepsilon_{RD,A}} log \frac{2R}{N_{\text{NS}}} 
+\end{equation}
+
+In \fref[figNathanChooseDescriptionHere3] we plot experimental fold change data against their associated Bohr parameter and find a nice data collapse with our 24 different strains. It is important to emphasize that the MWC model provides us with a single unified framework with which to explain our simple repression motif across a wide range of thermodynamic parameters.
+
+\nathanComment{would it be nice to plot master curve using RBS1027 fit AND global fit - just to show they match fairly well?}
+
 \begin{figure}[h]
 	\centering \includegraphics[scale=\globalScalePlots]{placeholder3.png}
 	\caption{{\bf Short description.} Full, detailed description. Go Nathan!!!}
 	\label{figNathanChooseDescriptionHere3}
 \end{figure}
+
+
+
+
+
+
+
