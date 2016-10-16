@@ -22,6 +22,9 @@ imp.reload(mwc)
 # ###################
 # General Thermodynamic Functions
 # ###################
+
+
+# ###################
 def test_pact_log():
     log_val = np.log(2)
     test_iptg = np.array([1, 1, 1])
@@ -32,6 +35,7 @@ def test_pact_log():
         mwc.pact_log(bad_iptg, 0, 0, 0)
 
 
+# ###################
 def test_fold_change_log():
     test_iptg = np.array([1, 1, 1])
     test_num_rep = 1
@@ -56,11 +60,12 @@ def test_fold_change_log():
                             nonspec_sites=-1)
 
 
+# ###################
 def test_fold_change_log_rnap():
     test_iptg = np.array([1, 1, 1])
     test_num_rep = 1
-    large_num_rep = 4.6E6
     test_num_pol = 1
+    large_num_rep = 4.6E6
     large_num_pol = 4.6E6
     assert np.isclose(mwc.fold_change_log_rnap(test_iptg, 0, 0, 0,
                                                test_num_rep, 0, test_num_pol,
@@ -94,6 +99,7 @@ def test_fold_change_log_rnap():
 
 
 # Need to test range of epsilon values here.
+# ###################
 def test_bohr_fn():
     columns = ('IPTG_uM', 'repressors', 'binding_energy')
     test_df = pd.DataFrame(3 * [[1, 4.6E6, 0]], columns=columns)
@@ -110,7 +116,7 @@ def test_bohr_fn():
 # ###################
 
 
-
+# ###################
 def test_log_post():
     zero_params = np.array([0, 0])
     val_params = np.array([np.log(2), np.log(2)])

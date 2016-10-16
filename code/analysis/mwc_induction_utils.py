@@ -93,6 +93,31 @@ Purpose:
             Function that applies an "unsupervised bivariate Gaussian gate" to
             the data over the channels x_val and y_val.
 
+        Image Processing
+        ----------------
+        find_zero_crossings:
+            This  function computes the gradients in pixel values of an image
+            after applying a sobel filter to a given image. This  function is
+            later used in the Laplacian of Gaussian cell segmenter
+            (log_segmentation) function.
+
+        log_segmentation:
+            This function computes the Laplacian of a gaussian filtered image
+            and detects object edges as regions which cross zero in the
+            derivative.
+
+        average_stack:
+            Computes an average image from a provided array of images.
+
+        generate_flatfield:
+            Corrects illumination of a given image using a dark image and an
+            image of the flat illumination.
+
+        gaussian_subtraction:
+            This function applies a gaussian blur to an image and subtracts it
+            from the original image. This removes any large-scale
+            irregularities in illumination.
+
 Notes:
     All functions in this file have been throroughly unit tested. See the
     associated file `mwc_induction_utils_test.py`
@@ -121,6 +146,11 @@ License: MIT
 """
 import numpy as np
 import scipy.special
+import scipy.ndimage
+import skimage.filters
+import skimage.morphology
+import skimage.segmentation
+import joblib as jlb
 import scipy.stats as sc
 import scipy
 import numdifftools as ndt
@@ -427,7 +457,8 @@ def log_likelihood_mcmc(param, indep_var, dep_var, epsilon=4.5):
 def log_post_mcmc(param, indep_var, dep_var, epsilon=4.5,
                   ea_range=[6, -6], ei_range=[6, -6], sigma_range=[0, 1]):
     '''
-    Computes the log posterior probability of the fold-change expression for input into the mcmc hammer.
+    Computes the log posterior probability of the fold-change expression for
+    input into the mcmc hammer.
 
     Parameters
     ----------
@@ -860,6 +891,7 @@ def mcmc_cred_reg_error_prop(iptg, flatchain, mass_frac=.95, epsilon=4.5):
 # Flow Cytometry Data Processing
 # #################
 
+
 # #################
 def fit_2D_gaussian(df, x_val='FSC-A', y_val='SSC-A', log=False):
     '''
@@ -1005,3 +1037,254 @@ def auto_gauss_gate(df, alpha, x_val='FSC-A', y_val='SSC-A', log=False,
         '''.format(alpha, np.sum(idx) / len(df)))
 
     return df[idx]
+
+
+# #################
+# Image Processing
+# #################
+
+# #################
+def find_zero_crossings(im, selem, thresh):
+    """
+    This  function computes the gradients in pixel values of an image after
+    applying a sobel filter to a given image. This  function is later used in
+    the Laplacian of Gaussian cell segmenter (log_segmentation) function. The
+    arguments are as follows.
+
+    Parameters
+    ----------
+    im : 2d-array
+        Image to be filtered.
+    selem : 2d-array, bool
+        Structural element used to compute gradients.
+    thresh :  float
+        Threshold to define gradients.
+
+    Returns
+    -------
+    zero_cross : 2d-array
+        Image with identified zero-crossings.
+
+    Notes
+    -----
+    This function as well as `log_segmentation` were written by Justin Bois.
+    http://bebi103.caltech.edu/
+    """
+
+    # apply a maximum and minimum filter to the image.
+    im_max = scipy.ndimage.filters.maximum_filter(im, footprint=selem)
+    im_min = scipy.ndimage.filters.minimum_filter(im, footprint=selem)
+
+    # Compute the gradients using a sobel filter.
+    im_filt = skimage.filters.sobel(im)
+
+    # Find the zero crossings.
+    zero_cross = (((im >= 0) & (im_min < 0)) | ((im <= 0) & (im_max > 0)))\
+        & (im_filt >= thresh)
+
+    return zero_cross
+
+
+# #################
+def log_segmentation(im, selem='default', thresh=0.001, radius=2.0,
+                     bg_radius=20.0, clear_border=True, label=False):
+    """
+    This function computes the Laplacian of a gaussian filtered image and
+    detects object edges as regions which cross zero in the derivative.
+
+    Parameters
+    ----------
+    im :  2d-array
+        Image to be processed. Must be a single channel image.
+    selem : 2d-array, bool
+        Structural element for identifying zero crossings. Default value is
+        a 2x2 pixel square.
+    radius : float
+        Radius for gaussian filter prior to computation of derivatives.
+    bg_radius: float
+        Radius for gaussian filter to perform background subtraction. Default
+        value is 20.0 pixels.
+    selem : 2d-array, bool
+        Structural element to be applied for laplacian calculation.
+    thresh : float
+        Threshold past which
+    clear_border : bool
+        If True, segmented objects touching the border will be removed.
+        Default is True.
+    label : bool
+        If True, segmented objecs will be labeled. Default is False.
+
+    Returns
+    -------
+    im_final : 2d-array
+        Final segmentation mask. If label==True, the output will be a integer
+        labeled image. If label==False, the output will be a bool.
+
+    Notes
+    -----
+    We thank Justin Bois in his help writing this function.
+    https://bebi103.caltech.edu
+    """
+
+    # Test that the provided image is only 2-d.
+    if len(np.shape(im)) > 2:
+        raise ValueError('image must be a single channel!')
+
+    # Ensure that the provided image is a float.
+    if np.max(im) > 1.0:
+        im_float = im_to_float(im)
+    else:
+        im_float = im
+
+    # Subtract background to fix illumination issues.
+    im_gauss = skimage.filters.gaussian(im_float, bg_radius)
+    im_float = im_float - im_gauss
+
+    # Compute the LoG filter of the image.
+    im_LoG = scipy.ndimage.filters.gaussian_laplace(im_float, radius)
+
+    # Define the structural element.
+    if selem == 'default':
+        selem = skimage.morphology.square(2)
+
+    # Using find_zero_crossings, identify the edges of objects.
+    edges = find_zero_crossings(im_LoG, selem, thresh)
+
+    # Skeletonize the edges to a line with a single pixel width.
+    skel_im = skimage.morphology.skeletonize(edges)
+
+    # Fill the holes to generate binary image.
+    im_fill = scipy.ndimage.morphology.binary_fill_holes(skel_im)
+
+    # Remove small objects and objects touching border.
+    im_final = skimage.morphology.remove_small_objects(im_fill)
+    if clear_border is True:
+        im_final = skimage.segmentation.clear_border(im_final, buffer_size=5)
+
+    # Determine if the objects should be labeled.
+    if label is True:
+        im_final = skimage.measure.label(im_final)
+
+    # Return the labeled image.
+    return im_final
+
+
+# #################
+def average_stack(im, median_filt=True, n_threads=1, **median_kwargs):
+    """
+    Computes an average image from a provided array of images.
+
+    Parameters
+    ----------
+    im : list or arrays of 2d-arrays
+        Stack of images to be filtered.
+    median_filt : bool
+        If True, each image will be median filtered before averaging.
+        Median filtering is performed using a 3x3 square structural element.
+
+    Returns
+    -------
+    im_avg : 2d-array
+        averaged image with a type of int.
+    """
+
+    # Determine if the images should be median filtered.
+    if median_filt is true:
+        selem = skimage.morphology.square(3)
+        im_filt = jlb.Parallel(n_jobs=n_threads)(jlb.delayed(
+            scipy.ndimage.median_filter(i, footprint=selem) for i in im))
+    else:
+        im = im_filt
+
+    # Generate and empty image to store the averaged image.
+    im_avg = np.zeros_like(im[0]).astype(int)
+    for i in im:
+        im_avg += i
+    im_avg = im_avg / len(im)
+    return im_avg
+
+
+# #################
+def generate_flatfield(im, im_dark, im_bright):
+    """
+    Corrects illumination of a given image using a dark image and an image of
+    the flat illumination.
+
+    Parameters
+    ----------
+    im : 2d-array
+        Image to be flattened.
+    im_dark : 2d-array
+        Average image of camera shot noise (no illumination).
+    im_bright : 2d-array
+        Average image of fluorescence illumination.
+
+    Returns
+    -------
+    im_flat : 2d-array
+        Image corrected for uneven fluorescence illumination. This is performed
+        as
+
+        im_flat = ((im - im_dark) / (im_bright - im_dark)) *
+                   mean(im_bright - im_dark)
+
+    Raises
+    ------
+    RuntimeError
+        Thrown if bright image and dark image are approximately equal. This
+        will result in a division by zero.
+    """
+
+    # Ensure that the same image is not being provided as the bright and dark.
+    if np.isclose(im_bright, im_dark):
+        raise RuntimeError('im_bright and im_dark are approximately equal.')
+    # Compute the mean difference between the bright and dark image.
+    mean_diff = np.mean(im_bright - im_dark)
+
+    # Compute and return the flattened image.
+    im_flat = ((im - im_dark) / (im_bright - im_dark)) * mean_diff
+    return im_flat
+
+
+# #################
+def gaussian_subtraction(im, radius):
+    """
+    This function applies a gaussian blur to an image and subtracts it
+    from the original image. This removes any large-scale irregularities in
+    illumination.
+
+    Parameters
+    ----------
+    im : 2d-array, int or float
+        Image to be filtered.
+    radius : float
+        Radius for the gaussian filter.
+
+    Returns
+    -------
+    im_subtract : 2d-array, float
+        Background subtracted image.
+
+    Raises
+    ------
+    TypeError
+        Thrown if input image contains negative values. This function will
+        only work on integer type images.
+    """
+    # Check the type of the image.
+    if im.dtype is not int or im.dtype is not float or np.min(im) < 0:
+        raise TypeError('input image must be unsigned integer type or a\
+        positive float.')
+
+    # Ensure that the provided image is a float.
+    if im.dtype is not float:
+        im = skimage.img_as_float(im)
+
+    # Apply the gaussian filter to the im.
+    im_gauss = skimage.filters.gaussian(im, radius)
+
+    # Subtract the background.
+    im_subtract = im - im_gauss
+
+    # Return the subtracted image.
+    return im_subtract
