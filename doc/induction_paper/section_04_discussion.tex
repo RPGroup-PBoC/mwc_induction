@@ -18,10 +18,56 @@ ideas:
   prediction
 \end{enumerate}
 
-In the last decade there has been remarkable advancements in our  understanding of how genes are regulated. From the exquisite dissection of the gene regulatory network of the sea-urchin developmental program [Peters & Davidson] to the \textit{in-vivo}  imaging of the central dogma [Ido's MS2, Hernan's MS2, Suntag paper, Xiaowei recent paper], new genetic reporters and  advancements in single-cell measurements has taken the field to a new level of precision measurements traditionally only achievable in more quantitative fields such as physics and chemistry.
+In the last decade there has been remarkable advancements in our  understanding
+of how genes are regulated. From the exquisite dissection of the gene regulatory
+network of the sea-urchin developmental program [Peters & Davidson] to the
+\textit{in-vivo}  imaging of the central dogma [Ido's MS2, Hernan's MS2, Suntag
+paper, Xiaowei recent paper], new genetic reporters and  advancements in
+single-cell measurements has taken the field to a new level of precision
+measurements traditionally only achievable in more quantitative fields such as
+physics and chemistry.
 
-This level of precision and the rate at which data is generated calls out for unifying theoretical frameworks under which conceptualize the richness of modern biology data sets. In this work we build upon a decade of quantitative dissection of the input-output function of one of the most abundant genetic architectures in all domains of life, i.e. simple repression [Mattias paper on regulonDB]. The \textit{lac} operon in combination with modern synthetic biology tools have served as an experimental playground on which to test predictive models of gene regulation. Statistical mechanical models of gene regulation have proved to be very effective not only predicting the mean expression level as a function of natural parameters such as the transcription factor copy number and its binding energy to the DNA [Garcia PNAS] but the effect of DNA looping [Boedicker PRL] and competing binding sites [Brewster Cell].
+This level of precision and the rate at which data is generated calls out for
+unifying theoretical frameworks under which conceptualize the richness of modern
+biology data sets. In this work we build upon a decade of quantitative
+dissection of the input-output function of one of the most abundant genetic
+architectures in all domains of life, i.e. simple repression [Mattias paper on
+regulonDB]. The \textit{lac} operon in combination with modern synthetic biology
+tools have served as an experimental playground on which to test predictive
+models of gene regulation. Statistical mechanical models of gene regulation have
+proved to be very effective not only predicting the mean expression level as a
+function of natural parameters such as the transcription factor copy number and
+its binding energy to the DNA [Garcia PNAS] but the effect of DNA looping
+[Boedicker PRL] and competing binding sites [Brewster Cell].
 
-Interestingly the \textit{lac} repressor was also the first allosteric gene regulator ever characterized [Monod original paper?]. The story goes that Monod claimed that allostery embodied the ``second secret of life'' [Marzen 2013]. And, as it is so familiar in the physics literature, a single theoretical framework can explain incredibly diverse phenomena in biology. Ion channels, enzymatic activity, chromatin remodeling, bacterial chemotaxis, and what concerns us in this paper, gene regulation all can be explained by the Monod-Wyman-Changeux (MWC) model [Marzen 2013, Einav 2015, what else?].
+Interestingly the \textit{lac} repressor was also the first allosteric gene
+regulator ever characterized [Monod original paper?]. The story goes that Monod
+claimed that allostery embodied the ``second secret of life'' [Marzen 2013].
+And, as it is so familiar in the physics literature, a single theoretical
+framework can explain incredibly diverse phenomena in biology with allostery as
+common ground. Ion channels, enzymatic activity[Einav 2016], chromatin
+remodeling, bacterial chemotaxis[Ned Wingreen's PNAS], and what concerns us in
+this paper, gene regulation all can be explained by the Monod-Wyman-Changeux
+(MWC) model [Marzen 2013].
 
-In this paper we have shown that the MWC model along a statistical mechanics model of gene expression can provide zero-parameter fit predictions for the fold-change in gene expression as a function of inducer concentration for a wide range of transcription factors copy number and binding affinity to the promoter.
+In this paper we have shown that the MWC model combined with a statistical
+mechanical model of gene expression can provide zero-parameter fit predictions
+of the fold-change in gene expression as a function of inducer concentration for
+a wide range of transcription factor copy numbers and their binding affinity to
+the promoter (see Figure X). We believe that this excellent agreement between
+prediction and data is not the result of fitting sigmoidal-like data to a
+sigmoidal-like curve. By taking the equations seriously we were able to rewrite
+the fold-change as a function of a highly non-linear parameter we called the
+Bohr parameter. Figure Y shows that when the data is plot as a function of this
+``natural variable of the system'' all the curves families collapse into a
+single master curve. Our claim is that without the underlying theoretical
+framework developed for this problem there is no way one could guess the
+functional form of this Bohr parameter in order to show that all the curves
+belong to the same family.
+
+As the insights on how genes are regulated increase, the theory modularly
+increases the physical knobs that can be tuned. These theories must be
+contrasted with experiments as we work our way through generating a predictive
+theory of gene regulation. In this paper we add yet another piece to this puzzle
+by showing how one can own the physical knob represented by the external inducer
+concentration.
