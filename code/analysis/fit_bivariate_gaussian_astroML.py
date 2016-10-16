@@ -1,3 +1,25 @@
+"""
+Title:
+    fit_bivariate_gaussian_astroML.py
+Creation Date:
+    2016-07-29
+Author(s):
+    Manuel Razo-Mejia
+Purpose:
+    This file contains two functions which are used in the
+    `mwc_induction_utils` function `fit_2d_gaussian` for the unsupervised
+    gating of flow-cytometry data.
+Notes:
+    These functions were used with modification from the astroML python
+    function `fit_bivariate_normal` which can be found [here]
+    (http://www.astroml.org/book_figures/chapter3/fig_robust_pca.html). In
+    this modified version, the percentiles are computed using the numpy
+    function `nanpercentile`.
+License:
+    These functions were borrowed from the AstroML library in agreement with
+    their 3-clause BSD license. These functions retain this 3-clause BSD
+    licensing and are the copyright of the owners.
+"""
 import numpy as np
 from scipy import stats
 
@@ -7,7 +29,9 @@ sigmaG_factor = 0.74130110925280102
 
 
 def mean_sigma(a, axis=None, dtype=None, ddof=0, keepdims=False):
-    """Compute mean and standard deviation for an array
+    """
+    Compute mean and standard deviation for an array
+
     Parameters
     ----------
     a : array_like
@@ -24,16 +48,19 @@ def mean_sigma(a, axis=None, dtype=None, ddof=0, keepdims=False):
         If this is set to True, the axes which are reduced are left
         in the result as dimensions with size one. With this option,
         the result will broadcast correctly against the original `arr`.
+
     Returns
     -------
     mu : ndarray, see dtype parameter above
         array containing the mean values
     sigma : ndarray, see dtype parameter above.
         array containing the standard deviation
+
     See Also
     --------
     median_sigmaG : robust rank-based version of this calculation.
     Notes
+
     -----
     This routine simply calls ``np.mean`` and ``np.std``, passing the
     keyword arguments to them.  It is provided for ease of comparison
@@ -56,7 +83,9 @@ def mean_sigma(a, axis=None, dtype=None, ddof=0, keepdims=False):
 
 
 def median_sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
-    """Compute median and rank-based estimate of the standard deviation
+    """
+    Compute median and rank-based estimate of the standard deviation
+
     Parameters
     ----------
     a : array_like
@@ -77,16 +106,19 @@ def median_sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
         If this is set to True, the axes which are reduced are left
         in the result as dimensions with size one. With this option,
         the result will broadcast correctly against the original `arr`.
+
     Returns
     -------
     median : ndarray, see dtype parameter above
         array containing the median values
     sigmaG : ndarray, see dtype parameter above.
         array containing the robust estimator of the standard deviation
+
     See Also
     --------
     mean_sigma : non-robust version of this calculation
     sigmaG : robust rank-based estimate of standard deviation
+
     Notes
     -----
     This routine uses a single call to ``np.nanpercentile`` to find the
@@ -115,7 +147,9 @@ def median_sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
 
 
 def sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
-    """Compute the rank-based estimate of the standard deviation
+    """
+    Compute the rank-based estimate of the standard deviation
+
     Parameters
     ----------
     a : array_like
@@ -136,15 +170,18 @@ def sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
         If this is set to True, the axes which are reduced are left
         in the result as dimensions with size one. With this option,
         the result will broadcast correctly against the original `arr`.
+
     Returns
     -------
     median : ndarray, see dtype parameter above
         array containing the median values
     sigmaG : ndarray, see dtype parameter above.
         array containing the robust estimator of the standard deviation
+
     See Also
     --------
     median_sigmaG : robust rank-based estimate of mean and standard deviation
+
     Notes
     -----
     This routine uses a single call to ``np.nanpercentile`` to find the
@@ -171,7 +208,9 @@ def sigmaG(a, axis=None, overwrite_input=False, keepdims=False):
 
 
 def fit_bivariate_normal(x, y, robust=False):
-    """Fit bivariate normal parameters to a 2D distribution of points
+    """
+    Fit bivariate normal parameters to a 2D distribution of points
+
     Parameters
     ----------
     x, y : array_like
@@ -179,6 +218,7 @@ def fit_bivariate_normal(x, y, robust=False):
     robust : boolean (optional, default=False)
         If True, then use rank-based statistics which are robust to outliers
         Otherwise, use mean/std statistics which are not robust
+
     Returns
     -------
     mu : tuple
