@@ -12,12 +12,12 @@ License:
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import mwc_induction_utils as mwc
 import pytest
 import pandas as pd
-import imp
+%matplotlib inline
 
-imp.reload(mwc)
 
 # ###################
 # General Thermodynamic Functions
@@ -32,7 +32,7 @@ def test_pact_log():
     assert (mwc.pact_log(test_iptg, log_val, log_val, -log_val) == 1/3).all()
     with pytest.raises(ValueError):
         neg_iptg = np.array([1, -1, 1])
-        mwc.pact_log(bad_iptg, 0, 0, 0)
+        mwc.pact_log(neg_iptg, 0, 0, 0)
 
 
 # ###################

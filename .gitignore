@@ -17,6 +17,8 @@ graphicspath.tex
 *.log
 *.aux
 *.bbl
+*.fls
+*.fdb_latexmk
 
 #Ignore images
 *.jpg
@@ -28,8 +30,8 @@ graphicspath.tex
 *.hdr
 
 #Ignore movies and audio
-*.mp4 
-*.mov 
+*.mp4
+*.mov
 *.avi
 *.wav
 *.mp3

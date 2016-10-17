@@ -118,6 +118,12 @@ Purpose:
             from the original image. This removes any large-scale
             irregularities in illumination.
 
+        Plotting Configuration
+        ----------------------
+        set_plotting_style:
+            Formats plotting enviroment to that used in Physical Biology of
+            the Cell, 2nd edition. To format all plots within a script, simply
+            execute `mwc_induction_utils.set_plotting_style() in the preamble.
 Notes:
     All functions in this file have been throroughly unit tested. See the
     associated file `mwc_induction_utils_test.py`
@@ -154,7 +160,9 @@ import joblib as jlb
 import scipy.stats as sc
 import scipy
 import numdifftools as ndt
-import bokeh.plotting
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
 from fit_bivariate_gaussian_astroML import *
 
 
@@ -1288,3 +1296,35 @@ def gaussian_subtraction(im, radius):
 
     # Return the subtracted image.
     return im_subtract
+
+
+# #################
+# Plotting Configuration
+# #################
+
+
+# #################
+def set_plotting_style():
+    """
+    Formats plotting enviroment to that used in Physical Biology of the Cell,
+    2nd edition. To format all plots within a script, simply execute
+    `mwc_induction_utils.set_plotting_style() in the preamble.
+    """
+    rc = {'lines.linewidth': 2,
+          'axes.labelsize': 16,
+          'axes.titlesize': 18,
+          'axes.facecolor': '#E3DCD0',
+          'xtick.labelsize': 12,
+          'ytick.labelsize': 12,
+          'font.family': 'Lucida Sans Unicode',
+          'grid.linestyle': ':',
+          'grid.linewidth': 1.5,
+          'grid.color': '#ffffff',
+          'mathtext.fontset': 'stixsans',
+          'mathtext.sf': 'sans',
+          'legend.frameon': True,
+          'legend.fontsize': 13}
+    plt.rc('text.latex', preamble=r'\usepackage{sfmath}')
+    plt.rc('mathtext', fontset='stixsans', sf='sans')
+    sns.set_style('darkgrid', rc=rc)
+    sns.set_palette("colorblind", color_codes=True)
