@@ -12,8 +12,8 @@ import matplotlib.cm as cm
 import seaborn as sns
 
 # favorite Seaborn settings for notebooks
-rc={'lines.linewidth': 2, 
-    'axes.labelsize' : 16, 
+rc={'lines.linewidth': 2,
+    'axes.labelsize' : 16,
     'axes.titlesize' : 18,
     'axes.facecolor' : 'F4F3F6',
     'axes.edgecolor' : '000000',
@@ -26,7 +26,7 @@ sns.set_context('notebook', rc=rc)
 sns.set_style('darkgrid', rc=rc)
 sns.set_palette("deep", color_codes=True)
 
-#=============================================================================== 
+#===============================================================================
 # define variables to use over the script
 date = 20161015
 username = 'nbellive'
@@ -38,17 +38,18 @@ df = pd.read_csv('output/' + str(date) + '_' + run + '_' + 'O1O2dimer' + \
                  '_IPTG_titration_MACSQuant.csv')
 rbs = df.rbs.unique()
 
-#=============================================================================== 
+#===============================================================================
 
 # plot all raw data
 plt.figure()
-for operator in operators.keys():
+for op in operators.keys():
     for strain in rbs[np.array([r != 'auto' and r != 'delta' for r in rbs])]:
-        plt.plot(df[(df.operator == operator) & \
+        plt.plot(df[(df.operator == op) & \
                 (df.rbs == strain)].sort_values(by='IPTG_uM').IPTG_uM * 1E-6,
-                df[df.rbs == strain].sort_values(by='IPTG_uM').fold_change_A,
+                df[(df.operator == op) & \
+                (df.rbs == strain)].sort_values(by='IPTG_uM').fold_change_A,
                 marker='o', linewidth=1, linestyle='--',
-                label=operator + ' ' + strain)
+                label=op + ' ' + strain)
 plt.xscale('log')
 plt.xlabel('IPTG (M)')
 plt.ylabel('fold-change')
