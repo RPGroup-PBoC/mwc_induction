@@ -91,7 +91,8 @@ mean_bgcorr_A = np.array([])
 for i in np.arange(len(df)):
     data = df.loc[i]
     auto = df[(df.IPTG_uM == data.IPTG_uM) & \
-              (df.rbs == 'auto')].mean_YFP_A
+              (df.rbs == 'auto') & \
+              (df.operator == data.operator)].mean_YFP_A
     mean_bgcorr_A = np.append(mean_bgcorr_A, data.mean_YFP_A - auto)
 
 mean_bgcorr_A = pd.Series(mean_bgcorr_A)
@@ -104,7 +105,8 @@ mean_fc_A = np.array([])
 for i in np.arange(len(df)):
     data = df.loc[i]
     delta = df[(df.IPTG_uM == data.IPTG_uM) & \
-              (df.rbs == 'delta')].mean_YFP_bgcorr_A
+              (df.rbs == 'delta') & \
+              (df.operator == data.operator)].mean_YFP_A
     mean_fc_A = np.append(mean_fc_A, data.mean_YFP_bgcorr_A / delta)
 
 mean_fc_A = pd.Series(mean_fc_A)
