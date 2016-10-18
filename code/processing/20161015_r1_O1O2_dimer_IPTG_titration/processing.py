@@ -74,7 +74,7 @@ for operator in operators.keys():
                                             log=True)
                 # compute the mean and append it to the data frame along the
                 # operator and strain
-                df = df.append([[date, username, operator, energy, 
+                df = df.append([[date, username, operator, operators[operator], 
                             strain, repressors[j], c,
                             data['FITC-A'].mean()]],
                             ignore_index=True)

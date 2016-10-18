@@ -9,7 +9,7 @@ import pandas as pd
 
 # Import the project utils
 import sys
-sys.path.insert(0, '../analysis/')
+sys.path.insert(0, '../')
 import mwc_induction_utils as mwc
 
 # Import matplotlib stuff for plotting
@@ -19,46 +19,8 @@ import matplotlib.cm as cm
 # Seaborn, useful for graphics
 import seaborn as sns
 
-# favorite Seaborn settings for notebooks
-rc={'lines.linewidth': 2, 
-    'axes.labelsize' : 16, 
-    'axes.titlesize' : 18,
-    'axes.facecolor' : 'F4F3F6',
-    'axes.edgecolor' : '000000',
-    'axes.linewidth' : 1.2,
-    'xtick.labelsize' : 13,
-    'ytick.labelsize' : 13,
-    'grid.linestyle' : ':',
-    'grid.color' : 'a6a6a6'}
-
-pboc_rc = { ##########SIZES################## 
-                'lines.linewidth'       : 2, 
-                'axes.titlesize'        : 18,
-                'axes.labelsize'        : 16,
-                'font.family'           : 'Lucida Sans Unicode',
-                
-                ##########COLORS#################
-                'axes.facecolor'        :'#E3DCD0',
-                
-                #########GRIDS/TICKS############
-                'xtick.labelsize'       : 12,
-                'ytick.labelsize'       : 12,
-
-                #########LEGEND#################
-                'legend.numpoints'      : 1,
-                'legend.fontsize'       : 13,
-                'legend.loc'            : 'best',
-                }
- 
-#Define the colorscheme. 
-# r, b, m, g, orange
-pboc  = sns.color_palette(['#d46c55', '#7aa874','#728ec1',
-                           '#aa85ab','#e08d14']) 
-
-
-sns.set_context('notebook', rc=pboc_rc)
-sns.set_style('dark', rc=pboc_rc)
 sns.set_palette("deep", color_codes=True)
+mwc.set_plotting_style()
 
 #=============================================================================== 
 # Set output directory based on the graphicspath.tex file to print in dropbox
@@ -114,12 +76,12 @@ energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 # Initialize subplots
 fig, ax = plt.subplots(2, 2, figsize=(11, 8))
 
-#Get a list of the axes. 
-axes = fig.get_axes()
-for axis in axes:
-    #Set the ticks to inward facing and white.  
-    axis.tick_params(reset=True, axis='both', direction='in', color='white',
-    width=1, length=5, top='off', right='off', labelsize=13)
+##Get a list of the axes. 
+#axes = fig.get_axes()
+#for axis in axes:
+#    #Set the ticks to inward facing and white.  
+#    axis.tick_params(reset=True, axis='both', direction='in', color='white',
+#    width=1, length=5, top='off', right='off', labelsize=13)
 
 ax = ax.ravel()
 
@@ -135,12 +97,12 @@ for i, op in enumerate(operators):
             epsilon_r=energies[op]),
             color=colors[j])
         # plot 95% HPD region using the variability in the MWC parameters
-        cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j])
+#        cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
+#            gauss_flatchain, epsilon=4.5,
+#            R=df[(df.rbs == rbs)].repressors.unique(),
+#            epsilon_r=energies[op])
+#        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+#                        alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
