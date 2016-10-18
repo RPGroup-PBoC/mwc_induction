@@ -211,7 +211,7 @@ def pact_log(iptg, ea, ei, epsilon=4.5):
 
 
 # #################
-def fold_change_log(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
+def fold_change_log(iptg, ea, ei, epsilon, R, epsilon_r,
                     quaternary_state=2, nonspec_sites=4.6E6):
     '''
     Returns the gene expression fold change according to the
@@ -227,7 +227,7 @@ def fold_change_log(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
         inactive states respectively
     epsilon : float.
         Energy difference between the active and the inactive state
-    num_repressors : array-like.
+    R : array-like.
         Repressor copy number for each of the strains. The length of
         this array should be equal to the iptg array. If only one value
         of the repressor is given it is asssume that all the data points
@@ -238,7 +238,7 @@ def fold_change_log(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
         binding energy is given it is asssume that all the data points
         should be evaluated with the same repressor copy number
     quaternary_state: int
-        Prefactor in front of num_repressors in fold-change. Default is 2
+        Prefactor in front of R in fold-change. Default is 2
         indicating that there are two functional heads per repressor molecule.
         This value must not be zero.
     nonspec_sites : int
@@ -260,21 +260,21 @@ def fold_change_log(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
 
 
    '''
-    # Ensure that IPTG values and num_repressors is positive.
-    if (iptg < 0).any() or (num_repressors < 0):
-        raise ValueError('iptg and num_repressors must be positive.')
+    # Ensure that IPTG values and R is positive.
+    if (iptg < 0).any() or (R < 0).any():
+        raise ValueError('iptg and R must be positive.')
     if (quaternary_state <= 0) or (nonspec_sites <= 0):
         raise ValueError('quaternary_state  and nonspec_sites must be greater\
         than zero.')
 
-    return (1 + quaternary_state * num_repressors / nonspec_sites *
+    return (1 + quaternary_state * R / nonspec_sites *
             pact_log(iptg, ea, ei, epsilon) * (1 + np.exp(-epsilon)) *
             np.exp(-epsilon_r))**-1
 
 
 # #################
-def fold_change_log_rnap(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
-                         num_pol, epsilon_p, quaternary_state=2,
+def fold_change_log_rnap(iptg, ea, ei, epsilon, R, epsilon_r,
+                         P, epsilon_p, quaternary_state=2,
                          nonspec_sites=4.6E6):
     '''
     Returns the gene expression fold change according to the thermodynamic
@@ -290,7 +290,7 @@ def fold_change_log_rnap(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
         inactive states respectively
     epsilon : float.
         Energy difference between the active and the inactive state
-    num_repressors : array-like.
+    R : array-like.
         Repressor copy number for each of the strains. The length of this
         array should be equal to the iptg array. If only one value of the
         repressor is given it is asssume that all the data points should be
@@ -301,12 +301,12 @@ def fold_change_log_rnap(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
         should be equal to the iptg array. If only one value of the binding
         energy is given it is asssume that all the data points
         should be evaluated with the same repressor copy number
-    num_pol : float.
+    P : float.
         Number of RNAP per cell.
     epsilon_p : float.
         RNAP binding energy in units of kT.
     quaternary_state: int
-        Prefactor in front of num_repressors in fold-change. Default is 2
+        Prefactor in front of R in fold-change. Default is 2
         indicating that there are two functional heads per repressor molecule.
         This value must not be zero.
     nonspec_sites : int
@@ -328,15 +328,15 @@ def fold_change_log_rnap(iptg, ea, ei, epsilon, num_repressors, epsilon_r,
 
    '''
     # Ensure the values are physically reasonable.
-    if (iptg < 0).any() or (num_repressors < 0) or (num_pol < 0):
-        raise ValueError('iptg, num_repressors, and num_pol must be positive.')
+    if (iptg < 0).any() or (R < 0).any() or (P < 0).any():
+        raise ValueError('iptg, R, and P must be positive.')
     if (quaternary_state <= 0) or (nonspec_sites <= 0):
         raise ValueError('quaternary_state  and nonspec_sites must be greater\
         than zero.')
 
-    return (1 + num_pol / nonspec_sites * np.exp(-epsilon_p)) / \
-           (1 + num_pol / nonspec_sites * np.exp(-epsilon_p) +
-            quaternary_state * num_repressors / nonspec_sites *
+    return (1 + P / nonspec_sites * np.exp(-epsilon_p)) / \
+           (1 + P / nonspec_sites * np.exp(-epsilon_p) +
+            quaternary_state * R / nonspec_sites *
             pact_log(iptg, ea, ei, epsilon) * (1 + np.exp(-epsilon)) *
             np.exp(-epsilon_r))
 
@@ -358,7 +358,7 @@ def bohr_fn(df, ea, ei, epsilon=4.5, quaternary_state=2, nonspec_sites=4.6E6):
     epsilon : float
         energy difference between the active and the inactive state.
     quaternary_state: int
-        Prefactor in front of num_repressors in fold-change. Default is 2
+        Prefactor in front of R in fold-change. Default is 2
         indicating that there are two functional heads per repressor molecule.
         This value must not be zero.
     nonspec_sites : int
@@ -535,7 +535,7 @@ def log_post(param, indep_var, dep_var, epsilon=4.5, quaternary_state=2,
         of this array should be the same as the number of rows in
         indep_var.
     quaternary_state: int
-        Prefactor in front of num_repressors in fold-change. Default is 2
+        Prefactor in front of R in fold-change. Default is 2
         indicating that there are two functional heads per repressor molecule.
         This value must not be zero.
     nonspec_sites : int
