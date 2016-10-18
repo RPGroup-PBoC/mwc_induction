@@ -9,7 +9,7 @@ transcriptional regulation. A first round of experiments measured the dependence
 of gene expression on repressor copy number and binding strength
 \cite{Garcia2011}. A second round of experiments pushed beyond the ``independent
 promoter approximation'' to acknowledge the fact that different genes compete
-for the same regulatory apparatus. Here too we were able to show that
+for the same regulatory apparatus. \stephanieComment{I suggest changing the wording here--"round of experiments" sounds like something we did as part of this study, where we are actually referencing previous studies.} Here too we were able to show that
 theoretical predictions of this subtle effect were consistent with their
 measured counterparts, even permitting the collapse of data from multiple
 experiments onto master curves \cite{Brewster2014, Weinert2014}. In the current
@@ -25,7 +25,7 @@ cell. \(R_A\) repressors will be in the active state (the favored state when
 repressor is not bound to inducer; in this state the repressor binds tightly to
 DNA) and the remaining \(R_I\) repressors will be in the inactive state (the
 predominant state when repressor is bound to inducer; in this state the
-repressor binds weakly to DNA) so that \(R_A+R_I=R\).
+repressor binds weakly to DNA) so that \(R_A+R_I=R\). \stephanieComment{Might be worth mentioning here that repressors can switch between these states even in the absence of inducer and will be in equilibrium with one another}
 
 We first model the interaction between the Lac repressor and DNA by enumerating
 all possible states and their corresponding weights. As shown in
@@ -42,7 +42,7 @@ Boltzmann's constant and $T$ is the temperature of the system.
 
 \begin{figure}[h]
 	\centering \includegraphics[scale=\globalScalePlots]{figure1v3.pdf}
-	\caption{{\bf States and weights for simple repression.} Both RNAP (light blue)
+	\caption{{\bf States and weights for simple repression.} \stephanieComment{We should move the operator so that the repressor isn't covering up the arrow--it's a confusing visual.} Both RNAP (light blue)
 		and repressor compete for DNA binding. There are $R_A$ repressors in the active
 		state (green) and $R_I$ repressors in the inactive state (red), with the latter
 		type typically bound to inducer (gold). The difference in energy between a
@@ -72,14 +72,14 @@ r_A &= \frac{R_A}{N_{\text{NS}}}e^{-\beta \Delta\varepsilon_{RD,A}} \\
 r_I &= \frac{R_I}{N_{\text{NS}}}e^{-\beta  \Delta\varepsilon_{RD,I}}.
 \end{align}
 Note the factor of 2 in the repressor states, which arises from the possibility
-that either repressor dimer may bind to DNA. Gene expression can be readily
+that either repressor dimer may bind to DNA \stephanieComment{Should explain the tetrameric nature of LacI before referring to dimers. Not sure this has been discussed yet in the text.} Gene expression can be readily
 measured experimentally by exploiting the fold-change,
 \begin{equation}\label{eq3}
 \foldchange\equiv \frac{p_{\text{bound}}(R)}{p_{\text{bound}}(0)}=\frac{1+p}{1+2r_A+2r_I+p}.
 \end{equation}
 We can simplify this expression using two well-justified approximations: \(p\ll
 1\) and \(r_I\ll r_A\). The first approximation is called the weak promoter
-approximation and is valid for the wild type Lac promoter \cite{Brewster2012}.
+approximation and is valid for the wild type Lac promoter \cite{Brewster2012} \stephanieComment{I think this deserves a brief explanation, namely that RNAP binding is too weak to compete with repressor binding}.
 The second approximation follows because $e^{-\beta  \Delta\varepsilon_{RD,I}}$ is
 approximately 1000 times smaller than $e^{-\beta \Delta\varepsilon_{RD,A}}$ for
 the Lac repressor \cite{Daber2011a}. Using these approximations, the fold-change
@@ -120,11 +120,11 @@ simultaneously active or simultaneously inactive). While no direct measurements
 have as of yet been carried out to definitively distinguish between these two
 models, in Appendix \ref{AppendixAllostery} we describe a simple experiment
 which can do precisely this. In this paper, we proceed with the assumption that
-the two repressor dimers are allosterically independent.
+the two repressor dimers are allosterically independent. \stephanieComment{For now I think this is fine--but if our experiments suggest otherwise when we get more data, I think we should be willing to change our model}
 
 \begin{figure}[h]
 	\centering \includegraphics[scale=\globalScalePlots]{figure2v2.pdf}
-	\caption{{\bf The eight states of a Lac repressor dimer.} The Lac repressor has
+	\caption{{\bf The eight states of a Lac repressor dimer.} \stephanieComment{I suggest changing the color of the second dimer to something other than green, which implies that it is active. Possibly gray?} The Lac repressor has
 		an active conformation (green, left column) and inactive conformation (red,
 		right column), with the energy difference between these two states given by
 		$\varepsilon$. In each conformation, the repressor can bind an inducer (gold) at
@@ -167,7 +167,7 @@ available data, but must ultimately be validated by direct measurement, as is
 possible by NMR \cite{Gardino2003, Boulton2016}. Given $\beta \varepsilon \gg
 1$, we can approximate the term $e^{-\beta \varepsilon}
 \left(1+\frac{c}{K_I}\right)^2 \approx e^{-\beta  \varepsilon
-}\left(\frac{c}{K_I}\right)^2$ in the denominator of \eref[eq6]. To see this,
+}\left(\frac{c}{K_I}\right)^2$ in the denominator of \eref[eq6]. \stephanieComment{I'm feeling that we may want to stick with the approximation from the Brewster/Franz data. Re-reading about the approximation in the context of the rest of our models makes me feel like it's a bit wishy-washy.} To see this,
 note that both expressions are negligible compared to
 $\left(1+\frac{c}{K_A}\right)^2$ for small $c$; on the other hand, the term
 $e^{-\beta \varepsilon} \left(1+\frac{c}{K_I}\right)^2$ becomes non-negligible
