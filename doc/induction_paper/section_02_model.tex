@@ -22,7 +22,7 @@ context of transcription.
 
 The ability of the the Lac repressor to regulate transcription has been
 previously characterized by an equilibrium model where the probability of each
-state of repressor and RNA polymerase occupancy is proportional to its Boltzmann
+state of repressor and RNA polymerase occupancy \manuelComment{occupancy of what? we should mention the promoter} is proportional to its Boltzmann
 weight \cite{Daber2011a, Phillips2015a}. We begin with a summary of this model.
 Suppose there are \(P\) RNA polymerase (RNAP) and \(R\) repressor molecules in a
 cell. \(R_A\) repressors will be in the active state (the favored state when
@@ -37,7 +37,7 @@ all possible states and their corresponding weights. As shown in
 occupied by RNAP, or occupied by either an active or inactive repressor
 molecule. Assume that there are $N_{\text{NS}}$ non-specific sites on the DNA outside
 the Lac operator where RNAP or the Lac repressor can bind. \(\Delta\varepsilon_{PD}\)
-represents the energy difference between RNAP bound to the Lac operator or bound
+represents the energy difference between RNAP bound to the Lac operator \manuelComment{the RNAP does not bind to the lac operator} or bound
 elsewhere on the DNA; \(\Delta\varepsilon_{RD,A}\) and \(\Delta\varepsilon_{RD,I}\) equal the
 difference in energy when the Lac repressor is bound to the Lac operator
 compared to when it is bound non-specifically elsewhere on the DNA in the active
@@ -67,8 +67,8 @@ Boltzmann's constant and $T$ is the temperature of the system.
 
 
 In thermodynamic models of transcription, gene expression is proportional to the
-probability $p_{\text{bound}}$ that RNAP is bound to the Lac operator which is
-given by
+probability $p_{\text{bound}}$ that RNAP is bound to the Lac operator \manuelComment{again this is not true} which is
+given by \manuelComment{the equation depends on $R$ but there is not explicit mention of this variable. I think this should probably be $p(r_A, r_I \mid R)$ or something along those lines}. \manuelComment{Also there should not be a factor of 2 because that implicitly states that the two dimers are allosterically dependent which we are not assuming to be true.}
 \begin{equation}\label{eq2}
 p_{\text{bound}}(R)=\frac{p}{1+2r_A+2r_I+p},
 \end{equation}
@@ -80,7 +80,7 @@ r_I &= \frac{R_I}{N_{\text{NS}}}e^{-\beta  \Delta\varepsilon_{RD,I}}.
 \end{align}
 Note the factor of 2 in the repressor states, which arises from the possibility
 that either repressor dimer may bind to DNA \stephanieComment{Should explain the tetrameric nature of LacI before referring to dimers. Not sure this has been discussed yet in the text.} Gene expression can be readily
-measured experimentally by exploiting the fold-change,
+measured experimentally by exploiting the fold-change \manuelComment{I don't think this explanation/justification of the use of fold-change captures the actual reason of why we use this quantity. Measuring $p_{\text{bound}}$ by itself is very difficult. But using a relative measurement gets rid of the complications},
 \begin{equation}\label{eq3}
 \foldchange\equiv \frac{p_{\text{bound}}(R)}{p_{\text{bound}}(0)}=\frac{1+p}{1+2r_A+2r_I+p}.
 \end{equation}
@@ -89,8 +89,8 @@ We can simplify this expression using two well-justified approximations: \(p\ll
 approximation and is valid for the wild type Lac promoter \cite{Brewster2012} \stephanieComment{I think this deserves a brief explanation, namely that RNAP binding is too weak to compete with repressor binding}.
 The second approximation follows because $e^{-\beta  \Delta\varepsilon_{RD,I}}$ is
 approximately 1000 times smaller than $e^{-\beta \Delta\varepsilon_{RD,A}}$ for
-the Lac repressor \cite{Daber2011a}. Using these approximations, the fold-change
-reduces to the form
+the Lac repressor \cite{Daber2011a} \manuelComment{as far as I am concerned this is a number that, quoting Julie Theriot, you pulled out of you butt. We should express it as one of our assumptions in the model rather than quoting a number that we don't even know if it is true.}. Using these approximations, the fold-change
+reduces to the form \manuelComment{again this I think should not have the factor of 2. The number of active repressors doesn't need to be an even number if we are assuming the two dimers are independent.}
 \begin{equation}\label{eq4}
 \foldchange\approx \frac{1}{1+2r_A}=\left(1+\frac{2R_A}{N_{\text{NS}}}e^{-\beta  \Delta\varepsilon_{RD,A}}\right)^{-1}.
 \end{equation}
@@ -148,7 +148,7 @@ the two repressor dimers are allosterically independent. \stephanieComment{For n
 As shown in \fref[figrepressorInducerStates], we can enumerate the relative
 likelihood of the eight possible conformations of a repressor dimer (the dimer
 can be in an active or inactive state, and each of its two inducer binding sites
-can be empty or occupied), using the difference in energy $\varepsilon$ between a
+can be empty or occupied), using the difference in energy $\varepsilon$ \manuelComment{if it is an energy difference I think it should be $\Delta \varepsilon$} between a
 Lac repressor dimer in the active and inactive state. From these eight states, we can
 compute the probability \(p_A(c)\) that a dimer will be in the active state
 as the sum of the weights of the active states divided by the sum of the weights
