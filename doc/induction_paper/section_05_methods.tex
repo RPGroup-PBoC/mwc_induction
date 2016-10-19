@@ -2,12 +2,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Methods \griffinComment{Griffin's Section!}}
 
+\talComment{This section is wicked!}
+
 \subsection*{Bacterial Strains and DNA Constructs}
 All strains used in these experiments were adapted from those created and
-described in \citep{Garcia2011}. Briefly, the operator mutants and YFP reporter
+described in \citep{Garcia2011} \talComment{Let's discuss cite vs citep}. Briefly, the operator mutants and YFP reporter
 gene were cloned into a pZS25 background which contains a \textit{lacUV5}
 promoter which drives expression as is shown in \ref{fig:S1}. The ribosomal
-binding site mutants were cloned into a pZS3\*5 plasmid backbone (find plasmid nomenclature reference). Expression of
+binding site mutants were cloned into a pZS3\*5 plasmid backbone \griffinComment{find plasmid nomenclature reference}. Expression of
 the \textit{lacI} transcript was driven by a P$_\mathrm{LtetO-1}$ promoter
 \cite{Lutz1997}. The ribosomal binding site mutants were made as described in
 \citep{Salis2009} using site-directed mutagenesis (Quickchange II; Stratagene)
@@ -45,14 +47,14 @@ was prepared and partitioned into 100\textmu L aliquots. The same parent stock
 was used for all experiments described in this work.
 
 \subsection*{Single-Cell Microscopy}
-Previous studies which make quantiative measurements of fold-change in gene
+Previous studies which make quantitative measurements of fold-change \talComment{we should decide whether to uniformly hyphenate this or not} in gene
 expression have typically been performed using single-cell microscopy
-\cite{Brewster2014, Jones2014} or bulk-measurment methods such as the LacZ
+\cite{Brewster2014, Jones2014} or bulk-measurment \talComment{spell check} methods such as the LacZ
 Miller assay or plate-reader fluorescence measurements \cite{Garcia2011,
 Razo-Mejia2014}. However, to our knowledge, no such measurement has been made
-with high-throughput single-cell  measurment techniques such as flow-cytometry.
+with high-throughput single-cell  measurement techniques such as flow-cytometry.
 To confirm our flow-cytometry results, we performed a subset of the previously
-described experments using  single-cell microscopy in conjuction with flow-
+described experiments using  single-cell microscopy in conjunction with flow-
 cytometry.
 
 The data analysis pipeline is described in detail in the supplementary text. In
@@ -68,7 +70,7 @@ imaged on a Nikon TI-Eclipse widefield epifluorescence microscope.
 a uniform field was generated. This is probably better for the SI.}
 
 \subsection*{Flow cytometry}
-Unless explicity mentioned, all fold-change measurements were collected on a
+Unless explicitly mentioned, all fold-change measurements were collected on a
 Miltenyi Biotec MACSquant Analyzer 10 Flow Cytometer graciously provided by the
 Pamela Bj\"{o}rkman lab at Caltech. Detailed information regarding the voltage
 and gain  settings of the photo-multiplier detectors can be found in
@@ -76,28 +78,28 @@ supplementary table \ref{table:S2}. Prior to each days experiments, the
 analyzer was calibrated using MACSQuant Calibration Beads (CAT NO. 130-093-607)
 such that day-to-day experiments could be comparable. All YFP fluorescence
 measurements were collected via 488nm laser excitation  coupled with a 525/50
-nm emission filter. Unless specified, all measurments were  taken over the
+nm emission filter. Unless specified, all measurements were  taken over the
 course of two to three hours using automated sampling from a 96-well plated
 kept at approximately 4$^\circ$ - 10$^\circ$ C \griffinComment{Include the
 ice-block-thing name}. Cells were diluted to a final concentration of
 approximately 4$\times 10^{4}$ cells per microliter which corresponded to a
 flow rate of 5,000 - 10,000 measurements per second \stephanieComment{I think it was more like 2000-6000 on average}. Once completed, the data
-was extracted and immediately  processed.
+was extracted and immediately  processed. \talComment{It may be fun to state explicitly the total number of raw data points per IPTG concentration per run}
 
 \subsection*{Unsupervised gating of flow cytometry data}
 The process of restricting the collected data set to those data determined to
-be  "real" is commonly referred to as gating. These gates are typically drawn
-manually \cite{Maecker2005} and restrict the data set to those data which
-desplay a high degree of linear correlation  between their forward-scatter
-(FSC) and side-scatter (SSC). The development of unbiased and unspervised
+be ``real'' is commonly referred to as gating. These gates are typically drawn
+manually \cite{Maecker2005} and restrict the data set to those data \talComment{awk} which
+display a high degree of linear correlation  between their forward-scatter
+(FSC) and side-scatter (SSC). The development of unbiased and unsupervised
 methods of drawing these gates is an active area of research
-\cite{Agaheepour2013, Lo2008}. In these methods, however, the rare events are
+\cite{Agaheepour2013, Lo2008}. In these methods \talComment{it is a bit hard to understand that ``these methods'' does not refer to our project}, however, the rare events are
 often the subject of interest. For our purposes, we assume that the
 fluorescence level of the population should be normally distributed about some
 mean value. With this  assumption in place, we developed a method that allows
 us to restrict the data used  to compute the mean fluorescence intensity of the
 population to smallest two-dimensional  region of the $\log(\mathrm{FSC})$ vs.
-$\log(\mathrm{SSC})$ space in which 40\% of the data is found. This  was
+$\log(\mathrm{SSC})$ space in which 40\% of the data is found \talComment{This is confusing}. This  was
 performed by fitting a bivariate Gaussian distribution and restricting the
 data used for calculation as those that reside within the 40th percentile.
 \griffinComment{Let's make sure that the Jupyter notebook for this gating is
@@ -105,14 +107,14 @@ crystal clear and well rendered. I feel that this is going to be a serious
 sticking point for any fc expert reviewers.} This procedure is  described in
 more detail in the supplementary information as well as in a  Jupyter notebook
 located on this paper's GitHub repository
-\texttt{https://www.github.com/rpgroup-pboc/mwc\_induction/analysis/unsupervised\_gating.ipynb}.
+\texttt{https://www.github.com/rpgroup-pboc/mwc\_induction/analysis/unsupervised\_gating.ipynb} \talComment{this could be a hyperlink}.
 
 \subsection*{Bayesian parameter estimation}
 In this work, we determined the maximum a posteriori (MAP) value for
 the inducer binding constants $K_A$ and $K_I$ of the active and inactive
-repressors respectively. To compute the MAP, we used a Bayesian method of
-inference and determined the probability of each parameter having a given
-value. Using Bayes's theorem, we can state that the posterior probability
+repressors respectively \talComment{what about the $\epsilon$ parameter. We should mention that we fixed the $\epsilon$ value and reference the sloppiness Appendix section}. To compute the MAP, we used a Bayesian method of
+inference and determined the probability \talComment{distribution for } \sout{of} each parameter \sout{having a given
+value}. Using Bayes's theorem, we can state that the posterior probability
 distribution of our parameter of interest is
 
 \begin{align}
@@ -121,16 +123,16 @@ P(\epsilon_A, \epsilon_I, R, \Delta\epsilon_r, \vert D, I) \propto P(D \vert
 R, \Delta\epsilon_r \vert I)
 \end{align}
 
-in which $\epsilon_A = -\ln K_A$ and
-$\epsilon_I = -\ln K_I$ for convenience, $R$ is the mean measurement of the average number of
-repressors per cell, $\Delta\epsilon_r$ is the average operator binding energy, $D$ is the experimental data, and $I$ is all prior
+in \talComment{punctuation and link sentence} which $\epsilon_A = -\ln K_A$ and
+$\epsilon_I = -\ln K_I$ for convenience \talComment{I would actually call this fit stability, since $K_A$ and $K_I$ must be positive}, $R$ is the \sout{mean measurement of the} average number of
+repressors per cell, $\Delta\epsilon_r$ is the \sout{average} operator binding energy, $D$ is the experimental data, and $I$ is all prior
 information. We can make the assumption that each measurement of fold-change
-is independent, the errors on these measurements are gaussian distributed, and
+is independent, the errors on these measurements are Gaussian distributed, and
 the error distribution of the concentration of inducer is homoscedastic. Given
 these assumptions, it is important to realize that each element of the
 experimental measurements $D$ is actually a pair of a dependent variable (the
 experimentally measured fold-change) and the independent variables ($R$, the
-operator binding energy $\Delta\epsilon_r$, and the IPTG concentration $C$). Using these assumptions, we can state our likelihood $P(D \vert \epsilon_A, \epsilon_i, R, I)$ as
+operator binding energy $\Delta\epsilon_r$, and the IPTG concentration $C$ \talComment{Why capitalize $c$ here?}). Using these assumptions, we can state our likelihood $P(D \vert \epsilon_A, \epsilon_i, R, I)$ as
 
 \begin{align}
 P(D \vert \epsilon_A, \epsilon_I, R, \Delta\epsilon_r, I) =
@@ -139,9 +141,9 @@ P(D \vert \epsilon_A, \epsilon_I, R, \Delta\epsilon_r, I) =
 C^i))^2}{2\sigma^2}\right]
 \end{align}
 
-where $\sigma$ is the variance associated with the gaussian distributed error
-of the MAP, $\mathrm{fc}$ is the the fold-change expression derived previously
-\griffinComment{reference the maintext equation here once we converge on
+where \talComment{link and punctuation, both here and below} $\sigma$ is the variance associated with the Gaussian distributed error
+of the MAP, $\mathrm{fc}$ is the the fold-change expression \talComment{why did you use $\mathrm{fc_{exp}}^i$ and not $\mathrm{fc_{exp}^i}$? Note that you used subsuperscripts in $\Delta\epsilon_r^i$} derived previously
+\griffinComment{reference the main text equation here once we converge on
 notation}, $n$ is the number of experimental measurements, and $i$ is each
 individual measurement. We can assume that the parameters $\epsilon_A$,
 $\epsilon_I$, $\sigma$ are independent and are uniform on a logarithmic scale.
@@ -177,7 +179,7 @@ parameters.
 With this posterior in hand, we used Markov Chain Monte Carlo to sample our
 posterior distribution in log space and compute the MAP value and uncertainty
 for the parameter values. \griffinComment{Once we finish collecting data and
-perform the final parameter estimation, we should report some of the MCM
+perform the final parameter estimation, we should report some of the MCMC
 parameters here as well as which sampler was used. I'm in favor of storing the
 MCMC flat chains on the git repository so anyone can fork the repository and
 immediately and exactly perform our measurements.}
@@ -185,12 +187,19 @@ immediately and exactly perform our measurements.}
 \subsection*{Data curation}
 All data was collected, stored, and preserved using the Git version control
 software in combination with off-site storage and hosting website GitHub. Code
-used to generate all figures and complete all processing stepas and analyses
+used to generate all figures and complete all processing step as and analyses
 are available on the GitHub repository. Many analysis files are stored as
 instructive Jupyter Notebooks. The scientific community is invited to fork our
 repositories and open constructive issues on the repository which can be
 located at \texttt{https://www.github.com/rpgroup-pboc/mwc\_induction}.
 
-Raw flow cytometery data files (\texttt{.fcs} and \texttt{.csv}) files were
+Raw flow cytometry data files (\texttt{.fcs} and \texttt{.csv}) files were
 stored on-site under redundant storage. Due to size limitations, all raw data
-files are available upon request and are not publically hosted.
+files are available upon request and are not publicly hosted.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgments}
+
+We thank...for their useful discussions and helpful insights.
+
+This work was supported by...

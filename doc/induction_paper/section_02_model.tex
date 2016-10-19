@@ -6,7 +6,7 @@
 
 \stephanieComment{General comments on this section: It seems pretty straightforward, especially given that much of what we are doing here has been discussed in previous papers. However, the MWC is not directly referenced here. I think that we should explicitly discuss what the MWC model is and how our models utilize it.}
 
-\griffinComment{I agree with Stephanie. Furthermore, we really need to determine whether we are telling the two or three parameter story. We should hammer this down ASAP.}
+\griffinComment{I agree with Stephanie. Furthermore, we really need to determine whether we are telling the two or three parameter story. We should hammer this down ASAP. \talComment{I think we should stick with the full 3 parameter model, and we can discuss the 2 parameter stuff in the SI}}
 
 This paper builds upon an extensive dialogue between theory and experiment in
 transcriptional regulation. A first round of experiments measured the dependence
@@ -46,7 +46,8 @@ Boltzmann's constant and $T$ is the temperature of the system.
 
 \begin{figure}[h]
 	\centering \includegraphics[scale=\globalScalePlots]{figure1v3.pdf}
-	\caption{{\bf States and weights for simple repression.} \stephanieComment{We should move the operator so that the repressor isn't covering up the arrow--it's a confusing visual.} Both RNAP (light blue)
+%	\centering \includegraphics[scale=\globalScalePlots]{states_weights_allosteric_independence.eps}
+	\caption{{\bf States and weights for simple repression.} \stephanieComment{We should move the operator so that the repressor isn't covering up the arrow--it's a confusing visual. \talComment{Griffin, your eps figure won't show up. Any reason why not to make it a pdf? Also, I don't have your fonts}} Both RNAP (light blue)
 		and repressor compete for DNA binding. There are $R_A$ repressors in the active
 		state (green) and $R_I$ repressors in the inactive state (red), with the latter
 		type typically bound to inducer (gold). The difference in energy between a
@@ -59,7 +60,7 @@ Boltzmann's constant and $T$ is the temperature of the system.
 		pushes them into the inactive state). Similarly, the $R_I$ term includes all
 		inactive state repressors bound to any number of inducer molecules, with the
 		most prevalent state shown in the figure. The factor of 2 in the repressor
-		weights comes from the ability of either repressor dimer to bind to DNA. }
+		weights comes from the ability of either repressor dimer to bind to DNA. \talComment{Need to refer somewhere around here to the Appendix section with our dimer data}}
 	\label{figpolymeraseRepressorStates}
 \end{figure}
 
@@ -173,7 +174,7 @@ available data, but must ultimately be validated by direct measurement, as is
 possible by NMR \cite{Gardino2003, Boulton2016}. Given $\beta \varepsilon \gg
 1$, we can approximate the term $e^{-\beta \varepsilon}
 \left(1+\frac{c}{K_I}\right)^2 \approx e^{-\beta  \varepsilon
-}\left(\frac{c}{K_I}\right)^2$ in the denominator of \eref[eq6]. \stephanieComment{I'm feeling that we may want to stick with the approximation from the Brewster/Franz data. Re-reading about the approximation in the context of the rest of our models makes me feel like it's a bit wishy-washy.} To see this,
+}\left(\frac{c}{K_I}\right)^2$ in the denominator of \eref[eq6]. \stephanieComment{I'm feeling that we may want to stick with the approximation from the Brewster/Franz data. Re-reading about the approximation in the context of the rest of our models makes me feel like it's a bit wishy-washy. \talComment{I think we should cut this out and just have all 3 parameters. We can discuss this approximation stuff in the SI.}} To see this,
 note that both expressions are negligible compared to
 $\left(1+\frac{c}{K_A}\right)^2$ for small $c$; on the other hand, the term
 $e^{-\beta \varepsilon} \left(1+\frac{c}{K_I}\right)^2$ becomes non-negligible
@@ -195,7 +196,7 @@ complete formula
 %1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2}\frac{2[R]}{\K} \right)^{-1},
 %\end{equation}
 which predicts that given a concentration \(c\) of the inducer IPTG, \(R\)
-copies of the Lac repressor, and the $N_{\text{NS}} = 4.6 \times 10^6$
+copies of the Lac repressor, and the $N_{\text{NS}} = 4.6 \times 10^6$ \talComment{Do we want italics or non-italics subscripts? I don't care, but the figures should be consistent}
 non-specific binding sites on the \textit{E. coli} genome, the fold-change in
 gene expression will depend solely on 3 parameters: the DNA binding affinity of
 the repressor ($\Delta\varepsilon_{RD,A}$) and the inducer binding affinities
