@@ -1,27 +1,27 @@
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection*{Results}
+%\subsection*{Results}
 
 \stephanieComment{General comments on this section: Mainly, I think we could expand upon the prediction of expression and provide more justification for data collapse. We might want to refer to some quantitative comparison between the quality of the fits from a single strain vs. the fits from all the data sets, and comment on places where the models don't quite fit with the data. }
 
-To exploit \eref[eq7] we used a set of simple repression constructs based on the \textit{lacUV5} promoter with a single binding site for Lac repressor. The operators were placed at the native wild-type position of O1. Each construct was chromosomally integrated and bore either Oid, O1, O2, or O3 as an operator and controlled the expression of yellow fluorescent protein (YFP) \cite{Garcia2011}. Flow cytometry was used to measure the fold change in gene expression of our contructs as the concentration of IPTG was titrated between Y and Z $\mu M$. In addition a subset of these strains were also examined by single cell microscopy, particularly those expected to be at the limit of sensitivity by the flow cytometer. \stephanieComment{This might be a good place to also mention that we change the RBS to tune repressor copy number, since it is referenced in the next section.}
+To exploit \eref[eq7] we used a set of simple repression constructs based on the \textit{lacUV5} promoter with a single binding site for Lac repressor. The operators were placed at the native wild-type position of the O1 binding site. Each construct was chromosomally integrated and bore either Oid, O1, O2, or O3 as an operator, controlling the expression of yellow fluorescent protein (YFP). The copy number of Lac repressor in each strain was controlled through changes to its ribosomal binding site. These are denoted RBS1147, RBS446, RBS1027, RBS1 and RBS1L and were previously measured by quantitative western blots to have mean copy numbers of 30, 62, 130, 610, and 870, respectively \cite{Garcia2011}. A strain containing the native Lac repressor copy number was also used and is denoted HG104, with a mean copy number of 10 per cell. Flow cytometry was used to measure the fold change in gene expression of our contructs as the concentration of IPTG was titrated between 0 and 5000 $\mu M$. In addition a subset of these strains were also examined by single cell microscopy, particularly those expected to be at the limit of sensitivity by the flow cytometer. \stephanieComment{This might be a good place to also mention that we change the RBS to tune repressor copy number, since it is referenced in the next section.}
 
 \noindent \textbf{Determination of the In Vivo MWC Parameters.}
 
-The binding energies $\Delta \varepsilon_{RD,A}$ and repressor copy number have previously been measured using either single-cell microscopy or bulk measurement \cite{Oehler1994,Vilar2003,Garcia2011, Brewster2014}. This leaves us with three free parameters in \eref[eq7] that are unknown, $K_I$, $K_A$, and $\epsilon$. We applied Bayesian Markov chain Monte Carlo parameter estimation to estimate these parameters from our experimental data. Since the parameters are dependent on the properies of Lac repressor and its interaction with inducer \textit{in vivo}, and not on the specific regulatory context, any subset of the data should be suitable to use for our estimation of $K_I$, $K_A$, and $\epsilon$ \stephanieComment{This sentence is a bit unclear to me. I would replace "any subset of the data" with something more explicit, like "any combination of operator and RBS"}. We therefore could take several approaches to estiamte these parameters. 
+The binding energies $\Delta \varepsilon_{RD,A}$ and repressor copy number have previously been measured using either single-cell microscopy or bulk measurement \cite{Oehler1994,Vilar2003,Garcia2011, Brewster2014}. This leaves us with three free parameters in \eref[eq7] that are unknown, $K_I$, $K_A$, and $\epsilon$. We applied Bayesian Markov chain Monte Carlo parameter estimation to estimate these parameters from our experimental data. Since the parameters are dependent on the properties of Lac repressor and its interaction with inducer rather than the specific regulatory context considered, we should be able to use expression data from any of our strains to estimate $K_I$, $K_A$, and $\epsilon$ \stephanieComment{This sentence is a bit unclear to me. I would replace "any subset of the data" with something more explicit, like "any combination of operator and RBS"}. We therefore considered several approaches to estimate these parameters.
 For example, we could use fold change expression data from a single strain as inducer concentration is varied. We could then use our parameters estimates along with the known binding energies and repressor copy numbers to \textit{predict} expression for our 23 other strains. Agreement between the predictions and the experimental data for these 23 other strains will allow us to consider the validity of our MWC model. An alternative approach in estimating this parameters will be to take all the data from the 24 different strains and perform a global fit. We consider each of these in turn.
 
-\noindent \textbf{MWC Model can be used to predict expression levels as operator binding energy and repressor concentration is varied.} \stephanieComment{I don't think this heading really fits the content below. It seems more like it fits with the previous heading. I think the expression level prediciton is an important point to make, however, so we might want to expand on it.}
+%\noindent \textbf{MWC Model can be used to predict expression levels as operator binding energy and repressor concentration is varied.} \stephanieComment{I don't think this heading really fits the content below. It seems more like it fits with the previous heading. I think the expression level prediciton is an important point to make, however, so we might want to expand on it.}
 
-Taking the first approach, we performed a parameter estimation with our strain RBS1027 (repressor copy number of 130 per cell) with the O2 operator. The measured fold changes in expression are shown in \fref[fig_result1] as a function of inducer concentration. We found $K_I$, $K_A$, and $\epsilon$ to be equal to X, Y, and Z respectively, and plot \eref[eq7] alongside the data in \fref[fig_result1]. 
+Taking the first approach, we performed a parameter estimation with our strain RBS1027 (repressor copy number of 130 per cell) with an O2 operator. The measured fold changes in expression are shown in \fref[fig_result1] as a function of inducer concentration. We found $K_I$, $K_A$, and $\epsilon$ to be equal to X, Y, and Z respectively, and plot \eref[eq7] alongside the data in \fref[fig_result1]. \nathanComment{We should talk about 2 vs 3 parameters.}
 
 \begin{figure}[h]
-	\centering \includegraphics[scale=0.5]{extra_figures/fig_fit_explanation_02.pdf}
-	\caption{{\bf IPTG Induction of RBS1027 O2 Simple Repression Construct.} Fold change of RBS1027 O2 simple repression construct located on the chromosome as a function of IPTG concentration. The solid points correspond to our experimental data, where error bars in fold change measurements refering to the SEM (n=10). The solid lines correspond to \eref[eq7] using the parameter estimates of $K_I$, $K_A$, and $\epsilon$. Values for repressor copy number and operator binding energy are from \cite{Garcia2011}.  The shaded region on the curve represents the uncertainty from our parameter estimates and reflect the 95\% highest probability density region of the parameter predictions for $K_I$, $K_A$, and $\epsilon$.}
+	\centering \includegraphics[scale=0.5]{extra_figures/fig_error_propagation.pdf}
+	\caption{{\bf IPTG Induction of RBS1027 O2 Simple Repression Construct.} Fold change of RBS1027 O2 simple repression construct as a function of IPTG concentration. The solid points correspond to our experimental data, where error bars in fold change measurements refering to the SEM (n=10). The solid lines correspond to \eref[eq7] using the parameter estimates of $K_I$, $K_A$, and $\epsilon$. Values for repressor copy number and operator binding energy are from \cite{Garcia2011}.  The shaded region on the curve represents the uncertainty from our parameter estimates and reflect the 95\% highest probability density region of the parameter predictions for $K_I$, $K_A$, and $\epsilon$.}
 	\label{fig_result1}
 \end{figure}
 
-Using the parameters we found for $K_I$, $K_A$, and $\epsilon$ we then predicted the fold change as a function of IPTG concentration for our 23 other strains. \fref[fig_result2] shows the measured fold change plotted with the parameter-free predictions for these other strains. We find good agreement between the theoretical predictions and the experimental measurements for these other strains. Of course, we could have used any of the strains to estimate our parameters and we consider a more extensive analysis between parameter estimates of the different datasets in the supplemental information (See Appendix \ref{AppendixParamEstimation}). Among our different strains, the choice of RBS1027 and the O2 operator provided us with a large range of fold-change measurements and allowed us to pin down the parameter estimates with good confidence.  
+Using the parameters we found for $K_I$, $K_A$, and $\epsilon$ we then predicted the fold change as a function of IPTG concentration for our 23 other strains with different operator and repressor copy number. \fref[fig_result2] shows the measured fold change plotted along with these parameter-free predictions. We find good agreement between the theoretical predictions and the experimental measurements for these other strains, supporting the validity of our model. Of course, we could have taken this approach with any of our strains and  consider a more extensive analysis between parameter estimates of the different datasets in the supplemental information (See Appendix \ref{AppendixParamEstimation}). Among our different strains, the choice of RBS1027 and the O2 operator provides a large dynaimc range and in fold-change measurements and allows us to pin down the parameter estimates with good confidence. \nathanComment{Should I discuss cases where data and experiment isn't perfect/great here as well?}
 
 \begin{figure}[h]
 	\centering \includegraphics[scale=0.5]{fig_theory_vs_data_log_O2_RBS1027_fit.pdf}
@@ -29,26 +29,26 @@ Using the parameters we found for $K_I$, $K_A$, and $\epsilon$ we then predicted
 	\label{fig_result2}
 \end{figure}
 
-While the above approach enabled us to estimate $K_I$ and $K_A$ and then ask how well our model performed as a function of changing repressor copy number and operator binding energy, it is also possible to use all of our data and perform a global fit. By taking this approach we find  $K_I$, $K_A$, and $\epsilon$ to be equal to X2, Y2, and Z2 respectively and is in agreement with our previous estimate.
+While the above approach enabled us to estimate $K_I$, $K_A$, and $\epsilon$ and then ask how well our model \textit{predicted} expression for other simple repression constructs, we could also have used all of our data and performed a global fit. By taking this approach we find $K_I$, $K_A$, and $\epsilon$ to be equal to X2, Y2, and Z2, respectively. This is in good agreement with the parameter values we found when using our individual strain, and in particular, those from strain RBS1027 with an O2 operator.
 
-\stephanieComment{In this part, I think we need some justification for why data collapse is important/interesting.} We can also rewrite \eref[eq7] in a way that enables us to collapse the predictions for our 24 different strains onto a single master curve. Specifically, if we write fold-change in the following form,
+\stephanieComment{In this part, I think we need some justification for why data collapse is important/interesting.} Finally, while our theory implies a unique response curve for any set of operator and repressor copy number, each seemingly different curve is derived from the same common mechanism of allostery. To better see how our model encompases this, we can rewrite \eref[eq7] in a way that enables us to collapse the predictions for our 24 different strains onto a single master curve. Specifically, if we write fold-change in the following form,
 
 \begin{equation}\label{eq8}
 \foldchange= \frac{1}{1+e^{-\beta F(c)}}
 \end{equation}
 
-Where we call $F(c)$ the Bohr parameter \cite{Phillips2016} and is a more natural scaling variable to plot our fold change expression data against. Here $F(c)$ is given by
+Where we call $F(c)$ the Bohr parameter \cite{Phillips2016} that is a more natural scaling variable to plot our fold change expression data against. Here $F(c)$ is given by
 
 \begin{equation}\label{eq9}
 F(c) =  \frac{1}{\beta} log p_A(c)
-- \Delta\varepsilon_{RD,A} 
-log \frac{2R}{N_{\text{NS}}} 
+- \Delta\varepsilon_{RD,A}
+log \frac{2R}{N_{\text{NS}}}
 \end{equation}
 
 From \eref[eq6v2] we can rewrite this as
 
 \begin{equation}\label{eq10}
-F(c) = \frac{1}{\beta} log \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^2} - \Delta\varepsilon_{RD,A} log \frac{2R}{N_{\text{NS}}} 
+F(c) = \frac{1}{\beta} log \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^2} - \Delta\varepsilon_{RD,A} log \frac{2R}{N_{\text{NS}}}
 \end{equation}
 
 In \fref[fig_result3] we plot experimental fold change data against their associated Bohr parameter and find a nice data collapse with our 24 different strains. It is important to emphasize that the MWC model provides us with a single unified framework with which to explain our simple repression motif across a wide range of thermodynamic parameters.
@@ -58,6 +58,3 @@ In \fref[fig_result3] we plot experimental fold change data against their associ
 	\caption{{\bf Data Collapse of data from all strains.} The fold change data plotted as a function of the Bohr parameter \eref[eq10].  Solid points correspond to our experimental data, where error bars in fold change measurements refering to the SEM (n=10). Green points refer to strains contaning the O1 operator, blue points refer to strains contaning the O2 operator, and red points refer to strains containing the O3 operator. The solid line corresponds to \eref[eq10] and uses the parameter estimates of $K_I$, $K_A$, and $\epsilon$ from strain RBS1027 with an O2 operator.}
 	\label{fig_result3}
 \end{figure}
-
-
-
