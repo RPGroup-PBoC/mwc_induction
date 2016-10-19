@@ -45,8 +45,9 @@ datadir = '../../../data/flow/csv/'
 files = np.array(os.listdir(datadir))
 csv_bool = np.array([str(date) in f and 'csv' in f for f in files])
 files = files[np.array(csv_bool)]
-rbs = np.array(['auto', 'delta', 'RBS1027dimer', 'RBS1027'])
-repressors = np.array([0, 0, 870, 610, 130, 62, 30, 11])
+mutants = ['wt', 'dimer']
+rbs = np.array(['auto', 'delta', 'RBS1027'])
+repressors = np.array([0, 0, 130])
 
 concentrations = [0, 0.1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000] # uM IPTG
 
@@ -58,32 +59,35 @@ alpha = 0.40
 df = pd.DataFrame()
 # read the files and compute the mean YFP value
 for operator in operators.keys():
-    for i, c in enumerate(concentrations):
-        for j, strain in enumerate(rbs):
-            # find the file
-            try:
-                r_file = glob.glob(datadir + str(date) + '_' + run + '*' + \
-                        operator + '_' + strain + '_' + str(c) + 'uM' + '*csv')
-                print(r_file)
-                # read the csv file
-                dataframe = pd.read_csv(r_file[0])
-                # apply an automatic bivariate gaussian gate to the log front
-                # and side scattering
-                data = mwc.auto_gauss_gate(dataframe, alpha,
-                                            x_val='FSC-A', y_val='SSC-A',
-                                            log=True)
-                # compute the mean and append it to the data frame along the
-                # operator and strain
-                df = df.append([[date, username, operator, operators[operator],
-                            strain, repressors[j], c,
-                            data['FITC-A'].mean()]],
-                            ignore_index=True)
-            except:
-                pass
+    for mut in mutants:
+        for i, c in enumerate(concentrations):
+            for j, strain in enumerate(rbs):
+                # find the file
+                try:
+                    r_file = glob.glob(datadir + str(date) + '_' + run + '_' + \
+                            mut + '_' + operator + '_' + strain + '_' + str(c) \
+                            + 'uM' + '*csv')
+                    print(r_file)
+                    # read the csv file
+                    dataframe = pd.read_csv(r_file[0])
+                    # apply an automatic bivariate gaussian gate to the log front
+                    # and side scattering
+                    data = mwc.auto_gauss_gate(dataframe, alpha,
+                                                x_val='FSC-A', y_val='SSC-A',
+                                                log=True)
+                    # compute the mean and append it to the data frame along the
+                    # operator and strain
+                    df = df.append([[date, username, mut,
+                                operator, operators[operator],
+                                strain, repressors[j], c,
+                                data['FITC-A'].mean()]],
+                                ignore_index=True)
+                except:
+                    pass
 
 # rename the columns of the data_frame
-df.columns = ['date', 'username', 'operator', 'binding_energy', \
-        'rbs', 'repressors', 'IPTG_uM', 'mean_YFP_A']
+df.columns = ['date', 'username', 'mutant', 'operator', 'binding_energy', \
+              'rbs', 'repressors', 'IPTG_uM', 'mean_YFP_A']
 
 # initialize pandas series to save the corrected YFP value
 mean_bgcorr_A = np.array([])
@@ -91,8 +95,7 @@ mean_bgcorr_A = np.array([])
 for i in np.arange(len(df)):
     data = df.loc[i]
     auto = df[(df.IPTG_uM == data.IPTG_uM) & \
-              (df.rbs == 'auto') & \
-              (df.operator == data.operator)].mean_YFP_A
+              (df.rbs == 'auto')].mean_YFP_A
     mean_bgcorr_A = np.append(mean_bgcorr_A, data.mean_YFP_A - auto)
 
 mean_bgcorr_A = pd.Series(mean_bgcorr_A)
