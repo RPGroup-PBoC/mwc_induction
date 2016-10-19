@@ -16,7 +16,7 @@ For example, we could use fold change expression data from a single strain as in
 Taking the first approach, we performed a parameter estimation with our strain RBS1027 (repressor copy number of 130 per cell) with an O2 operator. The measured fold changes in expression are shown in \fref[fig_result1] as a function of inducer concentration. We found $K_I$, $K_A$, and $\epsilon$ to be equal to X, Y, and Z respectively, and plot \eref[eq7] alongside the data in \fref[fig_result1]. \nathanComment{We should talk about 2 vs 3 parameters.}
 
 \begin{figure}[h]
-	\centering \includegraphics[scale=0.5]{extra_figures/fig_fit_explanation_02.pdf}
+	\centering \includegraphics[scale=0.5]{extra_figures/fig_error_propagation.pdf}
 	\caption{{\bf IPTG Induction of RBS1027 O2 Simple Repression Construct.} Fold change of RBS1027 O2 simple repression construct as a function of IPTG concentration. The solid points correspond to our experimental data, where error bars in fold change measurements refering to the SEM (n=10). The solid lines correspond to \eref[eq7] using the parameter estimates of $K_I$, $K_A$, and $\epsilon$. Values for repressor copy number and operator binding energy are from \cite{Garcia2011}.  The shaded region on the curve represents the uncertainty from our parameter estimates and reflect the 95\% highest probability density region of the parameter predictions for $K_I$, $K_A$, and $\epsilon$.}
 	\label{fig_result1}
 \end{figure}
