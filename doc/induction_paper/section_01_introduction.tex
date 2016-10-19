@@ -24,7 +24,7 @@ the MWC model stipulates that a symmetrical allosteric protein is capable of
 \sout{accessing at least two states} \talComment{accessing two distinct conformations}, a ``tense'' and ``relaxed'' state (or, as we will
 refer to them here, an ``active'' and ``inactive'' state) \talComment{Could italicize rather than use parentheses}. These states exist in
 equilibrium within a system, and a protein may switch between states at any
-time. Both states are capable of binding to a ligand, though the protein's
+time \manuelComment{We should avoid using the word time since it is forbidden in the theoretical framework we are using}. Both states are capable of binding to a ligand \manuelComment{here should be plural}, though the protein's
 affinity for the ligand will be affected significantly by the protein's
 allosteric conformation. Given a high enough concentration of ligand, it becomes
 energetically favorable for a protein to spend the significant majority of its
@@ -35,12 +35,12 @@ statistical mechanical framework for our model of transcriptional induction.
 \nathanComment{we say statistical mechanics a lot. Maybe remove the second one
 	in this sentence.} \talComment{I think the last 4 sentences can be tightened up}
 
-\talComment{Abrupt transition. This seems like the place to mention that we are going to focus on induction of the Lac repressor in \textit{Escherichia coli} and its effects of transcriptional regulation. The next sentence here may be too much detail for the intro, but we should definitely keep what has already been done.} To provide a straightforward context for exploring allosteric induction
+\talComment{Abrupt transition. This seems like the place to mention that we are going to focus on induction of the Lac repressor in \textit{Escherichia coli} and its effects of transcriptional regulation. The next sentence here may be too much detail for the intro, but we should definitely keep what has already been done.} \manuelComment{I agree. The first time I read it I thought this was too many details for the intro.} To provide a straightforward context for exploring allosteric induction
 \textit{in vivo}, we use a chromosomally-integrated simple repression construct
 in which a single repressor binding site blocks access to an RNAP polymerase
 binding site. A YFP reporter gene downstream of this construct allows us to
 measure the fold-change caused by repressor binding. As our model repressor, we
-use the Lac repressor (LacI), which has long been recognized as a rich model 
+use the Lac repressor (LacI), which has long been recognized as a rich model
 for understanding the nature of allostery within the MWC framework
 \cite{Daly1986, Dunaway1980, Meyer2013, Daber2007, Daber2009,
 	Muller-Hartmann1996, OGorman1980, Sharp2011, Taraban2008, Wilson2007}.
@@ -59,7 +59,7 @@ experimental data. \griffinComment{Maybe we should leave this section for the
 This work aims to extend our statistical mechanical models to include
 allosteric induction by examining the
 feedback mechanism by which the \textit{lac} system responds to changing levels
-of lactose \cite{JACOB1961}. We extend the previous thermodynamic models for
+of lactose \cite{JACOB1961} \manuelComment{There is not a single feedback component on our system. This sentence is very misleading}. We extend the previous thermodynamic models for
 simple repression to include the effects of an inducer. This introduces three
 new parameters into our model: the binding affinity of inducer to LacI in the
 ``active'' or DNA-binding conformation, the binding affinity of inducer to LacI
@@ -78,4 +78,4 @@ parameter'' governing IPTG induction; when plotted against this natural
 parameter, the fold-change values for all of the mutants fall on the same curve.
 In this way, we demonstrate the power of quantitative modeling as a tool for
 achieving deep understanding of biological systems. \nathanComment{Switches from
-strain to mutant half way through. I'd avoid using mutant}
+strain to mutant half way through. I'd avoid using mutant} \manuelComment{I feel that the last part of the intro needs to emphasize more on what are our contributions and what is the punchline of the paper}
