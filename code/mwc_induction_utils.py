@@ -159,7 +159,7 @@ import skimage.segmentation
 import joblib as jlb
 import scipy.stats as sc
 import scipy
-import numdifftools as ndt
+import statsmodels.tools.numdiff as smnd # to comput the Hessian matrix
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -564,9 +564,9 @@ def log_post(param, indep_var, dep_var, epsilon=4.5, quaternary_state=2,
         raise ValueError('quaternary_state must be positive.')
     if nonspec_sites <= 0:
         raise ValueError('nonspec_sites must be greater than zero')
-    if np.shape(indep_var)[-1] != 3 or len(np.shape(indep_var)[-1]) == 1:
+    if np.shape(indep_var)[-1] != 3 or len(np.shape(indep_var)) == 1:
         raise RuntimeError('indep_var must have Nx3 elements.')
-    if len(dep_var) != np.shape(indep_var[0]):
+    if len(dep_var) != np.shape(indep_var)[0]:
         raise RuntimeError('length of dependent variables must equal to depth\
             of indep_var')
 
@@ -624,45 +624,39 @@ def resid(param, indep_var, dep_var, epsilon=4.5):
 
 # #################
 def non_lin_reg_mwc(df, p0,
-                    indep_var=['iptg_uM', 'repressors', 'binding_energy'],
+                    indep_var=['IPTG_uM', 'repressors', 'binding_energy'],
                     dep_var='fold_change_A', epsilon=4.5, diss_const=False):
     '''
-    Performs a non-linear regression on the lacI iptg titration data
-    assuming Gaussian errors with constant variance. Returns the parameters
+    Performs a non-linear regression on the lacI IPTG titration data assuming
+    Gaussian errors with constant variance. Returns the parameters 
     e_A == -ln(K_A)
     e_I == -ln(K_I)
-    and its corresponding error bars by approximating the posterior
-    distribution
+    and it's corresponding error bars by approximating the posterior distribution
     as Gaussian.
-
     Parameters
     ----------
     df : DataFrame.
-        DataFrame containing all the titration information. It should at
-        minimum contain the iptg concentration used, the repressor copy
-        number for each strain and the binding energy of such strain as the
-        independent variables and obviously the gene expression fold-change
-        as the dependent variable.
+        DataFrame containing all the titration information. It should at minimum
+        contain the IPTG concentration used, the repressor copy number for each
+        strain and the binding energy of such strain as the independent variables
+        and obviously the gene expression fold-change as the dependent variable.
     p0 : array-like (length = 2).
-        Initial guess for the parameter values. The first entry is the guess
-        for e_A == -ln(K_A) and the second is the initial guess for
-        e_I == -ln(K_I).
+        Initial guess for the parameter values. The first entry is the guess for
+        e_A == -ln(K_A) and the second is the initial guess for e_I == -ln(K_I).
     indep_var : array-like (length = 3).
         Array of length 3 with the name of the DataFrame columns that contain
         the following parameters:
-        1) iptg concentration
+        1) IPTG concentration
         2) repressor copy number
         3) repressor binding energy to the operator
     dep_var : str.
-        Name of the DataFrame column containing the gene expression
-        fold-change.
+        Name of the DataFrame column containing the gene expression fold-change.
     epsilon : float.
         Value of the allosteric parameter, i.e. the energy difference between
         the active and the inactive state.
     diss_const : bool.
         Indicates if the dissociation constants should be returned instead of
-        the e_A and e_I parameters.
-
+        the e_A and e_I parameteres.
     Returns
     -------
     if diss_const  == True:
@@ -678,37 +672,33 @@ def non_lin_reg_mwc(df, p0,
     '''
     df_indep = df[indep_var]
     df_dep = df[dep_var]
-
-    # Extra arguments given as tuple
+    
+    # Extra arguments given as tuple 
     args = (df_indep.values, df_dep.values, epsilon)
 
-    # Compute the MAP
+    # Compute the MAP 
     popt, _ = scipy.optimize.leastsq(resid, p0, args=args)
 
     # Extract the values
     ea, ei = popt
-
-    # Instantiate a numdifftools Hessian object for the log posterior
-    hes_fun = ndt.Hessian(log_post)
-
+    
     # Compute the Hessian at the map
-    hes = hes_fun(popt, df_indep.values, df_dep.values)
-
+    hes = smnd.approx_hess(popt, log_post, 
+                           args=(df_indep.values, df_dep.values))
+    
     # Compute the covariance matrix
-    cov = -np.linalg.inv(hes)
-
+    cov = -np.linalg.inv(hes) 
+    
     if diss_const:
-        # Get the values for the dissociation constants and their
+        # Get the values for the dissociation constants and their 
         # respective error bars
         Ka = np.exp(-ea)
         Ki = np.exp(-ei)
-        deltaKa = np.sqrt(cov[0, 0]) * Ka
-        deltaKi = np.sqrt(cov[1, 1]) * Ki
+        deltaKa = np.sqrt(cov[0,0]) * Ka
+        deltaKi = np.sqrt(cov[1,1]) * Ki 
         return Ka, deltaKa, Ki, deltaKi
-
     else:
-        return ea, cov[0, 0], ei, cov[1, 1]
-
+        return ea, cov[0,0], ei, cov[1,1]
 
 # #################
 def hpd(trace, mass_frac):

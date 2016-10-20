@@ -67,10 +67,11 @@ ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
 IPTG = np.logspace(-8, -2, 100)
 
 # Set the colors for the strains
-colors = sns.color_palette(n_colors=7)
+colors = sns.color_palette('colorblind', n_colors=7)
+colors[4] = sns.xkcd_palette(['amber'])[0]
 
 # Define the operators and their respective energies
-operators = ['O2', 'O1', 'O3'] #, 'Oid']
+operators = ['O1', 'O2', 'O3'] #, 'Oid']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize subplots
@@ -97,12 +98,12 @@ for i, op in enumerate(operators):
             epsilon_r=energies[op]),
             color=colors[j])
         # plot 95% HPD region using the variability in the MWC parameters
-#        cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
-#            gauss_flatchain, epsilon=4.5,
-#            R=df[(df.rbs == rbs)].repressors.unique(),
-#            epsilon_r=energies[op])
-#        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-#                        alpha=0.3, color=colors[j])
+        cred_region = mwc.mcmc_cred_region(IPTG * 1e6, 
+            gauss_flatchain, epsilon=4.5,
+            R=df[(df.rbs == rbs)].repressors.unique(),
+            epsilon_r=energies[op])
+        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                        alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
@@ -110,14 +111,24 @@ for i, op in enumerate(operators):
         np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
         
         # plot the experimental data
-        ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-            yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
-            color=colors[j])
+        # Distinguish between the fit data and the predictions
+        if (op == 'O2') & (rbs == 'RBS1027'):
+            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+                    fc_mean, yerr=fc_err, 
+                    fmt='d',
+                    markeredgewidth=1, markeredgecolor=colors[j],
+                    markerfacecolor='None', color=colors[j])
+        else:
+            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+                    fc_mean, yerr=fc_err, 
+                    fmt='o', label=df[df.rbs==rbs].repressors.unique()[0] * 2,
+                color=colors[j])
     ax[i].set_xscale('log')
     ax[i].set_xlabel('IPTG (M)')
     ax[i].set_ylabel('fold-change')
-    ax[i].set_ylim([-0.01, 1.2])
+    ax[i].set_ylim([-0.01, 1.1])
     ax[i].set_title(op)
+    ax[i].margins(0.02)
 ax[0].legend(loc='upper left', title='repressors / cell')
 ax[3].set_axis_off()
 plt.tight_layout()
