@@ -9,7 +9,7 @@
 	\centering \caption{{\bf Key model parameters for induction of an allosteric repressor.} \talComment{We can decide whether we like this, and whether it should be explicitly referenced anywhere in the text}}
 	\begin{tabular}{@{\vrule height 10.5pt depth4pt  width0pt}cl}
 		\textbf{Parameter} & \multicolumn{1}{c}{\textbf{Description}} \cr
-		\hline \noalign{\vskip 2pt} 
+		\hline \noalign{\vskip 2pt}
 		\hline
 		$K_A, K_I$ & Dissociation constant between the inducer IPTG and the Lac repressor in the active/inactive state \cr
 		\hline
@@ -100,8 +100,8 @@ Boltzmann's constant and $T$ is the temperature of the system.
 
 In thermodynamic models of transcription, gene expression is proportional to the
 probability $p_{\text{bound}}$ that RNAP is bound to the Lac promoter which is
-given by 
-%\manuelComment{the equation depends on $R$ but there is not explicit mention of this variable. I think this should probably be $p(r_A, r_I \mid R)$ or something along those lines}. 
+given by
+%\manuelComment{the equation depends on $R$ but there is not explicit mention of this variable. I think this should probably be $p(r_A, r_I \mid R)$ or something along those lines}.
 %\manuelComment{Also there should not be a factor of 2 because that implicitly states that the two dimers are allosterically dependent which we are not assuming to be true.}
 \begin{equation}\label{eq2}
 p_{\text{bound}}(R_A, R_I \mid R)=\frac{\frac{P}{N_{NS}}e^{-\beta  \Delta\varepsilon_{P}}}{1+\frac{R_A}{N_{NS}}e^{-\beta \Delta\varepsilon_{RA}}+\frac{R_I}{N_{NS}}e^{-\beta  \Delta\varepsilon_{RI}}+\frac{P}{N_{NS}}e^{-\beta  \Delta\varepsilon_{P}}},
@@ -114,8 +114,8 @@ where the number of active ($R_A$) and inactive ($R_I$) repressor dimers are pro
 %r_I &= \frac{R_I}{N_{NS}}e^{-\beta  \Delta\varepsilon_{RI}}.
 %\end{align}
 %Note the factor of 2 in the repressor states, which arises from the possibility
-%that either repressor dimer may bind to DNA \stephanieComment{Should explain the tetrameric nature of LacI before referring to dimers. Not sure this has been discussed yet in the text.} 
-Measuring $p_{\text{bound}}$ directly is fraught with experimental difficulties \cite{Bintu2005}. Instead, we measure the fold-change, the ratio of gene expression relative to a bacterial strain with no Lac repressor, 
+%that either repressor dimer may bind to DNA \stephanieComment{Should explain the tetrameric nature of LacI before referring to dimers. Not sure this has been discussed yet in the text.}
+Measuring $p_{\text{bound}}$ directly is fraught with experimental difficulties \cite{Bintu2005}. Instead, we measure the fold-change, the ratio of gene expression relative to a bacterial strain with no Lac repressor,
 \begin{equation}\label{eq3}
 \foldchange\equiv \frac{p_{\text{bound}}(R_A, R_I \mid R)}{p_{\text{bound}}(R = 0)}.%=\frac{1+p}{1+2r_A+2r_I+p}.
 \end{equation}
@@ -125,7 +125,7 @@ approximation, which assumes that RNAP binding is too weak to compete with
 repressor binding, as has been shown for the Lac promoter \cite{Brewster2012}.
 The second approximation states that the inactive repressor binds weakly to the
 DNA so that it too cannot compete with the active repressor binding. Using these
-approximations, the fold-change reduces to the form 
+approximations, the fold-change reduces to the form
 %\manuelComment{again this I
 %	think should not have the factor of 2. The number of active repressors doesn't
 %	need to be an even number if we are assuming the two dimers are independent.}
@@ -165,7 +165,7 @@ simultaneously active or simultaneously inactive). While no direct measurements
 have as of yet been carried out to definitively distinguish between these two
 models, in Appendix \ref{AppendixAllostery} we describe a simple experiment
 which can do precisely this. In this paper, we proceed with the assumption that
-the two repressor dimers are allosterically independent. 
+the two repressor dimers are allosterically independent.
 %\stephanieComment{For now I think this is fine--but if our experiments suggest otherwise when we get more data, I think we should be willing to change our model}
 
 \begin{figure}[h]
@@ -195,7 +195,6 @@ of every possible state, namely,
 \begin{equation}\label{eq6}
 p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \Delta \varepsilon_{IA} }\left(1+\frac{c}{K_I}\right)^2}.
 \end{equation}
-
 %Note that in the \fref[figrepressorInducerStates] states and weights, we assumed
 %that within the Lac tetramer, each Lac dimer could be active or inactive
 %independently of the other dimer. An alternative model presumes that . While no
@@ -205,7 +204,6 @@ p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-
 %the Lac repressor we can distinguish between these two models. \talComment{Rob,
 %	this is super cool!!! If you agree with the theory in this Appendix, let us know
 %	if you approve of us carrying out this experiment!}
-
 %It is hypothesized that in the absence of inducer ($c=0$), all of the repressors
 %are present in the active state, which implies $\beta \varepsilon \gg 1$. As
 %discussed in Appendix \ref{AppendixModel}, this assertion seems supported by the
@@ -224,7 +222,7 @@ p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-
 %p_A(c) \approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(\frac{c}{K_I}\right)^2} \equiv \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2},
 %\end{equation}
 %where we have introduced the effective dissociation constant $\KIeff = K_I
-%e^{\beta  \varepsilon/2}$. 
+%e^{\beta  \varepsilon/2}$.
 Substituting this result into \eref[eq5] yields the
 complete formula
 \begin{equation}\label{eq7}
@@ -366,7 +364,7 @@ in the active state ($K_A$) and inactive state ($K_I$).
 %%p_A(c) \approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(\frac{c}{K_I}\right)^2} \equiv \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2},
 %%\end{equation}
 %%where we have introduced the effective dissociation constant $\KIeff = K_I
-%%e^{\beta  \varepsilon/2}$. 
+%%e^{\beta  \varepsilon/2}$.
 %Substituting this result into \eref[eq5] yields the
 %complete formula
 %\begin{equation}\label{eq7}
