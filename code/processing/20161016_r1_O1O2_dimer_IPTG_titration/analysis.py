@@ -37,19 +37,22 @@ operators = {'O1' : -15.3, 'O2' : -13.9}
 df = pd.read_csv('output/' + str(date) + '_' + run + '_' + 'O1O2dimer' + \
                  '_IPTG_titration_MACSQuant.csv')
 rbs = df.rbs.unique()
-
+mutants = df.mutant.unique()
 #===============================================================================
 
 # plot all raw data
 plt.figure()
 for op in operators.keys():
     for strain in rbs[np.array([r != 'auto' and r != 'delta' for r in rbs])]:
-        plt.plot(df[(df.operator == op) & \
-                (df.rbs == strain)].sort_values(by='IPTG_uM').IPTG_uM * 1E-6,
-                df[(df.operator == op) & \
-                (df.rbs == strain)].sort_values(by='IPTG_uM').fold_change_A,
-                marker='o', linewidth=1, linestyle='--',
-                label=op + ' ' + strain)
+        for mut in mutants:
+            plt.plot(df[(df.operator == op) & \
+                    (df.rbs == strain) & \
+                    (df.mutant == mut)].sort_values(by='IPTG_uM').IPTG_uM * 1E-6,
+                    df[(df.operator == op) & \
+                    (df.rbs == strain) & \
+                    (df.mutant == mut)].sort_values(by='IPTG_uM').fold_change_A,
+                    marker='o', linewidth=1, linestyle='--',
+                    label=op + ' ' + mut + ' ' + strain)
 plt.xscale('log')
 plt.xlabel('IPTG (M)')
 plt.ylabel('fold-change')

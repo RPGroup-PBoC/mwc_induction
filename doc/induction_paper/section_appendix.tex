@@ -135,10 +135,56 @@ $\varepsilon$.
 %\phantom{...}
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Sloppy Models} \label{AppendixSloppiness}
+\section{Parameter Degeneracy} \label{AppendixSloppiness}
+
+\talComment{Can discuss this stuff below. Follow ion channels. First introduce the parameter degeneracy graph, then state that we are using $\beta \epsilon = -4.5$, then can discuss how the sloppiness approximation may arise. This latter is pasted below.}
+
+Consider the probability that the allosteric Lac repressor is in the active state,
+\begin{equation}\label{AppendixEq5}
+p_A(c)=\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(1+\frac{c}{K_I}\right)^2}.
+\end{equation}
+
+It is hypothesized that in the absence of inducer ($c=0$), all of the repressors
+are present in the active state, which implies $\beta \varepsilon \gg 1$. As
+discussed in Appendix \ref{AppendixModel}, this assertion seems supported by the
+available data, but must ultimately be validated by direct measurement, as is
+possible by NMR \cite{Gardino2003, Boulton2016}. Given $\beta \varepsilon \gg
+1$, we can approximate the term $e^{-\beta \varepsilon}
+\left(1+\frac{c}{K_I}\right)^2 \approx e^{-\beta  \varepsilon
+}\left(\frac{c}{K_I}\right)^2$ in the denominator of \eref[AppendixEq5]. \stephanieComment{I'm feeling that we may want to stick with the approximation from the Brewster/Franz data. Re-reading about the approximation in the context of the rest of our models makes me feel like it's a bit wishy-washy. \talComment{I think we should cut this out and just have all 3 parameters. We can discuss this approximation stuff in the SI.}} To see this,
+note that both expressions are negligible compared to
+$\left(1+\frac{c}{K_A}\right)^2$ for small $c$; on the other hand, the term
+$e^{-\beta \varepsilon} \left(1+\frac{c}{K_I}\right)^2$ becomes non-negligible
+once $e^{-\beta \varepsilon }\left(\frac{c}{K_I}\right)^2 \gtrsim 1$, in which
+case $\frac{c}{K_I} \gg 1$ so that our approximation is again valid. Therefore,
+we can approximate the probability that a repressor dimer is active as
+\begin{equation}\label{AppendixEq6}
+p_A(c) \approx \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+e^{-\beta  \varepsilon }\left(\frac{c}{K_I}\right)^2} \equiv \frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2},
+\end{equation}
+where we have introduced the effective dissociation constant $\KIeff = K_I
+e^{\beta  \varepsilon/2}$. Substituting this result into \eref[eq5] yields the
+complete formula
+\begin{equation}\label{AppendixEq7}
+\foldchange= \left(
+1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2}\frac{2 R}{N_{\text{NS}}}e^{-\beta \Delta\varepsilon_{RD,A}} \right)^{-1},
+\end{equation}
+%\begin{equation}\label{eq7}
+%\foldchange= \left(
+%1+\frac{\left(1+\frac{c}{K_A}\right)^2}{\left(1+\frac{c}{K_A}\right)^2+\left(\frac{c}{\KIeff}\right)^2}\frac{2[R]}{\K} \right)^{-1},
+%\end{equation}
+which predicts that given a concentration \(c\) of the inducer IPTG, \(R\)
+copies of the Lac repressor, and the $N_{\text{NS}} = 4.6 \times 10^6$ \talComment{Do we want italics or non-italics subscripts? I don't care, but the figures should be consistent}
+non-specific binding sites on the \textit{E. coli} genome, the fold-change in
+gene expression will depend solely on 3 parameters: the DNA binding affinity of
+the repressor ($\Delta\varepsilon_{RD,A}$) and the inducer binding affinities
+for the repressor in the active state (\(K_A\)) and inactive state (\(\KIeff\)),
+with this latter quantity also incorporating the difference in free energy
+between the active and inactive states of the repressor.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Background}
+
+\talComment{The notation needs to be updated throughout the entire Appendix sections}
 
 We begin with the fold-change for the Lac repressor,
 \begin{equation}
