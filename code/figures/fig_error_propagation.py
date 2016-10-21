@@ -52,7 +52,7 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.operator != 'Oid')]
 # Load MCMC flatchain
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/' + '20161020' + \
+with open('../../data/mcmc/' + '20161021' + \
                   '_error_prop_pool_data_larger_sigma.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
@@ -76,7 +76,7 @@ IPTG = np.logspace(-8, -2, 100)
 
 # Set the colors for the strains
 colors = sns.color_palette('colorblind', n_colors=7)
-colors[4] = sns.xkcd_palette(['amber'])[0]
+colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
 # Define the operators and their respective energies
 operators = ['O1', 'O2', 'O3']# 'Oid']
