@@ -19,7 +19,6 @@ import matplotlib.cm as cm
 # Seaborn, useful for graphics
 import seaborn as sns
 
-sns.set_palette("deep", color_codes=True)
 mwc.set_plotting_style()
 
 #=============================================================================== 

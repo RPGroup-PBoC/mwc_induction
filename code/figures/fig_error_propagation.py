@@ -9,7 +9,7 @@ import pandas as pd
 
 # Import the project utils
 import sys
-sys.path.insert(0, '../')
+sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 
 # Import matplotlib stuff for plotting
