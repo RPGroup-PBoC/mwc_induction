@@ -69,10 +69,14 @@ df['bohr_1027'] = mwc.bohr_fn(df, ea, ei)
 
 # Given this result let's plot all the curves using this parameters.
 colors = sns.color_palette('colorblind', n_colors=4)
-F = np.linspace(-8, 10, 200)
+
+# Define the operators to use in the plot
+operators = ['O1', 'O2', 'O3']
+
+F = np.linspace(-10, 10, 200)
 plt.figure(figsize=(8, 6))
 plt.plot(F, 1 / (1 + np.exp(-F)), '-', color='black')
-for i, operator in enumerate(df.operator.unique()):
+for i, operator in enumerate(operators):
     data = df[df.operator==operator]
     plt.errorbar([], [], label=operator, color=colors[i], fmt='o')
     for j, rbs in enumerate(df.rbs.unique()):
