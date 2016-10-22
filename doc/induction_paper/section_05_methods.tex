@@ -5,14 +5,14 @@
 
 \subsection*{Bacterial Strains and DNA Constructs}
 All strains used in these experiments were adapted from those created and
-described in \citep{Garcia2011} \talComment{Let's discuss cite vs citep}. Briefly, the operator mutants and YFP reporter
+described in \cite{Garcia2011} \talComment{Let's discuss cite vs citep}. Briefly, the operator mutants and YFP reporter
 gene were cloned into a pZS25 background which contains a \textit{lacUV5}
 promoter which drives expression as is shown in \ref{fig:S1}. The ribosomal
 binding site mutants were cloned into a pZS3\*5 plasmid backbone \griffinComment{find plasmid nomenclature reference} \nathanComment{\cite{Lutz1997} ?}. Expression of
 the \textit{lacI} transcript was driven by a P$_\mathrm{LtetO-1}$ promoter
 \cite{Lutz1997}. The ribosomal binding site mutants were made as described in
-\citep{Salis2009} using site-directed mutagenesis (Quickchange II; Stratagene)
-and is described in detail in \citep{Garcia2011}.
+\cite{Salis2009} using site-directed mutagenesis (Quickchange II; Stratagene)
+and is described in detail in \cite{Garcia2011}.
 
 A subset of strains in these experiments were measured using fluorescence
 microscopy for validation of the flow cytometry data and results. To aid in the
@@ -118,49 +118,44 @@ repressors respectively \talComment{what about the $\Delta\varepsilon_{RA}$ para
 inference and determined the probability \talComment{distribution for } \sout{of} each parameter \sout{having a given
 value}. Using Bayes's theorem, we can state that the posterior probability
 distribution of our parameter of interest is
-
 \begin{align}
 P(\epsilon_A, \epsilon_I, R, \Delta\epsilon_r, \vert D, I) \propto P(D \vert
 \epsilon_A, \epsilon_I, R, \Delta\epsilon_r, I)\cdot P(\epsilon_A, \epsilon_I,
-R, \Delta\epsilon_r \vert I)
+R, \Delta\epsilon_r \vert I),
 \end{align}
-
-in \talComment{punctuation and link sentence} which $\epsilon_A = -\ln K_A$ and
-$\epsilon_I = -\ln K_I$ for convenience \talComment{I would actually call this fit stability, since $K_A$ and $K_I$ must be positive}, $R$ is the \sout{mean measurement of the} average number of
-repressors per cell, $\Delta\epsilon_r$ is the \sout{average} operator binding energy, $D$ is the experimental data, and $I$ is all prior
-information. We can make the assumption that each measurement of fold-change
-is independent, the errors on these measurements are Gaussian distributed, and
-the error distribution of the concentration of inducer is homoscedastic. Given
-these assumptions, it is important to realize that each element of the
-experimental measurements $D$ is actually a pair of a dependent variable (the
-experimentally measured fold-change) and the independent variables ($R$, the
-operator binding energy $\Delta\epsilon_r$, and the IPTG concentration $C$ \talComment{Why capitalize $c$ here?}). Using these assumptions, we can state our likelihood $P(D \vert \epsilon_A, \epsilon_i, R, I)$ as
-
-\begin{align}
-P(D \vert \epsilon_A, \epsilon_I, R, \Delta\epsilon_r, I) =
+in which $\epsilon_A = -\ln K_A$ and $\epsilon_I = -\ln K_I$ to maintain positivity of these values, $R$ is the \sout{mean measurement of the} average number of
+repressors per cell, $\Delta\epsilon_r$ is the \sout{average} operator binding
+energy, $D$ is the experimental data, and $I$ is all prior information. We can
+make the assumption that each measurement of fold-change is independent, the
+errors on these measurements are Gaussian distributed, and the error
+distribution of the concentration of inducer is homoscedastic. Given these
+assumptions, it is important to realize that each element of the experimental
+measurements $D$ is actually a pair of a dependent variable (the experimentally
+measured fold-change) and the independent variables ($R$, the operator binding
+energy $\Delta\epsilon_r$, and the IPTG concentration $C$ \talComment{Why
+capitalize $c$ here?}). Using these assumptions, we can state our likelihood
+$P(D \vert \epsilon_A, \epsilon_i, R, I)$ as \begin{align} P(D \vert
+\epsilon_A, \epsilon_I, R, \Delta\epsilon_r, I) =
 \frac{1}{(2\pi\sigma^2)^{\frac{n}{2}}}\prod\limits_{i=1}^n\exp\left[\frac{(\mathrm{fc_{exp}}^i -
 \mathrm{fc}(\epsilon_A, \epsilon_I, R^i, \Delta\epsilon_r^i,
-C^i))^2}{2\sigma^2}\right]
-\end{align}
-
-where \talComment{link and punctuation, both here and below} $\sigma$ is the variance associated with the Gaussian distributed error
-of the MAP, $\mathrm{fc}$ is the the fold-change expression \talComment{why did you use $\mathrm{fc_{exp}}^i$ and not $\mathrm{fc_{exp}^i}$? Note that you used subsuperscripts in $\Delta\epsilon_r^i$} derived previously
-\griffinComment{reference the main text equation here once we converge on
-notation}, $n$ is the number of experimental measurements, and $i$ is each
-individual measurement. We can assume that the parameters $\epsilon_A$,
-$\epsilon_I$, $\sigma$ are independent and are uniform on a logarithmic scale.
-For this reason, we can assign a Jeffery's prior on these parameters yielding
-
-\begin{align}
-P(\epsilon_A, \epsilon_I, \sigma \vert I) \equiv
-\frac{1}{\epsilon_A}\cdot\frac{1}{\epsilon_I}\cdot\frac{1}{\sigma}
-\end{align}
-
+C^i))^2}{2\sigma^2}\right], \end{align} where \talComment{link and punctuation,
+both here and below} $\sigma$ is the variance associated with the Gaussian
+distributed error of the MAP, $\mathrm{fc}$ is the the fold-change expression
+\talComment{why did you use $\mathrm{fc_{exp}}^i$ and not
+$\mathrm{fc_{exp}^i}$? Note that you used subsuperscripts in
+$\Delta\epsilon_r^i$} derived previously \griffinComment{reference the main
+text equation here once we converge on notation}, $n$ is the number of
+experimental measurements, and $i$ is each individual measurement. We can
+assume that the parameters $\epsilon_A$, $\epsilon_I$, $\sigma$ are independent
+and are uniform on a logarithmic scale. For this reason, we can assign a
+Jeffery's prior on these parameters yielding \begin{align} P(\epsilon_A,
+\epsilon_I, \sigma \vert I) \equiv
+\frac{1}{\epsilon_A}\cdot\frac{1}{\epsilon_I}\cdot\frac{1}{\sigma}. \end{align}
 These priors are maximally uninformative meaning that we imply that we have no
 prior knowledge of their actual value. For this work, we can further simplify
 our model by assuming that the values for $R$ and $\Delta\epsilon_r$ are fixed
-and their values are those reported in \citep{Garcia2011}. Our complete posterior probability distribution can then be written as
-
+and their values are those reported in \cite{Garcia2011}. Our complete
+posterior probability distribution can then be written as
 \begin{align}
 P(\epsilon_A, \epsilon_I, \sigma \vert D, I) \propto
 \frac{1}{(2\pi\sigma^2)^\frac{n}{2}}\prod\limits_{i =
@@ -168,15 +163,14 @@ P(\epsilon_A, \epsilon_I, \sigma \vert D, I) \propto
 R^i, \Delta\epsilon_r,^i,
 C^i))^2}{2\sigma^2}\right]\frac{1}{\epsilon_A\epsilon_I\sigma}.
 \end{align}
-
-However, the values reported for $R$ and $\Delta\epsilon_r$ as
-were measured experimentally and by fitting to a predictor strain in  \citep{Garcia2011} respectively. In this work, Garcia and Phillips reported a
-mean and standard deviation for the number of repressor molecules per cell. It
-is important to note that this does not represent the single-cell variability
-of repressor copy number but is rather a measure of uncertainty of this
-measurement. We invite the reader to consult the supplementary information the
-the propagation of the error into a framework in which we globally fit all
-parameters.
+However, the values reported for $R$ and $\Delta\epsilon_r$ as were measured
+experimentally and by fitting to a predictor strain in  \cite{Garcia2011}
+respectively. In this work, Garcia and Phillips reported a mean and standard
+deviation for the number of repressor molecules per cell. It is important to
+note that this does not represent the single-cell variability of repressor copy
+number but is rather a measure of uncertainty of this measurement. We invite
+the reader to consult the supplementary information the the propagation of the
+error into a framework in which we globally fit all parameters.
 
 With this posterior in hand, we used Markov Chain Monte Carlo to sample our
 posterior distribution in log space and compute the MAP value and uncertainty
@@ -201,7 +195,46 @@ files are available upon request and are not publicly hosted.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgments}
+This work has been a wonderful experience in scientific collaboration. We thank
+Hernan Garcia for information and advice for working with these bacterial
+strains, Pamela Bjo\"{o}rkman and Rachel Galimidi for access and training for
+use of the Miltenyi Biotec MACSQuant flow cytometer.
 
+Should include the following.
+
+\textbf{Strains information}
+% This is soooooo much easier in markdown.
+\begin{itemize}
+\item{Hernan Garcia}
+\item{Mitch Lewis (is he an author???)}
+\end{itemize}
+
+
+\textbf{Help with microscopy and FACS}
+\begin{itemize}
+\item{Pamela Bj\"orkman}
+\item{Rachel Galimidi}
+\item{Colin DeBakker}
+\item{Heun Jin Lee}
+\end{itemize}
+
+\textbf{Discussions}
+\begin{itemize}
+\item{Muir Morrison}
+\item{Soichi Hirokawa}
+\item{Suzy Beeler}
+\item{Mitch Lewis (???)}
+\item{Hernan Garcia}
+\end{itemize}
+
+\textbf{Money}
+\begin{itemize}
+\item{NIH MIRA}
+\item{NIH Training Grant}
+\item{HHMI?}
+\end{itemize}
 We thank...for their useful discussions and helpful insights.
 
 This work was supported by...
+
+will this recoooniazre
