@@ -127,7 +127,9 @@ for i, op in enumerate(operators):
     ax[i].set_xlabel('IPTG (M)')
     ax[i].set_ylabel('fold-change')
     ax[i].set_ylim([-0.01, 1.1])
-    ax[i].set_title(op)
+    ax[i].text(0.9, 0.1, op, ha='center', va='center', 
+            transform=ax[i].transAxes, fontsize=18)
+#    ax[i].set_title(op)
     ax[i].margins(0.02)
 ax[0].legend(loc='upper left', title='repressors / cell')
 ax[3].set_axis_off()
