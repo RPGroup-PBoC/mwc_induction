@@ -95,7 +95,10 @@ right. \robComment{Good paragraph - focus on building intuition. With respect to
 	$[EC_{50}]$, and effective Hill coefficient (referencing Peter Swain's paper).
 	Then discuss intuition. \talComment{We need to think hard about how to do this.
 		The derivations themselves will be long and technical, and we need to consider
-		eLife audience}}
+		eLife audience. My gut instinct right now is that we could have a \textit{short}
+		paper on the mathematics of this system which would discuss these 4 properties
+		as well as what happens when $\Delta\varepsilon_{AI} < 0$ or
+		$\Delta\varepsilon_{AI} > 0$, but aimed at a different audience of theorists}}
 
 Another interesting aspect of the theoretical predictions is the width of the
 confidence intervals, which increases with repressor copy number and inducer
@@ -159,7 +162,12 @@ response curves in \fref[fig_result2] all arise from a unified model
 	There are many ways to get the same fold-change: you could tune $R$, $\Delta
 	\varepsilon_{RA}$, or $c$. The system does not care which combination you use,
 	as long as you get to the right Bohr parameter value. This is the INTUITION to
-	emphasize.} with a single set of thermodynamic parameters.
+	emphasize. \talComment{Building off this point, can add something like:
+		``Various biological systems have shown that convergent evolution can emerge by
+		tuning different biological parameters \cite{Stern2009}. Indeed, in Appendix
+		\ref{AppendixSloppiness}, we discuss how the $K_A$, $K_I$, and $\Delta
+		\varepsilon_{AI}$ parameters are not completely independent.''}} with a single
+set of thermodynamic parameters.
 
 \begin{figure}[h!]
 	\centering \includegraphics[scale=0.4]{fig_data_collapse_O2_RBS1027_fit.pdf}
