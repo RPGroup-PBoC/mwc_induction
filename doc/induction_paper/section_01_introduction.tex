@@ -1,81 +1,49 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Introduction \stephanieComment{Stephanie's Section!}}
 
-Biological mechanisms are complex and diverse, and are often characterized by a
-slow accumulation of qualitative data \nathanComment{maybe include 'their
-understanding' is often characterized by ... }. Our understanding of biological
-systems can be expanded greatly by applying quantitative, predictive models to
-pervasive phenomena that, in the absence of models, exist as a collection of
-loosely-associated facts \talComment{How about: ``The recent rise of quantitative, mechanistic models has greatly bolstered our understanding of fundamental cellular processes such as...\textit{(list some awesome examples with references)}.'' Then maybe a sentence talking about how such disparate phenomena are actually related by very similar underlying mechanisms (as a transition towards the next sentence)}. Allosteric conformational change is an example of
-such a pervasive phenomenon. Allosteric proteins switch between conformational
-states in response to ligand binding. Perhaps most famously characterized in
-hemoglobin, allostery is also very common among transcription factors that
-switch between ``active'' and ``inactive'' states with significantly different
-regulatory capabilities. \talComment{Could use a transition sentence here} Here, we use quantitative models to describe
-transcriptional regulation through allosteric induction, and show that such
-models can be used to predict the behavior of novel systems.\nathanComment{
-With the first few lines, I worry that it'll come off as too belittling to
-non-quantitative approaches}\griffinComment{I usually dislike the idea that anything not quantitative is useless. I agree that we should soften it. We should emphasize that if we can predict the behavior of the system from a very general point of view, we understand.}
+Biological mechanisms are complex and diverse, and as a consequence our understanding of these mechanisms is often characterized by a slow accumulation of qualitative information that may be difficult to fit into a unifying framework. Nevertheless, in the last decade new techniques have given us unprecedented access to the fine details underlaying a broad array of biological phenomena, such as the complex task of regulating gene expression. From the exquisite dissection of the gene regulatory
+network of the sea-urchin developmental program [Peters and Davidson] to the
+\textit{in vivo} imaging of the central dogma [Ido's MS2, Hernan's MS2, Suntag
+paper, Xiaowei recent paper], new genetic reporters and  advancements in
+single-cell measurements have taken the field to a new level of precision
+measurements traditionally only achievable in more quantitative fields such as
+physics and chemistry.
 
-As the theoretical basis for our models, we turn to what may be the most
-powerful \talComment{interesting word choice...} model of allostery, the Monod-Wyman-Changeux (MWC) model
-\cite{MONOD1965}. \griffinComment{We need to standardize the cite keys} Briefly,
-the MWC model stipulates that a symmetrical allosteric protein is capable of
-\sout{accessing at least two states} \talComment{accessing two distinct conformations}, a ``tense'' and ``relaxed'' state (or, as we will
-refer to them here, an ``active'' and ``inactive'' state) \talComment{Could italicize rather than use parentheses}. These states exist in
-equilibrium within a system, and a protein may switch between states at any
-time \manuelComment{We should avoid using the word time since it is forbidden in the theoretical framework we are using}. Both states are capable of binding to a ligand \manuelComment{here should be plural}, though the protein's
+This level of precision and the rate at which data is generated calls for
+unifying theoretical frameworks which conceptualize the richness of modern
+biological data sets. In this work, we build upon a decade of quantitative
+dissection of the input-output function of one of the most abundant genetic
+architectures in all domains of life, simple repression [Mattias paper on
+regulonDB]. We use well-characterized promoter elements from \textit{E. coli's} \textit{lac} operon, contributing to a rich history in which the \textit{lac} operon, in combination with modern synthetic biology
+tools, has served as an experimental playground on which to test predictive
+models of gene regulation \cite{bintu2005, bintu2005a, Garcia2011}. Statistical mechanical models of gene regulation have
+proven to be very effective not only in predicting the mean expression level as a
+function of natural parameters such as the transcription factor copy number and
+its binding energy to the DNA \cite{Garcia2011}, but also in quantifying the effects of DNA looping
+\cite{Boedicker2013a} and competing binding sites \cite{Brewster2014}. Here, we extend such models to examine allostery as a mechanism for transcriptional regulation. We devise a model that describes the behavior of a simple repression construct, and then accurately predict the behavior of over 20 additional constructs in which repressor copy numbers and binding energies have been varied, and the inducer IPTG is titrated over several orders of magnitude. By introducing allostery into our models and accurately predicting its effects on regulation, we show that our models simultaneously capture multiple details of transcriptional regulation with a high level of precision.
+
+Allostery is a pervasive means of regulation in biological systems. Perhaps most famously characterized in hemoglobin, allostery is also very common among transcription factors that switch between conformational states with significantly different regulatory capabilities. The Lac repressor is famously allosteric, making \textit{lac}-based regulatory constructs a fitting foundation from which to explore our models of allostery. As the theoretical basis for our models, we turn to the Monod-Wyman-Changeux (MWC) model of allostery
+\cite{MONOD1965}. Briefly,
+the MWC model stipulates that a symmetrical allosteric protein is capable of accessing two distinct conformations, a ``tense'' and ``relaxed'' state (or, as we will
+refer to them here, an \textit{active} and \textit{inactive} state). These states exist in
+equilibrium within a system, and an individual protein is capable of accessing either state. Both states can bind to ligands, though the protein's
 affinity for the ligand will be affected significantly by the protein's
-allosteric conformation. Given a high enough concentration of ligand, it becomes
-energetically favorable for a protein to spend the significant majority of its
-time in the state that favors ligand binding, thus shifting the overall protein
+state. Given a high enough concentration of ligand, it becomes
+energetically favorable for a protein to assume the state that favors ligand binding, thus shifting the overall protein
 population towards the ligand-favoring state. We have previously discussed the
-statistical mechanics of MWC models \cite{Marzen2013}, and we use such a
-statistical mechanical framework for our model of transcriptional induction.
-\nathanComment{we say statistical mechanics a lot. Maybe remove the second one
-	in this sentence.} \talComment{I think the last 4 sentences can be tightened up}
+statistical mechanics of MWC models \cite{Marzen2013}, and use this framework for our models of induction. In order to account for allosteric effects in our models of simple repression, we include the effects of a ligand that acts as an inducer. Where our earlier models were governed by repressor binding energy and repressor copy number, our allosteric model introduces three
+new parameters: the binding affinity of inducer to LacI in the \textit{active} or DNA-binding conformation, the binding affinity of inducer to LacI
+in the \textit{inactive} or non-DNA-binding conformation, and the free energy
+difference between these two conformations. 
 
-\talComment{Abrupt transition. This seems like the place to mention that we are going to focus on induction of the Lac repressor in \textit{Escherichia coli} and its effects of transcriptional regulation. The next sentence here may be too much detail for the intro, but we should definitely keep what has already been done.} \manuelComment{I agree. The first time I read it I thought this was too many details for the intro.} To provide a straightforward context for exploring allosteric induction
-\textit{in vivo}, we use a chromosomally-integrated simple repression construct
-in which a single repressor binding site blocks access to an RNAP polymerase
-binding site. A YFP reporter gene downstream of this construct allows us to
-measure the fold-change caused by repressor binding. As our model repressor, we
-use the Lac repressor (LacI), which has long been recognized as a rich model
-for understanding the nature of allostery within the MWC framework
-\cite{Daly1986, Dunaway1980, Meyer2013, Daber2007, Daber2009,
-	Muller-Hartmann1996, OGorman1980, Sharp2011, Taraban2008, Wilson2007}.
-Additionally, in previous studies we have carefully quantified LacI repression
-as a function of repressor copy number and promoter affinity \cite{Garcia2011},
-as well as gene copy number and competitor binding sites \cite{Weinert2014}. All
-of these tunable parameters have been well characterized by statistical
-mechanical models \cite{Bintu2005, Bintu2005a}, allowing us to go beyond merely
-characterizing known data and enable us to predict \textit{a priori} the
-behavior of novel transcriptional architectures that can then be tested against
-experimental data. \griffinComment{Maybe we should leave this section for the
-	results/methods. We could just emphasize that we are testing this theory in an
-	experimental system where we have quantitative control of a number of
-	biophysical parameters.}
+\stephanieComment{Having trouble with the last paragraph here; I'd welcome any more insights on what people think our "punch lines" ought to be.}
+In this work, we show that:
+\begin{itemize}
+	\item Our statistical mechanical model of simple repression can be expanded to incorporate the effects of allostery as inducer is titrated over several orders of magnitude;
+	\item Fitting our model to a \textit{lac} simple repression construct with known repressor copy number and repressor binding energy allows us to determine the allosteric parameters of the Lac repressor \stephanieComment{Here I'm lumping $K_A$, $K_I$, and $\epsilon$ together as "allosteric parameters," though another term may be more appropriate};
+	\item Our model, combined with allosteric parameters inferred from a single \textit{lac} simple repression construct, can be used to predict the IPTG titration curve of \textit{any} other \textit{lac} simple repression construct, provided that we know the repressor copy number and binding energy;
+	\item Varying repressor copy number and binding strength allows the cell to access a wide range of regulatory behaviors (e.g. leakiness and dynamic range), even as the allosteric properties of LacI remain constant;
+	\item The fold-change for any of the 24 strains we examine, with any concentration of IPTG, can be rewritten in terms of a single fundamental "Bohr parameter" so that all data points collapse onto the same curve. 
+\end{itemize}
+Our results show that quantitative models are an incredibly powerful tool for understanding the myriad ways in which cells establish control over their systems. While many combinations of parameters are capable of achieving the same fold-change values, the dynamics of fold-change titration curves are significantly affected by both repressor copy number and binding energy, and we predict these effects neatly with our models. One might imagine extending these models to predict the consequences of transcription factor mutations, or incorporate allostery into more complex regulatory contexts, such as repression by looping. 
 
-This work aims to extend our statistical mechanical models to include
-allosteric induction by examining the
-feedback mechanism by which the \textit{lac} system responds to changing levels
-of lactose \cite{JACOB1961} \manuelComment{There is not a single feedback component on our system. This sentence is very misleading}. We extend the previous thermodynamic models for
-simple repression to include the effects of an inducer. This introduces three
-new parameters into our model: the binding affinity of inducer to LacI in the
-``active'' or DNA-binding conformation, the binding affinity of inducer to LacI
-in the ``inactive'' or non-DNA-binding conformation, and the free energy
-difference between these two conformations \talComment{I think this sentence can be moved into the previous paragraph. I think the next sentence should be removed, since our emphasis is not on fitting, but on our parameter-free predictive power}. We discuss how these parameters can
-be inferred by fitting our model to repression data acquired under varying
-concentrations of IPTG \nathanComment{Since we tend to talk about fold-change,
-or fold-change in expression, maybe used 'expression' instead of 'repression'
-data}. With these new parameters in hand, we quantitatively
-predict the induction profile for other strains in which operator affinity and
-LacI copy number have been varied. We analyze more than 20 such mutants and show
-that in each case, the theoretical predictions match the experimental
-measurements \talComment{This is the heart of our new contributions, and I think this should be emphasized much more and moved further back. This is the advertisement for why people should care about this paper}. In addition, we show that the mechanisms governing fold-change in
-each mutant are systematically equivalent by identifying the ``natural
-parameter'' governing IPTG induction; when plotted against this natural
-parameter, the fold-change values for all of the mutants fall on the same curve.
-In this way, we demonstrate the power of quantitative modeling as a tool for
-achieving deep understanding of biological systems. \nathanComment{Switches from
-strain to mutant half way through. I'd avoid using mutant} \manuelComment{I feel that the last part of the intro needs to emphasize more on what are our contributions. Give away the punchline in a way that if someone only reads the intro they can get the general idea of what we showed.}
