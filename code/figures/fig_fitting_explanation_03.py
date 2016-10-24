@@ -121,10 +121,11 @@ for i, op in enumerate(operators):
 #                color=colors[j])
 
 ax.set_xscale('log')
-ax.set_xlabel('IPTG (M)')
-ax.set_ylabel('fold-change')
+ax.set_xlabel('IPTG (M)', fontsize=18)
+ax.set_ylabel('fold-change', fontsize=18)
 ax.set_ylim([-0.01, 1.2])
 ax.set_xlim([1E-8, 1E-2])
+ax.tick_params(labelsize=16)
 ax.legend(loc='upper left', title='repressors / cell')
 plt.tight_layout()
 plt.savefig(output + '/fig_fit_explanation_03.pdf')

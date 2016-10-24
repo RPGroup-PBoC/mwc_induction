@@ -9,7 +9,7 @@ import pandas as pd
 
 # Import the project utils
 import sys
-sys.path.insert(0, '../')
+sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 
 # Import matplotlib stuff for plotting
@@ -124,15 +124,19 @@ for i, op in enumerate(operators):
                     fmt='o', label=df[df.rbs==rbs].repressors.unique()[0] * 2,
                 color=colors[j])
     ax[i].set_xscale('log')
-    ax[i].set_xlabel('IPTG (M)')
-    ax[i].set_ylabel('fold-change')
+    ax[i].set_xlabel('IPTG (M)', fontsize=15)
+    ax[i].set_ylabel('fold-change', fontsize=16)
     ax[i].set_ylim([-0.01, 1.1])
     ax[i].text(0.9, 0.1, op, ha='center', va='center', 
             transform=ax[i].transAxes, fontsize=18)
-#    ax[i].set_title(op)
+    ax[i].tick_params(labelsize=14)
     ax[i].margins(0.02)
 ax[0].legend(loc='upper left', title='repressors / cell')
 ax[3].set_axis_off()
+# add plot letter labels
+plt.figtext(0.0, .95, '(A)', fontsize=20)
+plt.figtext(0.50, 0.95, '(B)', fontsize=20)
+plt.figtext(0.0, .46, '(C)', fontsize=20)
 plt.tight_layout()
 plt.savefig(output + '/fig_theory_vs_data_O2_RBS1027_fit.pdf')
 
