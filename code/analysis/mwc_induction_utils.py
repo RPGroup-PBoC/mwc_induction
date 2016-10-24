@@ -628,7 +628,7 @@ def non_lin_reg_mwc(df, p0,
                     dep_var='fold_change_A', epsilon=4.5, diss_const=False):
     '''
     Performs a non-linear regression on the lacI IPTG titration data assuming
-    Gaussian errors with constant variance. Returns the parameters 
+    Gaussian errors with constant variance. Returns the parameters
     e_A == -ln(K_A)
     e_I == -ln(K_I)
     and it's corresponding error bars by approximating the posterior distribution
@@ -672,30 +672,30 @@ def non_lin_reg_mwc(df, p0,
     '''
     df_indep = df[indep_var]
     df_dep = df[dep_var]
-    
-    # Extra arguments given as tuple 
+
+    # Extra arguments given as tuple
     args = (df_indep.values, df_dep.values, epsilon)
 
-    # Compute the MAP 
+    # Compute the MAP
     popt, _ = scipy.optimize.leastsq(resid, p0, args=args)
 
     # Extract the values
     ea, ei = popt
-    
+
     # Compute the Hessian at the map
-    hes = smnd.approx_hess(popt, log_post, 
+    hes = smnd.approx_hess(popt, log_post,
                            args=(df_indep.values, df_dep.values))
-    
+
     # Compute the covariance matrix
-    cov = -np.linalg.inv(hes) 
-    
+    cov = -np.linalg.inv(hes)
+
     if diss_const:
-        # Get the values for the dissociation constants and their 
+        # Get the values for the dissociation constants and their
         # respective error bars
         Ka = np.exp(-ea)
         Ki = np.exp(-ei)
         deltaKa = np.sqrt(cov[0,0]) * Ka
-        deltaKi = np.sqrt(cov[1,1]) * Ki 
+        deltaKi = np.sqrt(cov[1,1]) * Ki
         return Ka, deltaKa, Ki, deltaKi
     else:
         return ea, cov[0,0], ei, cov[1,1]
@@ -1042,129 +1042,14 @@ def auto_gauss_gate(df, alpha, x_val='FSC-A', y_val='SSC-A', log=False,
 # #################
 
 # #################
-def find_zero_crossings(im, selem, thresh):
-    """
-    This  function computes the gradients in pixel values of an image after
-    applying a sobel filter to a given image. This  function is later used in
-    the Laplacian of Gaussian cell segmenter (log_segmentation) function. The
-    arguments are as follows.
-
-    Parameters
-    ----------
-    im : 2d-array
-        Image to be filtered.
-    selem : 2d-array, bool
-        Structural element used to compute gradients.
-    thresh :  float
-        Threshold to define gradients.
-
-    Returns
-    -------
-    zero_cross : 2d-array
-        Image with identified zero-crossings.
-
-    Notes
-    -----
-    This function as well as `log_segmentation` were written by Justin Bois.
-    http://bebi103.caltech.edu/
-    """
-
-    # apply a maximum and minimum filter to the image.
-    im_max = scipy.ndimage.filters.maximum_filter(im, footprint=selem)
-    im_min = scipy.ndimage.filters.minimum_filter(im, footprint=selem)
-
-    # Compute the gradients using a sobel filter.
-    im_filt = skimage.filters.sobel(im)
-
-    # Find the zero crossings.
-    zero_cross = (((im >= 0) & (im_min < 0)) | ((im <= 0) & (im_max > 0)))\
-        & (im_filt >= thresh)
-
-    return zero_cross
-
-
-# #################
-def log_segmentation(im, selem='default', thresh=0.001, radius=2.0,
-                     bg_radius=20.0, clear_border=True, label=False):
-    """
-    This function computes the Laplacian of a gaussian filtered image and
-    detects object edges as regions which cross zero in the derivative.
-
-    Parameters
-    ----------
-    im :  2d-array
-        Image to be processed. Must be a single channel image.
-    selem : 2d-array, bool
-        Structural element for identifying zero crossings. Default value is
-        a 2x2 pixel square.
-    radius : float
-        Radius for gaussian filter prior to computation of derivatives.
-    bg_radius: float
-        Radius for gaussian filter to perform background subtraction. Default
-        value is 20.0 pixels.
-    selem : 2d-array, bool
-        Structural element to be applied for laplacian calculation.
-    thresh : float
-        Threshold past which
-    clear_border : bool
-        If True, segmented objects touching the border will be removed.
-        Default is True.
-    label : bool
-        If True, segmented objecs will be labeled. Default is False.
-
-    Returns
-    -------
-    im_final : 2d-array
-        Final segmentation mask. If label==True, the output will be a integer
-        labeled image. If label==False, the output will be a bool.
-
-    Notes
-    -----
-    We thank Justin Bois in his help writing this function.
-    https://bebi103.caltech.edu
-    """
-
-    # Test that the provided image is only 2-d.
-    if len(np.shape(im)) > 2:
-        raise ValueError('image must be a single channel!')
-
-    # Ensure that the provided image is a float.
-    if np.max(im) > 1.0:
-        im_float = im_to_float(im)
-    else:
-        im_float = im
-
-    # Subtract background to fix illumination issues.
-    im_gauss = skimage.filters.gaussian(im_float, bg_radius)
-    im_float = im_float - im_gauss
-
-    # Compute the LoG filter of the image.
-    im_LoG = scipy.ndimage.filters.gaussian_laplace(im_float, radius)
-
-    # Define the structural element.
-    if selem == 'default':
-        selem = skimage.morphology.square(2)
-
-    # Using find_zero_crossings, identify the edges of objects.
-    edges = find_zero_crossings(im_LoG, selem, thresh)
-
-    # Skeletonize the edges to a line with a single pixel width.
-    skel_im = skimage.morphology.skeletonize(edges)
-
-    # Fill the holes to generate binary image.
-    im_fill = scipy.ndimage.morphology.binary_fill_holes(skel_im)
-
-    # Remove small objects and objects touching border.
-    im_final = skimage.morphology.remove_small_objects(im_fill)
-    if clear_border is True:
-        im_final = skimage.segmentation.clear_border(im_final, buffer_size=5)
-
-    # Determine if the objects should be labeled.
-    if label is True:
-        im_final = skimage.measure.label(im_final)
-
-    # Return the labeled image.
-    return im_final
+def ome_split(im):
+    """Splits an ome.tiff image into individual channels"""
+    if len(np.shape(im)) != 3:
+        raise RuntimeError('provided image must be a single image')
+    ims = []
+    for i in range(np.shape(im)[-1]):
+        ims.append(im[:, :, i])
+    return ims
 
 
 # #################
@@ -1245,48 +1130,186 @@ def generate_flatfield(im, im_dark, im_bright):
 
 
 # #################
-def gaussian_subtraction(im, radius):
+def find_zero_crossings(im, selem, thresh):
     """
-    This function applies a gaussian blur to an image and subtracts it
-    from the original image. This removes any large-scale irregularities in
-    illumination.
+    This  function computes the gradients in pixel values of an image after
+    applying a sobel filter to a given image. This  function is later used in
+    the Laplacian of Gaussian cell segmenter (log_segmentation) function. The
+    arguments are as follows.
 
     Parameters
     ----------
-    im : 2d-array, int or float
+    im : 2d-array
         Image to be filtered.
-    radius : float
-        Radius for the gaussian filter.
+    selem : 2d-array, bool
+        Structural element used to compute gradients.
+    thresh :  float
+        Threshold to define gradients.
 
     Returns
     -------
-    im_subtract : 2d-array, float
-        Background subtracted image.
+    zero_cross : 2d-array
+        Image with identified zero-crossings.
 
-    Raises
-    ------
-    TypeError
-        Thrown if input image contains negative values. This function will
-        only work on integer type images.
+    Notes
+    -----
+    This function as well as `log_segmentation` were written by Justin Bois.
+    http://bebi103.caltech.edu/
     """
-    # Check the type of the image.
-    if im.dtype is not int or im.dtype is not float or np.min(im) < 0:
-        raise TypeError('input image must be unsigned integer type or a\
-        positive float.')
 
+    # apply a maximum and minimum filter to the image.
+    im_max = scipy.ndimage.filters.maximum_filter(im, footprint=selem)
+    im_min = scipy.ndimage.filters.minimum_filter(im, footprint=selem)
+
+    # Compute the gradients using a sobel filter.
+    im_filt = skimage.filters.sobel(im)
+
+    # Find the zero crossings.
+    zero_cross = (((im >= 0) & (im_min < 0)) | ((im <= 0) & (im_max > 0)))\
+        & (im_filt >= thresh)
+
+    return zero_cross
+
+
+# #################
+def log_segmentation(im, selem='default', thresh=0.0001, radius=2.0,
+                     median_filt=True, clear_border=True, label=False):
+    """
+    This function computes the Laplacian of a gaussian filtered image and
+    detects object edges as regions which cross zero in the derivative.
+
+    Parameters
+    ----------
+    im :  2d-array
+        Image to be processed. Must be a single channel image.
+    selem : 2d-array, bool
+        Structural element for identifying zero crossings. Default value is
+        a 2x2 pixel square.
+    radius : float
+        Radius for gaussian filter prior to computation of derivatives.
+    median_filt : bool
+        If True, the input image will be median filtered with a 3x3 structural
+        element prior to segmentation.
+    selem : 2d-array, bool
+        Structural element to be applied for laplacian calculation.
+    thresh : float
+        Threshold past which
+    clear_border : bool
+        If True, segmented objects touching the border will be removed.
+        Default is True.
+    label : bool
+        If True, segmented objecs will be labeled. Default is False.
+
+    Returns
+    -------
+    im_final : 2d-array
+        Final segmentation mask. If label==True, the output will be a integer
+        labeled image. If label==False, the output will be a bool.
+
+    Notes
+    -----
+    We thank Justin Bois in his help writing this function.
+    https://bebi103.caltech.edu
+    """
+
+    # Test that the provided image is only 2-d.
+    if len(np.shape(im)) > 2:
+        raise ValueError('image must be a single channel!')
+
+    # Determine if the image should be median filtered.
+    if median_filt is True:
+        selem = skimage.morphology.square(3)
+        im_filt = scipy.ndimage.median_filter(im, footprint=selem)
+    else:
+        im_filt = im
     # Ensure that the provided image is a float.
-    if im.dtype is not float:
-        im = skimage.img_as_float(im)
+    if np.max(im) > 1.0:
+        im_float = skimage.img_as_float(im_filt)
+    else:
+        im_float = im_filt
 
-    # Apply the gaussian filter to the im.
-    im_gauss = skimage.filters.gaussian(im, radius)
+    # Compute the LoG filter of the image.
+    im_LoG = scipy.ndimage.filters.gaussian_laplace(im_float, radius)
 
-    # Subtract the background.
-    im_subtract = im - im_gauss
+    # Define the structural element.
+    if selem == 'default':
+        selem = skimage.morphology.square(3)
 
-    # Return the subtracted image.
-    return im_subtract
+    # Using find_zero_crossings, identify the edges of objects.
+    edges = find_zero_crossings(im_LoG, selem, thresh)
 
+    # Skeletonize the edges to a line with a single pixel width.
+    skel_im = skimage.morphology.skeletonize(edges)
+
+    # Fill the holes to generate binary image.
+    im_fill = scipy.ndimage.morphology.binary_fill_holes(skel_im)
+
+    # Remove small objects and objects touching border.
+    im_final = skimage.morphology.remove_small_objects(im_fill)
+    if clear_border is True:
+        im_final = skimage.segmentation.clear_border(im_final, buffer_size=5)
+
+    # Determine if the objects should be labeled.
+    if label is True:
+        im_final = skimage.measure.label(im_final)
+
+    # Return the labeled image.
+    return im_final
+
+
+# #################
+def props_to_df(mask, physical_distance=1, intensity_image=None):
+    """
+    Converts the output of skimage.measure.regionprops to a nicely
+    formatted pandas DataFrame.
+
+    Parameters
+    ----------
+    mask : 2d-array, int
+        Segmentation mask containing objects to be measured.
+    physical_distance : int or float
+        Interpixel distance of the image. This will be used to
+        convert the area measurements to meaningful units.
+    intensity_image : 2d-array
+        Intensity image for intensity based measurements. If none is
+        provided, only region based measurements will be returned.
+
+    Returns
+    -------
+    df : pandas DataFrame
+        Tidy DataFrame containing all measurements.
+
+    """
+
+    # Ensure that there is at least one object in the image.
+    if np.max(mask) == 0:
+        raise ValueError('no objects found in image.')
+
+    # Define the values that are to be extracted.
+    REGIONPROPS = ('area', 'eccentricity', 'solidity',
+                   'mean_intensity')
+
+    if intensity_image is None:
+        measurements = REGIONPROPS[:-3]
+    else:
+        measurements = REGIONPROPS
+
+    # Iterate through and extract the props.
+    props = skimage.measure.regionprops(mask,
+                                        intensity_image=intensity_image)
+    for i, p in enumerate(props):
+        extracted = []
+        for val in measurements:
+            extracted.append(p[val])
+
+        if i == 0:
+            df = pd.DataFrame(extracted).T
+        else:
+            df2 = pd.DataFrame(extracted).T
+            df = df.append(df2)
+    df.columns = measurements
+    df['area'] = df['area'] * physical_distance**2
+    return df
 
 # #################
 # Plotting Configuration
