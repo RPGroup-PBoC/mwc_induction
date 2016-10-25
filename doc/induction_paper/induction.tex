@@ -1,33 +1,15 @@
-% Template for PLoS
-% Version 3.0 December 2014
-
 \documentclass[10pt,letterpaper]{article}
 \usepackage[top=0.85in,left=1.00in,footskip=0.75in]{geometry}
-
-% Use adjustwidth environment to exceed column width (see example table in text)
-\usepackage{changepage}
-
 % Use Unicode characters when possible
 \usepackage[utf8]{inputenc}
-
-% textcomp package and marvosym package for additional characters
-\usepackage{textcomp,marvosym}
-
-% fixltx2e package for \textsubscript
-%\usepackage{fixltx2e}
-
 % amsmath and amssymb packages, useful for mathematical formulas and symbols
 \usepackage{amsmath,amssymb}
-
 % cite package, to clean up citations in the main text. Do not remove.
 \usepackage{cite}
 %\usepackage[round]{natbib}
 
 % Use nameref to cite supporting information files (see Supporting Information section for more info)
 \usepackage{nameref,hyperref}
-
-% line numbers
-\usepackage[right]{lineno}
 
 % ligatures disabled
 \usepackage{microtype}
@@ -40,9 +22,6 @@
 %\usepackage{setspace}
 %\doublespacing
 
-% Text layout
-\raggedright
-\setlength{\parindent}{0.5cm}
 %\textwidth 5.25in
 \textheight 8.75in
 
@@ -57,22 +36,6 @@
 \makeatletter
 \renewcommand{\@biblabel}[1]{\quad#1.}
 \makeatother
-
-% Leave date blank
-\date{}
-
-% Header and Footer with logo
-\usepackage{lastpage,fancyhdr,graphicx}
-\pagestyle{myheadings}
-\pagestyle{fancy}
-\fancyhf{}
-%\lhead{\includegraphics[natwidth=1.3in,natheight=0.4in]{PLOSlogo.png}}
-\rfoot{\thepage/\pageref{LastPage}}
-\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
-%\fancyheadoffset[L]{1.00in}
-%\fancyfootoffset[L]{1.00in}
-%\lfoot{\sf PLOS}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%% OPTIONAL MACRO DEFINITIONS %%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -119,7 +82,7 @@
 
 % Personal figures path, not synchronized to GitHub
 \input{graphicspath.tex}
-\vspace*{0.35in}
+% \vspace*{0in}
 
 % Title must be 150 characters or less
 \begin{flushleft}
@@ -144,7 +107,7 @@
 \input{section_99_todo}
 \input{section_appendix}
 %
-%%%%%%%%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% BIBLIOGRAPHY %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Compile your BiBTeX database using our plos2009.bst
 % style file and paste the contents of your .bbl file
 % here.
