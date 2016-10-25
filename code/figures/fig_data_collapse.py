@@ -87,9 +87,10 @@ for i, operator in enumerate(operators):
         bohr = data[data.rbs==rbs].groupby('IPTG_uM').bohr_1027.mean()
         plt.errorbar(bohr, fc_mean, yerr=fc_err, fmt='o', color=colors[i],
                 label=None)
-plt.xlabel(r'Bohr parameter ($k_BT$ units)')
-plt.ylabel('fold-change')
+plt.xlabel(r'Bohr parameter ($k_BT$ units)', fontsize=18)
+plt.ylabel('fold-change', fontsize=18)
 plt.ylim([-0.01, 1.1])
 plt.legend(loc='upper left', ncol=1, title='operator', fontsize=13)
 plt.tight_layout()
+plt.tick_params(labelsize=16)
 plt.savefig(output + '/fig_data_collapse_O2_RBS1027_fit.pdf')
