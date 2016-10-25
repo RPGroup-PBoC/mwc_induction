@@ -2,27 +2,23 @@
 \section*{Introduction}
 
 Biological mechanisms are complex and diverse, and as a consequence our
-understanding of these mechanisms is often characterized by a slow accumulation
-of qualitative information that may be difficult to fit into a unifying
-framework. Nevertheless, in the last decade new techniques have given us
-unprecedented access to the fine details underlaying a broad array of biological
-phenomena, from the exquisite dissection of the gene regulatory network of the
-sea-urchin developmental program [Peters and Davidson] to the \textit{in vivo}
-imaging of the central dogma [Ido's MS2, Hernan's MS2, Suntag paper, Xiaowei
-recent paper] to the complex task of regulating gene expression
+understanding is often characterized by a slow accumulation of qualitative
+information that is often difficult to fit into a unifying framework.
+Nevertheless, the last decade has yielded new techniques that have given us
+unprecedented access to the fine details underlaying a broad array of
+biological phenomena, from the exquisite dissection of the gene regulatory
+network of the sea-urchin developmental program [Peters and Davidson] to the
+\textit{in vivo} imaging of the central dogma [Ido's MS2, Hernan's MS2, Suntag
+paper, Xiaowei recent paper] to the complex task of regulating gene expression
 \cite{Garcia2011}. New genetic reporters and advancements in single-cell
 measurements have brought about a new level of precision measurements
 traditionally only achievable in more quantitative fields such as physics and
-chemistry.
-
-Such high quality data is now routinely generated in various fields of biology,
-and it calls for a similar expansion in the way the theoretical frameworks we
-use to conceptualize and understand the richness of modern biological data
-sets. At this level, fine details of a system - the steepness of
-the response, the limits of minimum and maximum response, etc. - can now be
-resolved that go beyond a general sigmoidal shapes. To this end, we first construct a thermodynamic model of transcriptional
-regulation coupled with a statistical mechanical treatment of the induction of
-allosteric proteins.
+chemistry. Such high quality data is now routinely generated in various fields
+of biology, and it calls for a similar expansion in our use of theoretical
+frameworks to conceptualize and understand the richness of modern biological
+data sets. At this level, fine details of a system - the steepness of the
+response, the limits of minimum and maximum response, etc. - can now be
+resolved to go beyond a general sigmoidal shapes.
 
 Statistical mechanical models of gene regulation have proven to be very
 effective not only in predicting the mean expression level as a function of
@@ -30,78 +26,39 @@ natural parameters such as the transcription factor copy number and its binding
 energy to the DNA \cite{Garcia2011}, but also in quantifying the effects of DNA
 looping \cite{Boedicker2013a} and competing binding sites \cite{Brewster2014}.
 Here, we extend such models to examine allostery as a mechanism for
-transcriptional regulation. Allostery is a remarkably pervasive property of
-biological molecules. This principle helps explain a large array of phenomena
-ranging from quorum sensing and chemotaxis, oxygen binding by hemoglobin, and
-signal  transduction via GPCRs. Here, we consider the Monod-Wyman-Changeux
-(MWC) model of allostery \cite{MONOD1965}, which stipulates that an allosteric
-protein is capable of accessing two distinct conformations -- an
-\textit{active} and \textit{inactive} state -- in thermodynamic equilibrium. A
-protein's affinity for ligand is different for the active and inactive states,
-such that the equilibrium between these states shifts with changing
-concentration of ligand \cite{Marzen2013}.
-
-
-% Given a high enough concentration of ligand, it becomes
-% energetically favorable for a protein to assume the state that favors ligand
-% binding, thus shifting the overall protein population towards the
-% ligand-favoring state. We have previously discussed the statistical mechanics
-% of MWC models , and use this framework for our models of
-% induction. In order to account for allosteric effects in our models of simple
-% repression, we include the effects of a ligand that acts as an inducer. Where
-% our earlier models were governed by repressor binding energy and repressor copy
-% number, our allosteric model introduces three new parameters: the binding
-% affinity of inducer to LacI in the \textit{active} or DNA-binding conformation,
-% the binding affinity of inducer to LacI in the \textit{inactive} or
-% non-DNA-binding conformation, and the free energy difference between these two
-% conformations.
-%
+transcriptional regulation. Allostery is a pervasive property of biological
+molecules. This principle helps explain a large array of phenomena ranging from
+quorum sensing and chemotaxis, oxygen binding by hemoglobin, and signal
+transduction via GPCRs. Here, we consider the Monod-Wyman-Changeux (MWC) model
+\cite{MONOD1965}, which stipulates that an allosteric protein is capable of
+accessing two distinct conformations -- an active and
+inactive state -- in thermodynamic equilibrium. A protein's affinity
+for ligand is different for the active and inactive states, such that the
+equilibrium between these states shifts with changing concentration of ligand
+\cite{Marzen2013}.
 
 In this work, we focus on the rich interplay between theory and experiment in
 transcriptional regulation, where quantitative dissection of input-output
 functions over the last decade has significantly pushed our ability to
-manipulate and understand such systems. Specifically, we focus on one of the
-most abundant genetic architectures -- the simple repression motif.
-[Mattias paper on regulonDB]. We use a simple repression promoter constructed of the well-characterized components of the famously allosteric \textit{E. coli lac} operon to quantiatively test a statistical mechanical model of induction using the MWC framework.
+manipulate and understand such systems. We focus on one of the
+most abundant genetic architectures -- the simple repression motif [Mattias
+paper on regulonDB] -- to test our predictions. Specifically, we use a simple repression promoter constructed of the
+well-characterized components of the \textit{E. coli lac}
+operon and the famously allosteric Lac repressor to quantiatively test a statistical mechanical model of induction using the MWC framework.
 
-One remarkable conclusion of this framework is that we can
-use the response of a single repressor strain (for example, the wild type Lac
-repressor in \textit{E. coli}), to make parameter free predictions for the
-induction profile of many other constructs. To test this, we used 20
-additional strains in which repressor copy numbers and the Lac repressor
-binding energies have been varied, and measured the induction profile of each.
-The remarkable agreement between these 20 predicted sets and the experimental
-data demonstrates how all of these titration curves are ultimately related by
-the same set of underlying thermodynamic parameters.
-
-These results show that quantitative models are an incredibly powerful tool for
-understanding the myriad ways in which cells establish control over their
-systems. While many combinations of parameters are capable of achieving the same
-fold-change values, the dynamics of fold-change titration curves are
-significantly affected by both repressor copy number and binding energy, and we
-predict these effects neatly with our models. One might imagine extending these
-models to predict the consequences of transcription factor mutations, or
-incorporate allostery into more complex regulatory contexts, such as repression
-by looping.
-
-
-% In this work, we show that: \stephanieComment{Having trouble with the last
-% 	paragraph here; I'd welcome any more insights on what people think our "punch
-% 	lines" ought to be.} \talComment{I think that this would be a great paragraph to
-% 	discuss the data collapse, where we remark that the 20 seemingly different
-% 	responses all fall out of the same theoretical framework. We can also discuss
-% 	how the data collapse emphasizes the different knobs that nature can tune (since
-% 	all it ultimately cares about is gene expression, and not $R$ or
-% 	$\Delta\varepsilon$), which could have evolutionary implications. This is also
-% 	the place to tie things back to the above paragraphs, and mention how we can now
-% 	start exploring things theoretically. If you want a specific input-output
-% 	response (for example, a very sharp, switch-like response or a response with
-% 	very low leakiness), the theory now gives you a clear cut guide to how to make
-% 	such constructs.}
-% \begin{itemize}
-% 	\item Our statistical mechanical model of simple repression can be expanded to incorporate the effects of allostery as inducer is titrated over several orders of magnitude;
-% 	\item Fitting our model to a \textit{lac} simple repression construct with known repressor copy number and repressor binding energy allows us to determine the allosteric parameters of the Lac repressor \stephanieComment{Here I'm lumping $K_A$, $K_I$, and $\epsilon$ together as "allosteric parameters," though another term may be more appropriate};
-% 	\item Our model, combined with allosteric parameters inferred from a single \textit{lac} simple repression construct, can be used to predict the IPTG titration curve of \textit{any} other \textit{lac} simple repression construct, provided that we know the repressor copy number and binding energy;
-% 	\item Varying repressor copy number and binding strength allows the cell to access a wide range of regulatory behaviors (e.g. leakiness and dynamic range), even as the allosteric properties of LacI remain constant;
-% 	\item The fold-change for any of the 24 strains we examine, with any concentration of IPTG, can be rewritten in terms of a single fundamental "Bohr parameter" so that all data points collapse onto the same curve.
-% \end{itemize}
+One remarkable conclusion of this theory is that we can use the response of
+a single strain of known repressor copy number and operator binding energy to
+make parameter free predictions for the induction profile of any other simple
+repression architecture. To test this, we used 20 additional strains in which
+repressor copy numbers and the Lac repressor binding energies have been varied,
+and measured the induction profile of each. The remarkable agreement between
+these 20 predicted sets and the experimental data demonstrates how all of these
+induction profiles collapse onto a master curve governed by a set of underlying
+thermodynamic parameters. These results show that quantitative models are an incredibly powerful tool for
+understanding the myriad ways in which cells establish control over
+their expression profiles. While many combinations of parameters are capable of
+achieving the same fold-change values, these titration
+curves are significantly affected by both repressor copy number and binding
+energy, and we predict these effects neatly with our models. One might imagine
+extending these models to predict the consequences of other perturbations such
+as mutations, allosteric activation, or more complex regulatory architectures.
