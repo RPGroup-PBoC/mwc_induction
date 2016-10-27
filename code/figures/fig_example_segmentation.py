@@ -143,7 +143,7 @@ def log_segmentation(im, selem='default', thresh=0.0001, radius=2.0,
         raise ValueError('image must be a single channel!')
 
     # Determine if the image should be median filtered.
-    if median_filt == True:
+    if median_filt is True:
         selem = skimage.morphology.square(3)
         im_filt = scipy.ndimage.median_filter(im, footprint=selem)
     else:
