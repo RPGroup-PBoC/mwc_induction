@@ -7,15 +7,39 @@
 %paper from PNAS that notes how hard it is to do any sort of high
 %throughput analysis of allostery.
 
-The communication of organisms with the external world is one of the most ubiquitous phenomena in biology. At the cellular level, this communication takes the form of signaling pathways. One of the most pervasive categories of cell signaling is allosteric regulation, which affects gene expression when transcription factors have their activity altered by the binding of a ligand. Despite the overarching importance of this model of signaling, we have lacked a rigorous dialogue between theory and experiment, in part due to the difficulty of analyzing allostery in a high-throughput manner \cite{Lindsley2006}. To that end, we explore cell signaling in the context of one of the most widespread bacterial regulatory architectures, the simple repression motif \cite{Rydenfeldt2014}.
+The communication of organisms with the external world is one of the most
+ubiquitous phenomena in biology. At the cellular level, this communication takes
+the form of signaling pathways \talComment{maybe finish this sentence with two
+	examples?}. One of the most pervasive categories of cell signaling is allosteric
+regulation, \talComment{where ligand binding induces a conformational change in
+	transcription factors, which thereby affects gene expression} \sout{which
+	affects gene expression when transcription factors have their activity altered
+	by the binding of a ligand}. Despite the overarching importance of this model of
+signaling, we have lacked a rigorous dialogue between theory and experiment, in
+part due to the difficulty of analyzing allostery in a high-throughput manner
+\cite{Lindsley2006}. To that end, we explore cell signaling in the context of
+one of the most widespread bacterial regulatory architectures, the simple
+repression motif \cite{Rydenfelt2014}.
 
 %Paragraph 2: The challenge we undertake - a predictive theory of the response
-%of genetic circuits to allosteric inputs.  What we require of such a predictive theory
-%is not that one can fit some sigmoidal curve, but rather something that allows
-%us to understand all aspects ranging from leakiness to the EC50 and effective
-%Hill coefficient to the dynamic range.  
+%of genetic circuits to allosteric inputs.  What we require of such a predictive
+% theory is not that one can fit some sigmoidal curve, but rather something that
+% allows us to understand all aspects ranging from leakiness to the EC50 and
+% effective Hill coefficient to the dynamic range.
 
-Here we propose a predictive theory of the response of genetic circuits to allosteric inputs. Such a theory should allow us to understand all aspects of a ligand titration curve, such as the leakiness, the $EC_{50}$, the slope of the inflection region, and the dynamic range. The inputs to our model must therefore have a strong biophysical basis. A strong theory of allosteric induction is likewise required to place each of these inputs in their proper context. 
+Here we propose a predictive theory of the response of genetic circuits to
+allosteric inputs. Such a theory should allow us to understand all aspects of a
+ligand titration curve, such as the leakiness, the $EC_{50}$, the slope of the
+inflection region, and the dynamic range \talComment{I really dislike this
+	sentence because: (1) We have not defined what any of these terms mean; (2) We
+	do not discuss any of these properties in our paper. I would prefer something
+	like our previous version: ``At this level, fine details of a system - the
+	steepness of the response, the limits of minimum and maximum response, etc. -
+	can now be resolved to go beyond a general sigmoidal shapes.''}. The inputs to
+our model must therefore have a strong biophysical basis. A strong theory of
+allosteric induction is likewise required to place each of these inputs in their
+proper context. \talComment{The last two sentences seem weak, and we should
+	definitely remove the double use of ``strong''}
 
 %Paragraph 3: WE show a general statistical mechanical theory of the induction
 %phenomenon using the famous MWC model.   We show how this model
@@ -23,12 +47,23 @@ Here we propose a predictive theory of the response of genetic circuits to allos
 %many inducer binding sites, whether inducer switches from active to inactive
 %or the other way around).
 
-As the foundation for our theory of allosteric induction, we use a statistical mechanical rendering of the Monod-Wyman-Changeux (MWC) model \cite{MONOD1965}. The MWC model stipulates that an allosteric protein is capable of
-accessing two distinct conformations -- an active and
-inactive state -- in thermodynamic equilibrium. A protein's affinity
-for ligand is different for the active and inactive states, such that the
-equilibrium between these states shifts with changing concentration of ligand
-\cite{Marzen2013}. We show how this model can be used for various transcription factors and modes of induction, accounting for variations such as the number of ligand binding sites, the regulatory effect of the ligand (i.e. whether it switches the transcription factor from active to inactive or vice versa), and cooperativity between transcription factor subunits. \stephanieComment{At this point we don't actually discuss variations to the allosteric properties of the transcription factor, but I like the idea of addressing it by showing theory curves for hypothetical TFs with various properties. This could either be part of our primary results or a cool appendix for the SI.}
+\sout{As the foundation for our theory of allosteric induction, we use a
+	statistical mechanical rendering of} \talComment{awk} the Monod-Wyman-Changeux
+(MWC) model, which stipulates that an allosteric protein is capable of accessing
+two distinct conformations -- an active and inactive state -- in thermodynamic
+equilibrium \cite{MONOD1965}. A protein's affinity for ligand is different for
+the active and inactive states, such that the equilibrium between these states
+shifts with changing concentration of ligand \cite{Marzen2013}. We show how this
+model can be used for various transcription factors and modes of induction,
+accounting for variations such as the number of ligand binding sites, the
+regulatory effect of the ligand (i.e. whether it switches the transcription
+factor from active to inactive or vice versa), and cooperativity
+\talComment{When do we discuss cooperativity???} between transcription factor
+subunits. \stephanieComment{At this point we don't actually discuss variations
+	to the allosteric properties of the transcription factor, but I like the idea of
+	addressing it by showing theory curves for hypothetical TFs with various
+	properties. This could either be part of our primary results or a cool appendix
+	for the SI.}
 
 %Paragraph 4: we design and implement an experimental system in which
 %we tune many distinct parameters in the genetic circuit itself - i.e. the binding
@@ -38,7 +73,19 @@ equilibrium between these states shifts with changing concentration of ligand
 %transcription factor in all of these different contexts and predict what the outcome
 %will be.
 
-To show how our model accounts for the biophysical parameters unique to each individual regulatory motif, we use the well-characterized components of the \textit{lac} regulatory system. We design and implement an experimental system in which we tune several distinct parameters in the genetic circuit itself, such as the transcription factor binding energies and copy numbers. This leaves the allosteric properties of the transcription factor as the only free parameters, which should remain constant in each of our variations on the genetic circuit. We then assess the predictive nature of our model with the following question: once we have determined the three parameters that characterize the allosteric properties of the transcription factor, can we then apply these parameters to each of our designed genetic circuits and determine the regulatory outcome?
+To show how our model accounts for the biophysical parameters unique to each
+individual regulatory motif, we use the well-characterized components of the
+\textit{lac} regulatory system. We design and implement an experimental system
+in which we tune several distinct parameters in the genetic circuit itself, such
+as the transcription factor binding energies and copy numbers. This leaves the
+allosteric properties of the transcription factor as the only free parameters,
+which should remain constant in each of our variations on the genetic circuit
+\talComment{awk}. We then assess the predictive nature of our model with the
+following question: once we have determined the three parameters \talComment{We
+	should not say three parameters unless we explicitly state what they are} that
+characterize the allosteric properties of the transcription factor, can we then
+apply these parameters to each of our designed genetic circuits and determine
+the regulatory outcome?
 
 
 %Paragraph 5: We show the measurements, the comparison between the theory
@@ -46,5 +93,80 @@ To show how our model accounts for the biophysical parameters unique to each ind
 %us to see how there are many ways to reach the same level of transcription
 %and all of these are equivalent.
 
-To answer this question, we measure the fold-change values of each of our genetic circuits over several orders of magnitude of ligand concentration. We show that we can use the ligand response curve of a single genetic circuit to determine the allosteric parameters of the transcription factor, and then use these parameters to accurately predict the response curves for each of the remaining genetic circuits. Moreover, we propose a new fundamental parameter (which we call the Bohr parameter) that captures the regulatory range of each genetic circuit on a single single curve, showing that a broad selection of thermodynamic parameters produce the same regulatory result, meaning that they are all biologically equivalent. 
+To answer this question, we measure the fold-change values of each of our
+genetic circuits over several orders of magnitude of ligand concentration. We
+show that we can use the ligand response curve of a single genetic circuit to
+determine the allosteric parameters of the transcription factor, and then use
+these parameters to accurately predict the response curves for each of the
+remaining genetic circuits. Moreover, we propose a new fundamental parameter
+(which we call the Bohr parameter) that captures the regulatory range of each
+genetic circuit on a single single curve, showing that a broad selection of
+thermodynamic parameters produce the same regulatory result, meaning that they
+are all biologically equivalent.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Old introduction, for reference %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Biological mechanisms are complex and diverse, and as a consequence our
+%understanding is often characterized by a slow accumulation of qualitative
+%information that is often difficult to fit into a unifying framework.
+%Nevertheless, the last decade has yielded new techniques that have given us
+%unprecedented access to the fine details underlaying a broad array of biological
+%phenomena, from the exquisite dissection of the gene regulatory network of the
+%sea-urchin developmental program [Peters and Davidson] to the \textit{in vivo}
+%imaging of the central dogma [Ido's MS2, Hernan's MS2, Suntag paper, Xiaowei
+%recent paper] to the complex task of regulating gene expression
+%\cite{Garcia2011}. New genetic reporters and advancements in single-cell
+%measurements have brought about a new level of precision measurements
+%traditionally only achievable in more quantitative fields such as physics and
+%chemistry. Such high quality data is now routinely generated in various fields
+%of biology, and it calls for a similar expansion in our use of theoretical
+%frameworks to conceptualize and understand the richness of modern biological
+%data sets. At this level, fine details of a system - the steepness of the
+%response, the limits of minimum and maximum response, etc. - can now be resolved
+%to go beyond a general sigmoidal shapes.
+%
+%Statistical mechanical models of gene regulation have proven to be very
+%effective not only in predicting the mean expression level as a function of
+%natural parameters such as the transcription factor copy number and its binding
+%energy to the DNA \cite{Garcia2011}, but also in quantifying the effects of DNA
+%looping \cite{Boedicker2013a} and competing binding sites \cite{Brewster2014}.
+%Here, we extend such models to examine allostery as a mechanism for
+%transcriptional regulation. Allostery is a pervasive property of biological
+%molecules. This principle helps explain a large array of phenomena ranging from
+%quorum sensing and chemotaxis, oxygen binding by hemoglobin, and signal
+%transduction via GPCRs. Here, we consider the Monod-Wyman-Changeux (MWC) model
+%\cite{MONOD1965}, which stipulates that an allosteric protein is capable of
+%accessing two distinct conformations -- an active and inactive state -- in
+%thermodynamic equilibrium. A protein's affinity for ligand is different for the
+%active and inactive states, such that the equilibrium between these states
+%shifts with changing concentration of ligand \cite{Marzen2013}.
+%
+%In this work, we focus on the rich interplay between theory and experiment in
+%transcriptional regulation, where quantitative dissection of input-output
+%functions over the last decade has significantly pushed our ability to
+%manipulate and understand such systems. We focus on one of the most abundant
+%genetic architectures -- the simple repression motif [Mattias paper on
+%regulonDB] -- to test our predictions. Specifically, we use a simple repression
+%promoter constructed of the well-characterized components of the \textit{E. coli
+%	lac} operon and the famously allosteric Lac repressor to quantiatively test a
+%statistical mechanical model of induction using the MWC framework.
+%
+%One remarkable conclusion of this theory is that we can use the response of a
+%single strain of known repressor copy number and operator binding energy to make
+%parameter free predictions for the induction profile of any other simple
+%repression architecture. To test this, we used 20 additional strains in which
+%repressor copy numbers and the Lac repressor binding energies have been varied,
+%and measured the induction profile of each. The remarkable agreement between
+%these 20 predicted sets and the experimental data demonstrates how all of these
+%induction profiles collapse onto a master curve governed by a set of underlying
+%thermodynamic parameters. These results show that quantitative models are an
+%incredibly powerful tool for understanding the myriad ways in which cells
+%establish control over their expression profiles. While many combinations of
+%parameters are capable of achieving the same fold-change values, these titration
+%curves are significantly affected by both repressor copy number and binding
+%energy, and we predict these effects neatly with our models. One might imagine
+%extending these models to predict the consequences of other perturbations such
+%as mutations, allosteric activation, or more complex regulatory architectures.
