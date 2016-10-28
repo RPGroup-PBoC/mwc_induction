@@ -1,6 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Introduction}
 
+\talComment{Dear Team Induction. After re-reading Rob's comments, I think that
+	we should not mention Lac at all in this introduction. Let's keep it totally
+	general, and then in the Results section we can bring up the specific genetic
+	circuit that we used to test our theory.}
+
+---
+
 %paragraph 1: the ubiquitous induction phenomenon -  a key part of the
 %central dogma story that is the meeting point of cell signaling and
 %gene regulation.  I would also touch on the “Whence Cometh the Allosterome”
@@ -9,20 +16,26 @@
 
 The communication of organisms with the external world is one of the most
 ubiquitous phenomena in biology. At the cellular level, this takes the form of
-signaling pathways \talComment{maybe finish this sentence with two examples?}.
-One of the most pervasive categories of cell signaling is allosteric
-regulation, where binding of a ligand induces a conformational change in
-transcription factors, dictate gene expression. Despite the overarching
-importance of this mode of signaling, we have lacked a rigorous dialogue
-between theory and experiment \cite{Lindsley2006}. To that end, we
-explore cell signaling in the context of one of the most widespread bacterial
-regulatory architectures, the simple repression motif \cite{Rydenfelt2014}.
+\talComment{diverse} signaling pathways \talComment{from two component systems
+	found primarily in bacteria to multi-component pathways in eukaryotes involving
+	MAPK, cAMP, IP$_3$, and other key signaling molecules}. One of the most
+pervasive categories \talComment{found in all realms} of cell signaling is
+allosteric regulation, where binding of a ligand induces a conformational change
+in transcription factors, dictate gene expression. Despite the overarching
+importance of this mode of signaling, we have lacked a rigorous dialogue between
+theory and experiment \cite{Lindsley2006}. To that end, we explore cell
+signaling in the context of one of the most widespread bacterial regulatory
+architectures, the simple repression motif \cite{Rydenfelt2014}.
 
-%Paragraph 2: The challenge we undertake - a predictive theory of the response
-%of genetic circuits to allosteric inputs.  What we require of such a predictive
-% theory is not that one can fit some sigmoidal curve, but rather something that
-% allows us to understand all aspects ranging from leakiness to the EC50 and
-% effective Hill coefficient to the dynamic range.
+%Paragraph 2: The challenge we undertake - a predictive theory of the response of
+%genetic circuits to allosteric inputs.  What we require of such a predictive
+%theory is not that one can fit some sigmoidal curve, but rather something that
+%allows us to understand all aspects ranging from leakiness to the EC50 and
+%effective Hill coefficient to the dynamic range.
+
+---
+
+\textbf{Paragraph 2}
 
 Here we propose a predictive theory of the response of genetic circuits to
 allosteric inputs. This theory allows us to understand and predict the fine
@@ -30,6 +43,12 @@ details of an induction profile -- such as the steepness of the response and
 the limits of minimum and maximum expression -- beyond a general sigmoidal
 shape.
 
+\talComment{In this work, we demonstrate that a thermodynamic model of transcriptional
+regulation coupled with a statistical mechanical treatment of the induction of
+allosteric proteins allows us to go beyond merely understanding the sigmoidal
+shape of induction profiles, but allows us to quantitatively predict fine
+details of such responses, such as the steepness of the response as well as the
+limits of minimum and maximum expression.}
 
 % The inputs to our model must therefore have a strong biophysical basis.
 % A strong theory of allosteric induction is likewise required to place each of
@@ -41,30 +60,57 @@ shape.
 % reasoning. A strong theory of allosteric induction is imperative to place these
 % inputs in their proper context."}
 
+---
 
-% %Paragraph 3: WE show a general statistical mechanical theory of the induction
-%phenomenon using the famous MWC model.   We show how this model
-%can be used for various transcription factors and modes of induction (i.e. how
-%many inducer binding sites, whether inducer switches from active to inactive
-%or the other way around).
+\textbf{Paragraph 3}
+
+%Paragraph 3: We show a general statistical mechanical theory of the induction
+%phenomenon using the famous MWC model. We show how this model can be used for
+%various transcription factors and modes of induction (i.e. how many inducer
+%binding sites, whether inducer switches from active to inactive or the other way
+%around).
 
 \sout{As the foundation for our theory of allosteric induction, we use a
-statistical mechanical rendering of} \talComment{awk} the Monod-Wyman-Changeux
-(MWC) model, which stipulates that an allosteric protein is capable of
-accessing two distinct conformations -- an active and inactive state -- \griffinComment{fluctating between them} in
-thermodynamic equilibrium \cite{MONOD1965}. \griffinComment{For the existence of these states to be useful, a} protein's affinity for ligand is
-different for the active and inactive states, such that the equilibrium between
-these states shifts with changing concentration of ligand \cite{Marzen2013}. We
-show how this model can be used for various transcription factors and modes of
-induction, accounting for variations such as the number of ligand binding
-sites, the regulatory effect of the ligand (i.e. whether it switches the
-transcription factor from active to inactive or vice versa), and cooperativity
-\talComment{When do we discuss cooperativity???} \griffinComment{Aren't we assuming infinite cooperativity here? We assign a arbitrarily large energetic penalty for dependent subunits to be in different active/inactive states} between transcription factor
-subunits. \stephanieComment{At this point we don't actually discuss variations
-to the allosteric properties of the transcription factor, but I like the idea
-of addressing it by showing theory curves for hypothetical TFs with various
-properties. This could either be part of our primary results or a cool appendix
-for the SI.}\griffinComment{I think Rob would even like this to be in the model section of the text. He had mentioned talking about the case of activation and induction of repression. He also expressed interest in having some kind of small figure which shows the numerous ways our theory can be applied. Maybe that is better saved for a review article, however.}
+	statistical mechanical rendering of} \talComment{awk} the Monod-Wyman-Changeux
+(MWC) model, which stipulates that an allosteric protein is capable of accessing
+two distinct conformations -- an active and inactive state --
+\griffinComment{fluctuating between them} in thermodynamic equilibrium
+\cite{MONOD1965}. \griffinComment{For the existence of these states to be
+	useful, a} protein's affinity for ligand is different for the active and
+inactive states, such that the equilibrium between these states shifts with
+changing concentration of ligand \cite{Marzen2013}. We show how this model can
+be used for various transcription factors and modes of induction, accounting for
+variations such as the number of ligand binding sites, the regulatory effect of
+the ligand (i.e. whether it switches the transcription factor from active to
+inactive or vice versa), and cooperativity \talComment{When do we discuss
+	cooperativity???} \griffinComment{Aren't we assuming infinite cooperativity
+	here? We assign a arbitrarily large energetic penalty for dependent subunits to
+	be in different active/inactive states} between transcription factor subunits.
+\stephanieComment{At this point we don't actually discuss variations to the
+	allosteric properties of the transcription factor, but I like the idea of
+	addressing it by showing theory curves for hypothetical TFs with various
+	properties. This could either be part of our primary results or a cool appendix
+	for the SI.}\griffinComment{I think Rob would even like this to be in the model
+	section of the text. He had mentioned talking about the case of activation and
+	induction of repression. He also expressed interest in having some kind of small
+	figure which shows the numerous ways our theory can be applied. Maybe that is
+	better saved for a review article, however.}
+
+\talComment{Specifically, we consider allosteric transcription factors using the
+Monod-Wyman-Changeux (MWC) model of allostery, which stipulates that an
+allosteric protein is capable of accessing two distinct conformations -- an
+active and inactive state -- in thermodynamic equilibrium \cite{MONOD1965}. For
+example, an inducer binding to an allosteric repressor increases the probability
+that the repressor will be inactive, weakening its ability to bind to the
+promoter and increasing gene expression. We discuss how such frameworks are
+remarkably general, capable of modeling both induction and corepression in
+addition to accounting for the number of binding sites and binding energies of a
+system.}
+
+
+---
+
+\textbf{Paragraph 4}
 
 %Paragraph 4: we design and implement an experimental system in which
 %we tune many distinct parameters in the genetic circuit itself - i.e. the binding
@@ -88,6 +134,21 @@ they are} that characterize the allosteric properties of the transcription
 factor, can we then apply these parameters to each of our designed genetic
 circuits and \sout{determine}\griffinComment{predict} the regulatory outcome?
 
+\talComment{To test our model, we design a genetic circuit which allows us to
+	directly tune various physical parameters associated with a transcription factor
+	including its copy number and DNA binding energy. We then pose a simple
+	question: after we characterize the biophysical parameters associated with
+	induction, how much predictive power does our model provide when we tune the
+	parameters associated with the transcription factor? To this end, we construct
+	24 genetic circuits, each with a different combination of transcription factor
+	copy number and DNA binding energy. We use data from a single strain in order to
+	completely characterize the system and make parameter-free predictions of the
+	remaining 23 strains.}
+
+---
+
+\textbf{Paragraph 5}
+
 %Paragraph 5: We show the measurements, the comparison between the theory
 %and the experiment and propose a new fundamental parameter that allows
 %us to see how there are many ways to reach the same level of transcription
@@ -107,7 +168,24 @@ before?}) that captures the regulatory range of each genetic circuit on a
 single single curve, showing that a broad selection of thermodynamic parameters
 produce the same regulatory result. \sout{meaning that they are all
 biologically equivalent}. \griffinComment{demonstrating that a combination of a
-variety of parameter values can yield biolgically equivalent responses.}
+variety of parameter values can yield biologically equivalent responses.}
+
+\talComment{We compare our theoretical predictions with experimental
+	measurements and demonstrate how interesting trends such as the minimal and
+	maximal responses of the strains can be understood using the MWC framework. In
+	addition, we propose a new fundamental parameter which characterizes the
+	trade-offs between the different physical parameters of the system. For example,
+	if the transcription factor copy number is doubled but its binding energy is
+	decreased by $k_B T \log 2$, the level of gene expression would
+	remain unchanged. Such relationships not only give insight into the evolution of
+	such systems, but also permit us to understand the data from a new perspective.
+	We demonstrate how the titration curves from the 24 strains collapse onto a
+	master curve. In this manner, the myriad of data from these 24 genetic circuits
+	can all be understood as multiple embodiments of the same underlying phenomenon.
+	One might imagine extending these models to predict the consequences of other
+	perturbations such as mutations, allosteric activation, or more complex
+	regulatory architectures.}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
