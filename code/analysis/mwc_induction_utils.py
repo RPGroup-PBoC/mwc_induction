@@ -157,6 +157,7 @@ import skimage.filters
 import skimage.morphology
 import skimage.segmentation
 import joblib as jlb
+import pandas as pd
 import scipy.stats as sc
 import scipy
 import statsmodels.tools.numdiff as smnd # to comput the Hessian matrix
@@ -711,7 +712,7 @@ def hpd(trace, mass_frac):
         1D array of MCMC samples for a single variable
     mass_frac : float with 0 < mass_frac <= 1
         The fraction of the probability to be included in
-        the HPD.  For example, `massfrac` = 0.95 gives a
+        the HPD.  For hreple, `massfrac` = 0.95 gives a
         95% HPD.
 
     Returns
@@ -1053,7 +1054,7 @@ def ome_split(im):
 
 
 # #################
-def average_stack(im, median_filt=True, n_threads=1, **median_kwargs):
+def average_stack(im, median_filt=True):
     """
     Computes an average image from a provided array of images.
 
@@ -1072,10 +1073,9 @@ def average_stack(im, median_filt=True, n_threads=1, **median_kwargs):
     """
 
     # Determine if the images should be median filtered.
-    if median_filt is true:
+    if median_filt is True:
         selem = skimage.morphology.square(3)
-        im_filt = jlb.Parallel(n_jobs=n_threads)(jlb.delayed(
-            scipy.ndimage.median_filter(i, footprint=selem) for i in im))
+        im_filt = [scipy.ndimage.median_filter(i, footprint=selem) for i in im]
     else:
         im = im_filt
 
@@ -1087,8 +1087,7 @@ def average_stack(im, median_filt=True, n_threads=1, **median_kwargs):
     return im_avg
 
 
-# #################
-def generate_flatfield(im, im_dark, im_bright):
+def generate_flatfield(im, im_dark, im_field, median_filt=True):
     """
     Corrects illumination of a given image using a dark image and an image of
     the flat illumination.
@@ -1099,8 +1098,11 @@ def generate_flatfield(im, im_dark, im_bright):
         Image to be flattened.
     im_dark : 2d-array
         Average image of camera shot noise (no illumination).
-    im_bright : 2d-array
+    im_field: 2d-array
         Average image of fluorescence illumination.
+    median_filt : bool
+        If True, the image to be corrected will be median filtered with a
+        3x3 square structural element.
 
     Returns
     -------
@@ -1108,8 +1110,8 @@ def generate_flatfield(im, im_dark, im_bright):
         Image corrected for uneven fluorescence illumination. This is performed
         as
 
-        im_flat = ((im - im_dark) / (im_bright - im_dark)) *
-                   mean(im_bright - im_dark)
+        im_flat = ((im - im_dark) / (im_field - im_dark)) *
+                   mean(im_field - im_dark)
 
     Raises
     ------
@@ -1119,13 +1121,20 @@ def generate_flatfield(im, im_dark, im_bright):
     """
 
     # Ensure that the same image is not being provided as the bright and dark.
-    if np.isclose(im_bright, im_dark):
+    if np.isclose(im_field, im_dark).all():
         raise RuntimeError('im_bright and im_dark are approximately equal.')
+
     # Compute the mean difference between the bright and dark image.
-    mean_diff = np.mean(im_bright - im_dark)
+    mean_diff = np.mean(im_field - im_dark)
+
+    if median_filt is True:
+        selem = skimage.morphology.square(3)
+        im_filt = scipy.ndimage.median_filter(im, footprint=selem)
+    else:
+        im_filt = im
 
     # Compute and return the flattened image.
-    im_flat = ((im - im_dark) / (im_bright - im_dark)) * mean_diff
+    im_flat = ((im_filt - im_dark) / (im_field - im_dark)) * mean_diff
     return im_flat
 
 
@@ -1311,9 +1320,66 @@ def props_to_df(mask, physical_distance=1, intensity_image=None):
     df['area'] = df['area'] * physical_distance**2
     return df
 
+
+def example_segmentation(mask, im, bar_length, bounds=True):
+    """
+    Generates and example segmentation with segmentation mask shown in red over
+    the original phase image.
+
+    Parameters
+    ----------
+    mask : 2d-array, bool
+        Boolean mask of segmented objects.
+    im : 2d-array, float
+        Original image on which the segmentation mask will be overlaid.
+    bar_length : int
+        Length of scale bar in units of pixels.
+    bounds : bool
+        If True, only teh bounds of the segmentation mask will be shown around
+        each object.
+
+    Returns
+    -------
+    merge : 3d-array
+        Merged segmentation mask.
+    """
+
+    # Ensure that the original image is a float and the mask is a bool.
+    if np.max(im) > 1:
+        im = (im - im.min()) / (im.max() - im.min())
+    if np.max(mask) > 0:
+        mask = mask > 0
+
+    # Determine if the bounds should be hsown.
+    if bounds is True:
+        mask = skimage.segmentation.find_boundaries(mask)
+    im_copy = np.copy(im)
+    im_copy[mask] = 1.0
+
+    return np.dstack((im_copy, im, im))
+
+
 # #################
 # Plotting Configuration
 # #################
+
+def ecdf(data):
+    """
+    Computes the empirical cumulative distribution function (ECDF)
+    of a given set of 1D data.
+
+    Parameters
+    ----------
+    data : 1d-array
+        Data from which the ECDF will be computed.
+
+    Returns
+    -------
+    x, y : 1d-arrays
+        The sorted data (x) and the ECDF (y) of the data.
+    """
+
+    return np.sort(data), np.arange(len(data))/len(data)
 
 
 # #################
