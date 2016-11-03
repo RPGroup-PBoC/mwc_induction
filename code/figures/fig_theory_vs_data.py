@@ -134,9 +134,9 @@ for i, op in enumerate(operators):
 ax[0].legend(loc='upper left', title='repressors / cell')
 ax[3].set_axis_off()
 # add plot letter labels
-plt.figtext(0.0, .95, '(A)', fontsize=20)
-plt.figtext(0.50, 0.95, '(B)', fontsize=20)
-plt.figtext(0.0, .46, '(C)', fontsize=20)
+plt.figtext(0.0, .95, 'A', fontsize=20)
+plt.figtext(0.50, 0.95, 'B', fontsize=20)
+plt.figtext(0.0, .46, 'C', fontsize=20)
 plt.tight_layout()
 plt.savefig(output + '/fig_theory_vs_data_O2_RBS1027_fit.pdf')
 
