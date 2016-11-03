@@ -22,18 +22,18 @@ import seaborn as sns
 sns.set_palette("deep", color_codes=True)
 mwc.set_plotting_style()
 
-#=============================================================================== 
+#===============================================================================
 # Set output directory based on the graphicspath.tex file to print in dropbox
-#=============================================================================== 
+#===============================================================================
 dropbox = open('../../doc/induction_paper/graphicspath.tex')
 output = dropbox.read()
 output = re.sub('\\graphicspath{{', '', output)
 output = output[1::]
 output = re.sub('}}\n', '', output + '/extra_figures')
 
-#=============================================================================== 
+#===============================================================================
 # Read the data
-#=============================================================================== 
+#===============================================================================
 
 datadir = '../../data/'
 # read the list of data-sets to ignore
@@ -48,21 +48,21 @@ df = pd.concat(pd.read_csv(f, comment='#') for f in read_files)
 # Now we remove the autofluorescence and delta values
 df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 
-#=============================================================================== 
+#===============================================================================
 # O2 RBS1027
-#=============================================================================== 
+#===============================================================================
 # Load the flat-chain
 with open('../../data/mcmc/' + '20160815' + \
                   '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
-    
+
 # map value of the parameters
 ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
 
-#=============================================================================== 
+#===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
-#=============================================================================== 
+#===============================================================================
 # Define the IPTG concentrations to evaluate
 IPTG = np.logspace(-8, -2, 100)
 
@@ -87,13 +87,13 @@ for i, op in enumerate(operators):
         # Plot only for RBS1027
         if rbs=='RBS1027':
             # plot the theory using the parameters from the fit.
-            ax.plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
+            ax.plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
                 ea=ea, ei=ei, epsilon=4.5,
                 R=df[(df.rbs == rbs)].repressors.unique(),
                 epsilon_r=energies[op]),
                 color=colors[j])
             # plot 95% HPD region using the variability in the MWC parameters
-            cred_region = mwc.mcmc_cred_region(IPTG * 1E6, 
+            cred_region = mwc.mcmc_cred_region(IPTG * 1E6,
                 gauss_flatchain, epsilon=4.5,
                 R=df[(df.rbs == rbs)].repressors.unique(),
                 epsilon_r=energies[op])
@@ -104,11 +104,15 @@ for i, op in enumerate(operators):
             # compute the standard error of the mean
             fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
             np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
-            
+
             # plot the experimental data
             ax.errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
-                color=colors[j])
+                yerr=fc_err, label=df[df.rbs==rbs].repressors.unique()[0],
+                color=colors[j], linestyle='none')
+            ax.plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+                    fc_mean, linestyle='none', marker='D', markeredgewidth=2,
+                    markeredgecolor=colors[j], markerfacecolor='w')
+
 
 ax.set_xscale('log')
 ax.set_xlabel('IPTG (M)')
@@ -118,4 +122,5 @@ ax.set_xlim([1E-8, 1E-2])
 ax.set_title(op)
 ax.legend(loc='upper left', title='repressors / cell')
 plt.tight_layout()
+# output = '/Users/gchure/Dropbox/mwc_induction/Figures'
 plt.savefig(output + '/fig_fit_explanation_02.pdf')

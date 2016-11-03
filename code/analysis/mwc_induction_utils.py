@@ -1407,4 +1407,5 @@ def set_plotting_style():
     plt.rc('text.latex', preamble=r'\usepackage{sfmath}')
     plt.rc('mathtext', fontset='stixsans', sf='sans')
     sns.set_style('darkgrid', rc=rc)
+    colors = sns.color_pallete
     sns.set_palette("colorblind", color_codes=True)
