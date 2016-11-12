@@ -114,20 +114,22 @@ for i, op in enumerate(operators):
                      color=colors[j],
                     label=None,  linestyle='none')
             ax.plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
-                    fc_mean, marker='D', markersize=7, markeredgewidth=1, markeredgecolor=colors[j],
-                    markerfacecolor='w', label=df[df.rbs==rbs].repressors.unique()[0] * 2, linestyle='none')
-
-#            ax.errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-#                yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
-#                color=colors[j])
+                    fc_mean, marker='o', markeredgewidth=1.5, 
+                    markeredgecolor=colors[j],
+                    markerfacecolor='w', label=df[df.rbs==rbs].repressors.unique()[0] * 2,
+                    linestyle='none')
+            # Label the plot with the operator name and the energy
+            ax.text(0.95, 0.1, op + 
+                    '\n' + r'$\Delta\varepsilon_{RA} =$' +\
+                    '{:.1f}'.format(energies[op]) + r' $k_BT$',
+                    ha='right', va='center',
+                    transform=ax.transAxes, fontsize=18)
 
 ax.set_xscale('log')
-ax.set_xlabel('IPTG (M)', fontsize=18)
-ax.set_ylabel('fold-change', fontsize=18)
+ax.set_xlabel('IPTG (M)')
+ax.set_ylabel('fold-change')
 ax.set_ylim([-0.01, 1.2])
 ax.set_xlim([1E-8, 1E-2])
-ax.tick_params(labelsize=16)
 ax.legend(loc='upper left', title='repressors / cell')
 plt.tight_layout()
-# output='/Users/gchure/Dropbox/mwc_induction'
 plt.savefig(output + '/fig_fit_explanation_03.pdf')

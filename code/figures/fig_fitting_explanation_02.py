@@ -9,7 +9,7 @@ import pandas as pd
 
 #Import the project utils
 import sys
-sys.path.insert(0, '../')
+sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 
 # Import matplotlib stuff for plotting
@@ -107,11 +107,19 @@ for i, op in enumerate(operators):
 
             # plot the experimental data
             ax.errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                yerr=fc_err, label=df[df.rbs==rbs].repressors.unique()[0],
+                yerr=fc_err, label='',
                 color=colors[j], linestyle='none')
             ax.plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
-                    fc_mean, linestyle='none', marker='D', markeredgewidth=2,
-                    markeredgecolor=colors[j], markerfacecolor='w')
+                    fc_mean, linestyle='none', marker='o', markeredgewidth=1.5,
+                    markeredgecolor=colors[j], markerfacecolor='w',
+                    label=df[df.rbs==rbs].repressors.unique()[0])
+            # Label the plot with the operator name and the energy
+            ax.text(0.95, 0.1, op + 
+                    '\n' + r'$\Delta\varepsilon_{RA} =$' +\
+                    '{:.1f}'.format(energies[op]) + r' $k_BT$',
+                    ha='right', va='center',
+                    transform=ax.transAxes, fontsize=18)
+
 
 
 ax.set_xscale('log')
@@ -119,8 +127,6 @@ ax.set_xlabel('IPTG (M)')
 ax.set_ylabel('fold-change')
 ax.set_ylim([-0.01, 1.2])
 ax.set_xlim([1E-8, 1E-2])
-ax.set_title(op)
 ax.legend(loc='upper left', title='repressors / cell')
 plt.tight_layout()
-# output = '/Users/gchure/Dropbox/mwc_induction/Figures'
 plt.savefig(output + '/fig_fit_explanation_02.pdf')
