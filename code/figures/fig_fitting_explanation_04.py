@@ -137,7 +137,7 @@ handles, labels = ax.get_legend_handles_labels()
 # Make the labels be numeric
 labels = [int(x) for x in labels]
 # Sort both lists by this numeric label
-labels, handles = (list(x) for x in zip(*sorted(zip(labels, handles))))
+labels, handles = (list(x) for x in zip(*sorted(zip(labels, handles), reverse=True)))
 # Convert back the labels to strings
 labels = [str(x) for x in labels]
 # use this order for the legend

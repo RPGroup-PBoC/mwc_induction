@@ -112,7 +112,7 @@ for i, op in enumerate(operators):
             ax.plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
                     fc_mean, linestyle='none', marker='o', markeredgewidth=1.5,
                     markeredgecolor=colors[j], markerfacecolor='w',
-                    label=df[df.rbs==rbs].repressors.unique()[0])
+                    label=df[df.rbs==rbs].repressors.unique()[0] * 2)
             # Label the plot with the operator name and the energy
             ax.text(0.95, 0.1, op + 
                     '\n' + r'$\Delta\varepsilon_{RA} =$' +\

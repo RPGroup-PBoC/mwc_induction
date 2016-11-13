@@ -1393,9 +1393,9 @@ def set_plotting_style():
           'axes.labelsize': 18,
           'axes.titlesize': 20,
           'axes.facecolor': '#E3DCD0',
-          'xtick.major' : 20,
+          'xtick.major' : 13,
           'xtick.labelsize': 'large',
-          'ytick.labelsize': 30,
+          'ytick.labelsize': 13,
           'font.family': 'Lucida Sans Unicode',
           'grid.linestyle': ':',
           'grid.linewidth': 1.5,
@@ -1408,3 +1408,4 @@ def set_plotting_style():
     plt.rc('mathtext', fontset='stixsans', sf='sans')
     sns.set_style('darkgrid', rc=rc)
     sns.set_palette("colorblind", color_codes=True)
+    sns.set_context('notebook', rc=rc)

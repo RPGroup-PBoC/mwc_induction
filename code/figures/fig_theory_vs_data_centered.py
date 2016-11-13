@@ -19,7 +19,6 @@ import matplotlib.cm as cm
 # Seaborn, useful for graphics
 import seaborn as sns
 
-sns.set_palette("deep", color_codes=True)
 mwc.set_plotting_style()
 
 #===============================================================================
@@ -74,18 +73,23 @@ colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 operators = ['O1', 'O2', 'O3'] #, 'Oid']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
-# Initialize subplots
-fig, ax = plt.subplots(1, 3, figsize=(11, 8))
+# Initialize the plot to set the size
+fig = plt.figure(figsize=(11, 8))
 
-ax = ax.ravel()
+# Define the GridSpec to center the lower plot
+ax1 = plt.subplot2grid((2, 4), (0, 0), colspan=2)
+ax2 = plt.subplot2grid((2, 4), (0, 2), colspan=2)
+ax3 = plt.subplot2grid((2, 4), (1, 1), colspan=2)
+ax = [ax1, ax2, ax3]
 
 # Loop through operators
 for i, op in enumerate(operators):
+    print(op)
     data = df[df.operator==op]
     # loop through RBS mutants
     for j, rbs in enumerate(df.rbs.unique()):
         # plot the theory using the parameters from the fit.
-        ax[i+1].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
+        ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
             ea=ea, ei=ei, epsilon=4.5,
             R=df[(df.rbs == rbs)].repressors.unique(),
             epsilon_r=energies[op]),
@@ -95,7 +99,7 @@ for i, op in enumerate(operators):
             gauss_flatchain, epsilon=4.5,
             R=df[(df.rbs == rbs)].repressors.unique(),
             epsilon_r=energies[op])
-        ax[i+1].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
                         alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
@@ -106,43 +110,37 @@ for i, op in enumerate(operators):
         # plot the experimental data
         # Distinguish between the fit data and the predictions
         if (op == 'O2') & (rbs == 'RBS1027'):
-            ax[i+1].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
                     fc_mean, yerr=fc_err, linestyle='none', color=colors[j])
-            ax[i+1].plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+            ax[i].plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
                        fc_mean, marker='o', linestyle='none',
                        markeredgewidth=2, markeredgecolor=colors[j],
                        markerfacecolor='w', 
                        label=df[df.rbs=='RBS1027'].repressors.unique()[0] * 2)
         else:
-            ax[i+1].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
                     fc_mean, yerr=fc_err,
                     fmt='o', label=df[df.rbs==rbs].repressors.unique()[0] * 2,
                 color=colors[j])
 
-        # Add operator and binding energy labels.
-        ax[i+1].text(0.8, 0.08, r'{0}'.format(op), transform=ax[i+1].transAxes, 
-                fontsize=14)
-        ax[i+1].text(0.7, 0.02,
-                r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
-                transform=ax[i+1].transAxes, fontsize=12)
-    ax[i+1].set_xscale('log')
-    ax[i+1].set_xlabel('IPTG (M)', fontsize=15)
-    ax[i+1].set_ylabel('fold-change', fontsize=16)
-    ax[i+1].set_ylim([-0.01, 1.1])
-    # ax[i].text(0.9, 0.1, op, ha='center', va='center',
-            # transform=ax[i].transAxes, fontsize=18)
-    ax[i+1].tick_params(labelsize=14)
-    ax[i+1].margins(0.02)
-ax[1].legend(loc='upper left', title='repressors / cell')
-ax[0].set_axis_off()
+    # Add operator and binding energy labels.
+    ax[i].text(0.8, 0.08, r'{0}'.format(op), transform=ax[i].transAxes, 
+            fontsize=14)
+    ax[i].text(0.7, 0.02,
+            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
+            transform=ax[i].transAxes, fontsize=12)
+    ax[i].set_xscale('log')
+    ax[i].set_xlabel('IPTG (M)', fontsize=15)
+    ax[i].set_ylabel('fold-change', fontsize=16)
+    ax[i].set_ylim([-0.01, 1.1])
+    ax[i].tick_params(labelsize=14)
+    ax[i].margins(0.02)
+ax[0].legend(loc='upper left', title='repressors / cell')
 # add plot letter labels
 plt.figtext(0.0, .95, 'A', fontsize=20)
 plt.figtext(0.50, 0.95, 'B', fontsize=20)
-plt.figtext(0.0, .46, 'C', fontsize=20)
-plt.figtext(0.5, .46, 'D', fontsize=20)
+plt.figtext(0.25, .46, 'C', fontsize=20)
 plt.tight_layout()
-output = '/Users/gchure/Dropbox/mwc_induction/Figures/'
-# output = '/Users/gchure/Desktop'
-plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_with_data.pdf', 
+plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_centered.pdf', 
         bbox_inches='tight')
 
