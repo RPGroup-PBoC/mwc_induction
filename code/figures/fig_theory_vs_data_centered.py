@@ -77,9 +77,9 @@ energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 fig = plt.figure(figsize=(11, 8))
 
 # Define the GridSpec to center the lower plot
-ax1 = plt.subplot2grid((2, 4), (0, 0), colspan=2)
-ax2 = plt.subplot2grid((2, 4), (0, 2), colspan=2)
-ax3 = plt.subplot2grid((2, 4), (1, 1), colspan=2)
+ax1 = plt.subplot2grid((2, 4), (0, 1), colspan=2)
+ax2 = plt.subplot2grid((2, 4), (1, 0), colspan=2)
+ax3 = plt.subplot2grid((2, 4), (1, 2), colspan=2)
 ax = [ax1, ax2, ax3]
 
 # Loop through operators
@@ -137,9 +137,9 @@ for i, op in enumerate(operators):
     ax[i].margins(0.02)
 ax[0].legend(loc='upper left', title='repressors / cell')
 # add plot letter labels
-plt.figtext(0.0, .95, 'A', fontsize=20)
-plt.figtext(0.50, 0.95, 'B', fontsize=20)
-plt.figtext(0.25, .46, 'C', fontsize=20)
+plt.figtext(0.25, .95, 'A', fontsize=20)
+plt.figtext(0.0, .46, 'B', fontsize=20)
+plt.figtext(0.50, .46, 'C', fontsize=20)
 plt.tight_layout()
 plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_centered.pdf', 
         bbox_inches='tight')
