@@ -70,7 +70,7 @@ colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
 # Define the operators and their respective energies
-operators = ['O1', 'O2', 'O3'] #, 'Oid']
+operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize the plot to set the size

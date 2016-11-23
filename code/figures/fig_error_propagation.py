@@ -19,7 +19,6 @@ import matplotlib.cm as cm
 # Seaborn, useful for graphics
 import seaborn as sns
 
-sns.set_palette("deep", color_codes=True)
 mwc.set_plotting_style()
 
 #=============================================================================== 
@@ -39,7 +38,7 @@ datadir = '../../data/'
 # read the list of data-sets to ignore
 data_ignore = pd.read_csv(datadir + 'datasets_ignore.csv', header=None).values
 # read the all data sets except for the ones in the ignore list
-all_files = glob.glob(datadir + '*' + '_IPTG_titration' + '*csv')
+all_files = glob.glob(datadir + '*' + '_IPTG_titration_MACSQuant' + '*csv')
 ignore_files = [f for f in all_files for i in data_ignore if i[0] in f]
 read_files = [f for f in all_files if f not in ignore_files]
 print('Number of unique data-sets: {:d}'.format(len(read_files)))
@@ -52,7 +51,7 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.operator != 'Oid')]
 # Load MCMC flatchain
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/' + '20161021' + \
+with open('../../data/mcmc/' + '20161121' + \
                   '_error_prop_pool_data_larger_sigma.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
@@ -79,15 +78,21 @@ colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
 # Define the operators and their respective energies
-operators = ['O1', 'O2', 'O3']# 'Oid']
+operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
-# Initialize subplots
-fig, ax = plt.subplots(2, 2, figsize=(11, 8))
-ax = ax.ravel()
+# Initialize the plot to set the size
+fig = plt.figure(figsize=(11, 8))
+
+# Define the GridSpec to center the lower plot
+ax1 = plt.subplot2grid((2, 4), (0, 1), colspan=2)
+ax2 = plt.subplot2grid((2, 4), (1, 0), colspan=2)
+ax3 = plt.subplot2grid((2, 4), (1, 2), colspan=2)
+ax = [ax1, ax2, ax3]
 
 # Loop through operators
 for i, op in enumerate(operators):
+    print(op)
     data = df[df.operator==op]
     # loop through RBS mutants
     for j, rbs in enumerate(df.rbs.unique()):
@@ -115,11 +120,24 @@ for i, op in enumerate(operators):
         ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
             yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
             color=colors[j])
+    # Add operator and binding energy labels.
+
+    ax[i].text(0.8, 0.08, r'{0}'.format(op), transform=ax[i].transAxes, 
+            fontsize=14)
+    ax[i].text(0.7, 0.02,
+            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
+            transform=ax[i].transAxes, fontsize=12)
     ax[i].set_xscale('log')
-    ax[i].set_xlabel('IPTG (M)')
-    ax[i].set_ylabel('fold-change')
-    ax[i].set_ylim([-0.01, 1.2])
-    ax[i].set_title(op)
+    ax[i].set_xlabel('IPTG (M)', fontsize=15)
+    ax[i].set_ylabel('fold-change', fontsize=16)
+    ax[i].set_ylim([-0.01, 1.1])
+    ax[i].tick_params(labelsize=14)
+    ax[i].margins(0.02)
+
 ax[0].legend(loc='upper left', title='repressors / cell')
+# add plot letter labels
+plt.figtext(0.25, .95, 'A', fontsize=20)
+plt.figtext(0.0, .46, 'B', fontsize=20)
+plt.figtext(0.50, .46, 'C', fontsize=20)
 plt.tight_layout()
-plt.savefig(output + '/fig_error_propagation.pdf')
+plt.savefig(output + '/fig_error_propagation.pdf', bbox_inches='tight')
