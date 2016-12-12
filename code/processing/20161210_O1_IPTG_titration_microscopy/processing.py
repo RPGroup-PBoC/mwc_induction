@@ -21,10 +21,10 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Define the data directory.
-data_dir = '../../../data/microscopy/20161102/'
+data_dir = '../../../data/microscopy/20161210/'
 
 # Set details of the experiment.
-DATE = 20161102
+DATE = 20161210
 USERNAME = 'gchure'
 OPERATOR = 'O1'
 BINDING_ENERGY = -15.8
@@ -89,7 +89,7 @@ final_df = final_df[(final_df.area > 0.5) & (final_df.area < 6.0) &
 # Add the comments to the header of the data file
 final_df.to_csv('output/' + str(DATE) + '_' + OPERATOR +
                 '_IPTG_titration_microscopy.csv', index=False)
-filenames = ['./comments.txt', 'output/' + str(DATE) + '_' + OPERATOR +
+filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR +
              '_IPTG_titration_microscopy.csv']
 with open('../../../data/' + str(DATE) + '_' + OPERATOR +
           '_IPTG_titration_microscopy.csv', 'w') as output:

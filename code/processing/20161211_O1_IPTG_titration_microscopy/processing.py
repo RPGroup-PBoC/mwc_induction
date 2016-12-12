@@ -21,10 +21,10 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Define the data directory.
-data_dir = '../../../data/microscopy/20161102/'
+data_dir = '../../../data/microscopy/20161211/'
 
 # Set details of the experiment.
-DATE = 20161102
+DATE = 20161211
 USERNAME = 'gchure'
 OPERATOR = 'O1'
 BINDING_ENERGY = -15.8
@@ -32,7 +32,7 @@ REPRESSORS = (0, 0, 130)
 IPDIST = 0.160  # in units of µm per pixel
 STRAINS = ['auto', 'delta', 'RBS1027']
 IPTG_RANGE = (0, 0.1, 5, 10, 25, 50, 75,
-              100, 250, 500, 1000, 5000)
+              100, 250, 1000, 5000)
 
 # Generate the flatfield images.
 dark_glob = glob.glob(data_dir + '*camera_noise*/*tif')
@@ -50,11 +50,15 @@ ex_iptg = np.random.choice(IPTG_RANGE)
 dfs = []
 for i, st in enumerate(STRAINS):
     for j, iptg in enumerate(IPTG_RANGE):
+
         # Load the imagesimages = glob.glob
         images = glob.glob(data_dir + '*' + st + '*_' + str(iptg) +
                            'uMIPTG*/*.ome.tif')
         ims = skimage.io.ImageCollection(images)
         for _, x in enumerate(ims):
+
+            print('Processing strain {0} iptg {1} image {2}'.format(st, iptg, _))
+            print(images[_])
             _, m, y = mwc.ome_split(x)
             y_flat = mwc.generate_flatfield(y, average_dark, average_field)
 
@@ -65,20 +69,21 @@ for i, st in enumerate(STRAINS):
                 ex_phase = _
 
             # Extract the measurements.
-            im_df = mwc.props_to_df(m_seg, physical_distance=IPDIST,
-                                    intensity_image=y_flat)
+            if np.max(m_seg) > 0:
+                im_df = mwc.props_to_df(m_seg, physical_distance=IPDIST,
+                                        intensity_image=y_flat)
 
-            # Add strain and  IPTG concentration information.
-            im_df.insert(0, 'IPTG_uM', iptg)
-            im_df.insert(0, 'repressors', REPRESSORS[i])
-            im_df.insert(0, 'rbs', st)
-            im_df.insert(0, 'binding_energy', BINDING_ENERGY)
-            im_df.insert(0, 'operator', OPERATOR)
-            im_df.insert(0, 'username', USERNAME)
-            im_df.insert(0, 'date', DATE)
+                # Add strain and  IPTG concentration information.
+                im_df.insert(0, 'IPTG_uM', iptg)
+                im_df.insert(0, 'repressors', REPRESSORS[i])
+                im_df.insert(0, 'rbs', st)
+                im_df.insert(0, 'binding_energy', BINDING_ENERGY)
+                im_df.insert(0, 'operator', OPERATOR)
+                im_df.insert(0, 'username', USERNAME)
+                im_df.insert(0, 'date', DATE)
 
-            # Append the dataframe to the global list.
-            dfs.append(im_df)
+                # Append the dataframe to the global list.
+                dfs.append(im_df)
 
 # Concatenate the dataframe
 final_df = pd.concat(dfs, axis=0)
@@ -89,7 +94,7 @@ final_df = final_df[(final_df.area > 0.5) & (final_df.area < 6.0) &
 # Add the comments to the header of the data file
 final_df.to_csv('output/' + str(DATE) + '_' + OPERATOR +
                 '_IPTG_titration_microscopy.csv', index=False)
-filenames = ['./comments.txt', 'output/' + str(DATE) + '_' + OPERATOR +
+filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR +
              '_IPTG_titration_microscopy.csv']
 with open('../../../data/' + str(DATE) + '_' + OPERATOR +
           '_IPTG_titration_microscopy.csv', 'w') as output:
@@ -107,7 +112,7 @@ for prop in props:
         approved_im += lab == prop.label
 mask = approved_im > 0
 bar_length = 10 / IPDIST
-merge = mwc.example_segmentation(ex_seg, ex_phase, bar_length)
+merge = mwc.example_segmentation(mask, ex_phase, bar_length)
 skimage.io.imsave('output/' + str(DATE) + '_' + OPERATOR +
                   '_IPTG_titration_microscopy_example_segmentation.png',
                   merge)

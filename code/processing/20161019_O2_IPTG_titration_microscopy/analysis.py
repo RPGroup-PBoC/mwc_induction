@@ -19,12 +19,12 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Set some values.
-DATE = 20161102
-OPERATOR = 'O1'
+DATE = 20161019
+OPERATOR = 'O2'
 STRAINS = ('auto', 'delta', 'RBS1027')
 IPTG_RANGE = [0, 0.1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000]
 # Load the data files.
-df = pd.read_csv('output/20161102_O1_IPTG_titration_microscopy.csv')
+df = pd.read_csv('output/20161019_O2_IPTG_titration_microscopy.csv')
 
 # Generate a plot of the distributions.
 grouped = pd.groupby(df, ['rbs', 'IPTG_uM']).mean_intensity.apply(mwc.ecdf)
@@ -67,7 +67,7 @@ plt.savefig('output/' + str(DATE) + '_' + OPERATOR +
 # Plot the fold change vs the prediction.
 epa = -np.log(141E-6)
 epi = -np.log(0.56E-6)
-epr = -15.3  # In units of kBT
+epr = -13.9  # In units of kBT
 iptg = np.logspace(-9, -2, 1000)
 R = np.array([130])  # Number of lac tetramers per cell.
 fc = mwc.fold_change_log(iptg, epa, epi, 4.5, R, epr)
@@ -89,6 +89,7 @@ plt.legend(title=OPERATOR + ', ' + STRAINS[-1], loc='upper left')
 plt.xlabel('IPTG (M)')
 plt.ylabel('fold-change')
 plt.xscale('log')
+plt.ylim([0, 1.2])
 plt.tight_layout()
 
 plt.savefig('output/' + str(DATE) + '_' + OPERATOR + '_IPTG_titration.png',

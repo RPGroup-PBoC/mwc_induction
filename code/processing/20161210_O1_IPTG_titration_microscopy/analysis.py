@@ -19,12 +19,12 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Set some values.
-DATE = 20161102
+DATE = 20161210
 OPERATOR = 'O1'
 STRAINS = ('auto', 'delta', 'RBS1027')
 IPTG_RANGE = [0, 0.1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000]
 # Load the data files.
-df = pd.read_csv('output/20161102_O1_IPTG_titration_microscopy.csv')
+df = pd.read_csv('output/20161210_O1_IPTG_titration_microscopy.csv')
 
 # Generate a plot of the distributions.
 grouped = pd.groupby(df, ['rbs', 'IPTG_uM']).mean_intensity.apply(mwc.ecdf)
