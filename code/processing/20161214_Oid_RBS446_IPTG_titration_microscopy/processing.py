@@ -72,7 +72,6 @@ for i, st in enumerate(STRAINS):
             if np.max(m_seg) > 0:
                 im_df = mwc.props_to_df(m_seg, physical_distance=IPDIST,
                                         intensity_image=y_flat)
-                im_df.mean_intensity = im_df.mean_intensity * im_df.area 
                 # Add strain and  IPTG concentration information.
                 im_df.insert(0, 'IPTG_uM', iptg)
                 im_df.insert(0, 'repressors', REPRESSORS[i])

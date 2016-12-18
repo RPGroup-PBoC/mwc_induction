@@ -69,7 +69,7 @@ epa = -np.log(141E-6)
 epi = -np.log(0.56E-6)
 epr = -17.3  # In units of kBT
 iptg = np.logspace(-9, -2, 1000)
-R = np.array([130])  # Number of lac tetramers per cell.
+R = np.array([62])  # Number of lac tetramers per cell.
 fc = mwc.fold_change_log(iptg, epa, epi, 4.5, R, epr)
 # Group the dataframe by IPTG concentration then strain.
 fc_grouped = pd.groupby(df, 'IPTG_uM')
