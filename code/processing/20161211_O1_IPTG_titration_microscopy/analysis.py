@@ -90,6 +90,21 @@ plt.xlabel('IPTG (M)')
 plt.ylabel('fold-change')
 plt.xscale('log')
 plt.tight_layout()
-
 plt.savefig('output/' + str(DATE) + '_' + OPERATOR + '_IPTG_titration.png',
             bbox_inches='tight')
+
+# Save the fold-change data
+df_IPTG = df.IPTG_uM.unique()
+fc_dict = {'date' : DATE, 'username': 'gchure', 'operator' : OPERATOR,
+            'binding_energy': epr, 'rbs': STRAINS[-1],
+           'repressors' : R[0], 'IPTG_uM' : df_IPTG, 'fold_change': fc_exp}
+fc_df = pd.DataFrame(fc_dict)
+fc_df.to_csv('output/' + str(DATE) + '_' + OPERATOR + '_' + STRAINS[-1] +
+             '_IPTG_titration_microscopy_foldchange.csv', index=False)
+filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR + '_' +
+             STRAINS[-1] + '_IPTG_titration_microscopy_foldchange.csv']
+with open('../../../data/' + str(DATE) + '_' + OPERATOR +
+          '_IPTG_titration_microscopy_foldchange.csv', 'w') as output:
+    for fname in filenames:
+        with open(fname) as infile:
+            output.write(infile.read())
