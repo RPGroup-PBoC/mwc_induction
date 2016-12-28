@@ -1,0 +1,25 @@
+# Date : 2016-10-18
+# Equipment : Nikon Ti-Eclipse
+# User : gchure
+# Description :
+# IPTG titration with RBS1027 strains in O2.
+# The strains were grown in deep 96-well plates in 1 mL of LB + spec. Then they were
+# diluted next morning 1:1000 into 0.5 mL of M9 + 0.5% glucose also in deep 96-well plates with the following
+# IPTG concentrations and mounted on agarose pads:
+# 0uM, 0.1uM, 5uM, 10uM, 25uM, 50uM, 75uM, 100uM, 250uM, 500uM, 1000uM, 5000uM
+# Comments:
+# These data have been thresholded such that only cells with areas between 0.5
+# µm^2 and 6µm^2 and eccentricities > 0.8 are selected.
+IPTG_uM,binding_energy,date,fold_change,operator,rbs,repressors,username
+0.0,-13.9,20161018,-0.47705029452736547,O2,RBS1027,130,gchure
+0.1,-13.9,20161018,0.022274766531479483,O2,RBS1027,130,gchure
+5.0,-13.9,20161018,0.049053019364876084,O2,RBS1027,130,gchure
+10.0,-13.9,20161018,0.09283200261719085,O2,RBS1027,130,gchure
+25.0,-13.9,20161018,0.2183384065941244,O2,RBS1027,130,gchure
+50.0,-13.9,20161018,0.4609585006230016,O2,RBS1027,130,gchure
+75.0,-13.9,20161018,0.5122995600881931,O2,RBS1027,130,gchure
+100.0,-13.9,20161018,0.5154966783872525,O2,RBS1027,130,gchure
+250.0,-13.9,20161018,0.7498792874296908,O2,RBS1027,130,gchure
+500.0,-13.9,20161018,0.8115412942580671,O2,RBS1027,130,gchure
+1000.0,-13.9,20161018,0.9046816036275255,O2,RBS1027,130,gchure
+5000.0,-13.9,20161018,1.0315279284555328,O2,RBS1027,130,gchure
