@@ -39,7 +39,7 @@ run = 'r1'
 
 # define the patterns in the file names to read them
 operator = 'Oid'
-energy = -17
+energy = -17.3
 
 # list the directory with the data
 datadir = '../../../data/flow/csv/'
