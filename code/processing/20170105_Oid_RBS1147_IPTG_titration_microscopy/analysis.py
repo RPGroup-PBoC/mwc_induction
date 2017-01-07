@@ -19,7 +19,7 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Set some values.
-DATE = 20170104
+DATE = 20170105
 OPERATOR = 'Oid'
 STRAINS = ('auto', 'delta', 'RBS1147')
 IPTG_RANGE = [0, 0.1,  5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000]
@@ -65,8 +65,8 @@ plt.savefig('output/' + str(DATE) + '_' + OPERATOR +
 
 
 # Plot the fold change vs the prediction.
-epa = -np.log(141E-6)
-epi = -np.log(0.56E-6)
+epa = -np.log(139E-6)
+epi = -np.log(0.53E-6)
 epr = -17.3  # In units of kBT
 iptg = np.logspace(-9, -2, 1000)
 R = np.array([30])  # Number of lac tetramers per cell.

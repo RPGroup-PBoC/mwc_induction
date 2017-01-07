@@ -10,5 +10,3 @@
 # Comments:
 # These data have been thresholded such that only cells with areas between 0.5
 # µm^2 and 6µm^2 and eccentricities > 0.8 are selected. This experiment was
-# performed "in reverse" meaning that measurements were made in decreasing IPTG
-# concentration.
