@@ -12,8 +12,8 @@ import matplotlib.cm as cm
 import seaborn as sns
 
 # favorite Seaborn settings for notebooks
-rc={'lines.linewidth': 2, 
-    'axes.labelsize' : 16, 
+rc={'lines.linewidth': 2,
+    'axes.labelsize' : 16,
     'axes.titlesize' : 18,
     'axes.facecolor' : 'F4F3F6',
     'axes.edgecolor' : '000000',
@@ -31,7 +31,7 @@ import sys
 sys.path.insert(0, '../../analysis/')
 
 import mwc_induction_utils_processing as mwc
-#=============================================================================== 
+#===============================================================================
 # define variables to use over the script
 date = 20160909
 username = 'nbellive'
@@ -39,7 +39,7 @@ run = 'r1'
 
 # define the patterns in the file names to read them
 operator = 'Oid'
-energy = -17
+energy = -17.3
 
 # list the directory with the data
 datadir = '../../../data/flow/csv/'
@@ -51,7 +51,7 @@ repressors = np.array([0, 0, 870, 610, 130, 62, 30, 11])
 
 concentrations = [0, 0.1, 5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000] # uM IPTG
 
-#=============================================================================== 
+#===============================================================================
 # define the parameter alpha for the automatic gating
 alpha = 0.40
 
@@ -69,12 +69,12 @@ for i, c in enumerate(concentrations):
             dataframe = pd.read_csv(r_file[0])
             # apply an automatic bivariate gaussian gate to the log front
             # and side scattering
-            data = mwc.auto_gauss_gate(dataframe, alpha, 
+            data = mwc.auto_gauss_gate(dataframe, alpha,
                                         x_val='FSC-A', y_val='SSC-A',
                                         log=True)
             # compute the mean and append it to the data frame along the
             # operator and strain
-            df = df.append([[date, username, operator, energy, 
+            df = df.append([[date, username, operator, energy,
                         strain, repressors[j], c,
                         data['FITC-A'].mean()]],
                         ignore_index=True)
@@ -114,7 +114,7 @@ df = pd.concat([df, mean_fc_A], join_axes=[df.index], axis=1, join='inner')
 # write
 df.to_csv('output/' + str(date) + '_' + run + '_' + operator + \
         '_IPTG_titration_MACSQuant.csv', index=False)
-#=============================================================================== 
+#===============================================================================
 # Add the comments to the header of the data file
 filenames = ['./comments.txt', 'output/' + str(date) + '_' + run + '_' + \
              operator + '_IPTG_titration_MACSQuant.csv']
