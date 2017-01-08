@@ -21,13 +21,13 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Define the data directory.
-data_dir = '../../../data/microscopy/20170106_r3/'
+data_dir = '../../../data/microscopy/20170106_r1/'
 
 # Set details of the experiment.
-DATE = 20170106
+DATE = 20170107
 USERNAME = 'gchure'
 OPERATOR = 'Oid'
-BINDING_ENERGY = -17.3
+BINDING_ENERGY = -17
 REPRESSORS = (0, 0, 11)
 IPDIST = 0.160  # in units of µm per pixel
 STRAINS = ['auto', 'delta', 'HG104']

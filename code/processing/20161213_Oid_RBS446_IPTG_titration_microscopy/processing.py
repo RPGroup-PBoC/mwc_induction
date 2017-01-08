@@ -27,7 +27,7 @@ data_dir = '../../../data/microscopy/20161213/'
 DATE = 20161213
 USERNAME = 'gchure'
 OPERATOR = 'Oid'
-BINDING_ENERGY = -17.3
+BINDING_ENERGY = -17
 REPRESSORS = (0, 0, 62)
 IPDIST = 0.160  # in units of µm per pixel
 STRAINS = ['auto', 'delta', 'RBS446']
@@ -72,7 +72,7 @@ for i, st in enumerate(STRAINS):
             if np.max(m_seg) > 0:
                 im_df = mwc.props_to_df(m_seg, physical_distance=IPDIST,
                                         intensity_image=y_flat)
-                im_df.mean_intensity = im_df.mean_intensity * im_df.area 
+                im_df.mean_intensity = im_df.mean_intensity * im_df.area
                 # Add strain and  IPTG concentration information.
                 im_df.insert(0, 'IPTG_uM', iptg)
                 im_df.insert(0, 'repressors', REPRESSORS[i])

@@ -67,7 +67,7 @@ plt.savefig('output/' + str(DATE) + '_' + OPERATOR +
 # Plot the fold change vs the prediction.
 epa = -np.log(139E-6)
 epi = -np.log(0.53E-6)
-epr = -17.3  # In units of kBT
+epr = -17  # In units of kBT
 iptg = np.logspace(-9, -2, 1000)
 R = np.array([11])  # Number of lac tetramers per cell.
 fc = mwc.fold_change_log(iptg, epa, epi, 4.5, R, epr)

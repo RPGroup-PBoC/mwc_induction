@@ -19,12 +19,12 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Set some values.
-DATE = 20170106
+DATE = 20170107
 OPERATOR = 'Oid'
-STRAINS = ('auto', 'delta', 'RBS1147')
+STRAINS = ('auto', 'delta', 'HG104')
 IPTG_RANGE = [0, 0.1,  5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000]
 # Load the data files.
-df = pd.read_csv('output/20170106_Oid_IPTG_titration_microscopy.csv')
+df = pd.read_csv('output/20170107_Oid_IPTG_titration_microscopy.csv')
 
 # Generate a plot of the distributions.
 grouped = pd.groupby(df, ['rbs', 'IPTG_uM']).mean_intensity.apply(mwc.ecdf)
@@ -37,7 +37,8 @@ for i, st in enumerate(STRAINS):
     else:
         labels = len(IPTG_RANGE) * [None]
     for j, _ in enumerate(IPTG_RANGE):
-        ax[i].plot(samp[j][0], samp[j][1], '.', color=colors[j],
+        if (st != 'auto') & (_ != 50):
+            ax[i].plot(samp[j][0], samp[j][1], '.', color=colors[j],
                    label=labels[j])
 for i, a in enumerate(ax):
     a.margins(0.02)
@@ -54,7 +55,11 @@ grouped_means = pd.groupby(df, ['rbs', 'IPTG_uM']).mean_intensity.mean()
 fig, ax = plt.subplots()
 for i, st in enumerate(STRAINS):
     samp = grouped_means[st].values
-    ax.plot(np.array(IPTG_RANGE) * 1E-6, samp, 'o--', label=st)
+    if (st == 'auto'):
+        z = np.array([0, 0.1, 5, 10, 25, 75, 100, 250, 500, 1000, 5000]) * 1E-6
+    else:
+        z = np.array(IPTG_RANGE) * 1E-6
+    ax.plot(z, samp, 'o--', label=st)
 ax.legend(title='strain', loc='center left')
 ax.set_xlabel('IPTG (M)')
 ax.set_xscale('log')
@@ -69,15 +74,20 @@ epa = -np.log(139E-6)
 epi = -np.log(0.53E-6)
 epr = -17  # In units of kBT
 iptg = np.logspace(-9, -2, 1000)
-R = np.array([30])  # Number of lac tetramers per cell.
+R = np.array([11])  # Number of lac tetramers per cell.
 fc = mwc.fold_change_log(iptg, epa, epi, 4.5, R, epr)
 # Group the dataframe by IPTG concentration then strain.
 fc_grouped = pd.groupby(df, 'IPTG_uM')
 fc_exp = []
 for group, data in fc_grouped:
     rbs_grp = pd.groupby(data, 'rbs').mean_intensity.mean()
-    fc_exp.append((rbs_grp[STRAINS[-1]] - rbs_grp['auto']) /
-                  (rbs_grp['delta'] - rbs_grp['auto']))
+    if group == 50:
+        auto = auto
+    else:
+        auto = rbs_grp['auto']
+    rbs_grp = pd.groupby(data, 'rbs').mean_intensity.mean()
+    fc_exp.append((rbs_grp[STRAINS[-1]] - auto) /
+                  (rbs_grp['delta'] - auto))
 # Plot the prediction.
 plt.figure()
 plt.plot(iptg, fc, 'r-', label='prediction')
@@ -100,11 +110,11 @@ fc_dict = {'date': DATE, 'username': 'gchure', 'operator': OPERATOR,
            'binding_energy': epr, 'rbs': STRAINS[-1],
            'repressors': R[0], 'IPTG_uM': df_IPTG, 'fold_change': fc_exp}
 fc_df = pd.DataFrame(fc_dict)
-fc_df.to_csv('output/' + str(DATE) + '_r1_' + OPERATOR + '_' + STRAINS[-1] +
+fc_df.to_csv('output/' + str(DATE) + '_r2_' + OPERATOR + '_' + STRAINS[-1] +
              '_IPTG_titration_microscopy_foldchange.csv', index=False)
-filenames = ['comments.txt', 'output/' + str(DATE) + '_r1_' + OPERATOR + '_' +
+filenames = ['comments.txt', 'output/' + str(DATE) + '_r2_' + OPERATOR + '_' +
              STRAINS[-1] + '_IPTG_titration_microscopy_foldchange.csv']
-with open('../../../data/' + str(DATE) + '_' + OPERATOR +
+with open('../../../data/' + str(DATE) + '_r2_' + OPERATOR +
           '_IPTG_titration_microscopy_foldchange.csv', 'w') as output:
     for fname in filenames:
         with open(fname) as infile:

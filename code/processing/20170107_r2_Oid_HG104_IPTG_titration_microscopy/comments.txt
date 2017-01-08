@@ -1,6 +1,6 @@
 # Date : 2017-01-07
 # Equipment : Nikon Ti-Eclipse
-# User : gchure
+# User : nbellive
 # Description :
 # IPTG titration with HG104 strains in Oid.
 # The strains were grown in deep 96-well plates in 1 mL of LB + spec. Then they
@@ -8,4 +8,7 @@
 # deep 96-well plates with the following IPTG concentrations and mounted on
 # agarose pads: 0uM, 0.1uM, 1uM, 5uM, 10uM, 25uM, 50uM, 75uM, 100uM, 250uM,
 # 500uM, 1000uM Comments: These data have been thresholded such that only cells
-# with areas between 0.5 µm^2 and 6µm^2 and eccentricities > 0.8 are selected. In this experiment, the autofluorescent strains  10 and 100 uM IPTG appeared to be contaminated with brightly fluorescent cells. These two autofluorescent samples were removed. 
+# with areas between 0.5 µm^2 and 6µm^2 and eccentricities > 0.8 are
+# selected.note that 100 uM HG105 had to be re-imaged several times and may not
+# be good if the same spot was re-imaged. We might want to ignore if data point
+# is strange.

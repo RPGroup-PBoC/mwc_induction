@@ -96,7 +96,7 @@ final_df.to_csv('output/' + str(DATE) + '_' + OPERATOR +
                 '_IPTG_titration_microscopy.csv', index=False)
 filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR +
              '_IPTG_titration_microscopy.csv']
-with open('../../../data/' + str(DATE) + '_r3_' + OPERATOR +
+with open('../../../data/' + str(DATE) + '_r1_' + OPERATOR +
           '_IPTG_titration_microscopy.csv', 'w') as output:
     for fname in filenames:
         with open(fname) as infile:

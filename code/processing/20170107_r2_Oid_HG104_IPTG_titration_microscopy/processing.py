@@ -21,16 +21,16 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Define the data directory.
-data_dir = '../../../data/microscopy/20170106/'
+data_dir = '../../../data/microscopy/20170107_r2/'
 
 # Set details of the experiment.
-DATE = 20170106
-USERNAME = 'gchure'
+DATE = 20170107
+USERNAME = 'nbellive'
 OPERATOR = 'Oid'
 BINDING_ENERGY = -17
-REPRESSORS = (0, 0, 30)
+REPRESSORS = (0, 0, 11)
 IPDIST = 0.160  # in units of µm per pixel
-STRAINS = ['auto', 'delta', 'RBS1147']
+STRAINS = ['auto', 'delta', 'HG104']
 IPTG_RANGE = (0, 0.1, 5, 10, 25, 50, 75,
               100, 250, 500, 1000, 5000)
 
@@ -39,6 +39,7 @@ dark_glob = glob.glob(data_dir + '*noise*/*tif')
 field_glob = glob.glob(data_dir + '*YFP_profile*/*tif')
 dark_ims = skimage.io.ImageCollection(dark_glob, conserve_memory=False)
 field_ims = skimage.io.ImageCollection(field_glob, conserve_memory=False)
+
 average_field = mwc.average_stack(field_ims)
 average_dark = mwc.average_stack(dark_ims)
 
@@ -95,7 +96,7 @@ final_df.to_csv('output/' + str(DATE) + '_' + OPERATOR +
                 '_IPTG_titration_microscopy.csv', index=False)
 filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR +
              '_IPTG_titration_microscopy.csv']
-with open('../../../data/' + str(DATE) + '_r1_' + OPERATOR +
+with open('../../../data/' + str(DATE) + '_r2_' + OPERATOR +
           '_IPTG_titration_microscopy.csv', 'w') as output:
     for fname in filenames:
         with open(fname) as infile:

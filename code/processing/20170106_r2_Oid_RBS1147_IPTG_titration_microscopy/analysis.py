@@ -67,7 +67,7 @@ plt.savefig('output/' + str(DATE) + '_' + OPERATOR +
 # Plot the fold change vs the prediction.
 epa = -np.log(139E-6)
 epi = -np.log(0.53E-6)
-epr = -17.3  # In units of kBT
+epr = -17  # In units of kBT
 iptg = np.logspace(-9, -2, 1000)
 R = np.array([30])  # Number of lac tetramers per cell.
 fc = mwc.fold_change_log(iptg, epa, epi, 4.5, R, epr)
@@ -100,11 +100,11 @@ fc_dict = {'date': DATE, 'username': 'gchure', 'operator': OPERATOR,
            'binding_energy': epr, 'rbs': STRAINS[-1],
            'repressors': R[0], 'IPTG_uM': df_IPTG, 'fold_change': fc_exp}
 fc_df = pd.DataFrame(fc_dict)
-fc_df.to_csv('output/' + str(DATE) + '_' + OPERATOR + '_' + STRAINS[-1] +
+fc_df.to_csv('output/' + str(DATE) + '_' + OPERATOR + '_r2_' + STRAINS[-1] +
              '_IPTG_titration_microscopy_foldchange.csv', index=False)
 filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR + '_' +
              STRAINS[-1] + '_IPTG_titration_microscopy_foldchange.csv']
-with open('../../../data/' + str(DATE) + '_' + OPERATOR +
+with open('../../../data/' + str(DATE) + '_r2_' + OPERATOR +
           '_IPTG_titration_microscopy_foldchange.csv', 'w') as output:
     for fname in filenames:
         with open(fname) as infile:
