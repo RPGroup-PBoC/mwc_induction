@@ -19,7 +19,6 @@ import matplotlib.cm as cm
 # Seaborn, useful for graphics
 import seaborn as sns
 
-sns.set_palette("deep", color_codes=True)
 mwc.set_plotting_style()
 
 #===============================================================================
@@ -39,9 +38,9 @@ datadir = '../../data/'
 # read the list of data-sets to ignore
 data_ignore = pd.read_csv(datadir + 'datasets_ignore.csv', header=None).values
 # read the all data sets except for the ones in the ignore list
-all_files = glob.glob(datadir + '*' + '_IPTG_titration' + '*csv')
+all_files = glob.glob(datadir + '*' + '_IPTG_titration_MACSQuant' + '*csv')
 ignore_files = [f for f in all_files for i in data_ignore if i[0] in f]
-read_files = [f for f in all_files if f not in ignore_files]
+read_files = [f for f in all_files if f not in ignore_files and 'dimer' not in f]
 print('Number of unique data-sets: {:d}'.format(len(read_files)))
 df = pd.concat(pd.read_csv(f, comment='#') for f in read_files)
 
@@ -51,14 +50,15 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 #===============================================================================
 # O2 RBS1027
 #===============================================================================
-# Load the flat-chain
-with open('../../data/mcmc/' + '20160815' + \
+with open('../../data/mcmc/' + '20161208' + \
                   '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
-
+    gauss_flatlnprobability = unpickler.load()
+    
 # map value of the parameters
-ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
+max_idx = np.argmax(gauss_flatlnprobability, axis=0)
+ea, ei, sigma = gauss_flatchain[max_idx]
 
 #===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
@@ -71,16 +71,17 @@ colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
 # Define the operators and their respective energies
-operators = ['O1', 'O2', 'O3'] #, 'Oid']
-energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
+operators = ['O1', 'O2', 'O3']
+energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7}
 
 # Initialize subplots
-fig, ax = plt.subplots(1, 3, figsize=(11, 8))
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
 
 ax = ax.ravel()
 
 # Loop through operators
 for i, op in enumerate(operators):
+    print(op)
     data = df[df.operator==op]
     # loop through RBS mutants
     for j, rbs in enumerate(df.rbs.unique()):
@@ -129,20 +130,16 @@ for i, op in enumerate(operators):
     ax[i+1].set_xlabel('IPTG (M)', fontsize=15)
     ax[i+1].set_ylabel('fold-change', fontsize=16)
     ax[i+1].set_ylim([-0.01, 1.1])
-    # ax[i].text(0.9, 0.1, op, ha='center', va='center',
-            # transform=ax[i].transAxes, fontsize=18)
     ax[i+1].tick_params(labelsize=14)
     ax[i+1].margins(0.02)
 ax[1].legend(loc='upper left', title='repressors / cell')
 ax[0].set_axis_off()
 # add plot letter labels
 plt.figtext(0.0, .95, 'A', fontsize=20)
-plt.figtext(0.50, 0.95, 'B', fontsize=20)
+plt.figtext(0.5, .95, 'B', fontsize=20)
 plt.figtext(0.0, .46, 'C', fontsize=20)
 plt.figtext(0.5, .46, 'D', fontsize=20)
 plt.tight_layout()
-output = '/Users/gchure/Dropbox/mwc_induction/Figures/'
-# output = '/Users/gchure/Desktop'
 plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_with_data.pdf', 
         bbox_inches='tight')
 

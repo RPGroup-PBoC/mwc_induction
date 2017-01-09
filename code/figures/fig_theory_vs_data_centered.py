@@ -38,9 +38,9 @@ datadir = '../../data/'
 # read the list of data-sets to ignore
 data_ignore = pd.read_csv(datadir + 'datasets_ignore.csv', header=None).values
 # read the all data sets except for the ones in the ignore list
-all_files = glob.glob(datadir + '*' + '_IPTG_titration' + '*csv')
+all_files = glob.glob(datadir + '*' + '_IPTG_titration_MACSQuant' + '*csv')
 ignore_files = [f for f in all_files for i in data_ignore if i[0] in f]
-read_files = [f for f in all_files if f not in ignore_files]
+read_files = [f for f in all_files if f not in ignore_files and 'dimer' not in f]
 print('Number of unique data-sets: {:d}'.format(len(read_files)))
 df = pd.concat(pd.read_csv(f, comment='#') for f in read_files)
 
@@ -51,13 +51,15 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 # O2 RBS1027
 #===============================================================================
 # Load the flat-chain
-with open('../../data/mcmc/' + '20160815' + \
+with open('../../data/mcmc/' + '20161208' + \
                   '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
-
+    gauss_flatlnprobability = unpickler.load()
+    
 # map value of the parameters
-ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
+max_idx = np.argmax(gauss_flatlnprobability, axis=0)
+ea, ei, sigma = gauss_flatchain[max_idx]
 
 #===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
@@ -91,7 +93,7 @@ for i, op in enumerate(operators):
         # plot the theory using the parameters from the fit.
         ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
             ea=ea, ei=ei, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
+            R=np.array(df[(df.rbs == rbs)].repressors.unique()),
             epsilon_r=energies[op]),
             color=colors[j], label=None)
         # plot 95% HPD region using the variability in the MWC parameters

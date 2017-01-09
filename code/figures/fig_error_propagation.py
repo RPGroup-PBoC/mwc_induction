@@ -40,7 +40,7 @@ data_ignore = pd.read_csv(datadir + 'datasets_ignore.csv', header=None).values
 # read the all data sets except for the ones in the ignore list
 all_files = glob.glob(datadir + '*' + '_IPTG_titration_MACSQuant' + '*csv')
 ignore_files = [f for f in all_files for i in data_ignore if i[0] in f]
-read_files = [f for f in all_files if f not in ignore_files]
+read_files = [f for f in all_files if f not in ignore_files and 'dimer' not in f]
 print('Number of unique data-sets: {:d}'.format(len(read_files)))
 df = pd.concat(pd.read_csv(f, comment='#') for f in read_files)
 
@@ -51,11 +51,12 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.operator != 'Oid')]
 # Load MCMC flatchain
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/' + '20161121' + \
+with open('../../data/mcmc/' + '20170108' + \
                   '_error_prop_pool_data_larger_sigma.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
-    
+    gauss_flatlnprobability = unpickler.load()   
+
 # Generate a Pandas Data Frame with the mcmc chain
 columns = np.concatenate([['ea', 'ei', 'sigma'],\
           [df[df.repressors==r].rbs.unique()[0] for r in \
@@ -64,8 +65,12 @@ columns = np.concatenate([['ea', 'ei', 'sigma'],\
               np.sort(df.binding_energy.unique())]])
 
 mcmc_df = pd.DataFrame(gauss_flatchain, columns=columns)
+# Generate data frame with mode values for each parameter
+max_idx = np.argmax(gauss_flatlnprobability, axis=0)
+param_fit = pd.DataFrame(gauss_flatchain[max_idx, :], index=columns,
+                         columns=['mode'])
 # map value of the parameters
-map_param = dict(mcmc_df.mean())
+map_param = param_fit['mode'].to_dict()
 
 #=============================================================================== 
 # Plot the theory vs data for all 4 operators with the credible region
