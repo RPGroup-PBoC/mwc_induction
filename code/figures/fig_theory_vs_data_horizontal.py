@@ -15,7 +15,6 @@ import mwc_induction_utils as mwc
 # Import matplotlib stuff for plotting
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-import matplotlib.patches as pch
 
 # Seaborn, useful for graphics
 import seaborn as sns
@@ -62,66 +61,83 @@ with open('../../data/mcmc/' + '20161208' + \
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
 ea, ei, sigma = gauss_flatchain[max_idx]
 
-# Compute the Bohr parameter
-df['bohr_1027'] = mwc.bohr_fn(df, ea, ei)
-
 #===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
 #===============================================================================
+# Define the IPTG concentrations to evaluate
+IPTG = np.logspace(-8, -2, 100)
 
-# Given this result let's plot all the curves using this parameters.
-colors = sns.color_palette('colorblind', n_colors=8)
+# Set the colors for the strains
+colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
-# Define the operators to use in the plot
-operators = ['O1', 'O2', 'O3']
-markers = ['o', 'D', 's']
-F = np.linspace(-10, 10, 200)
-plt.figure(figsize=(8, 6))
-plt.plot(F, 1 / (1 + np.exp(-F)), '-', color='black')
 
-# Instantiate the legend.
-label_col = ['R', 1740, 1220, 260, 124, 60, 22]
-label_O1 = ['O1']
-label_O2 = ['O2']
-label_O3 = ['O3']
-label_empty = ['']
-handles = []
-for i, operator in enumerate(operators):
-    data = df[df.operator==operator]
-    # plt.errorbar([], [], label=operator, color=colors[i], fmt='o')
+# Define the operators and their respective energies
+operators = ['O1', 'O2', 'O3']
+energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
+
+# Initialize the plot to set the size
+fig, ax = plt.subplots(1, 3, figsize=(15, 4), sharey=True)
+
+# Loop through operators
+for i, op in enumerate(operators):
+    print(op)
+    data = df[df.operator==op]
+    # loop through RBS mutants
     for j, rbs in enumerate(df.rbs.unique()):
+        # plot the theory using the parameters from the fit.
+        ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
+            ea=ea, ei=ei, epsilon=4.5,
+            R=np.array(df[(df.rbs == rbs)].repressors.unique()),
+            epsilon_r=energies[op]),
+            color=colors[j], label=None)
+        # plot 95% HPD region using the variability in the MWC parameters
+        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+            gauss_flatchain, epsilon=4.5,
+            R=df[(df.rbs == rbs)].repressors.unique(),
+            epsilon_r=energies[op])
+        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                        alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
         fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
         np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
-        bohr = data[data.rbs==rbs].groupby('IPTG_uM').bohr_1027.mean()
-        plt.errorbar(bohr, fc_mean, yerr=fc_err, fmt=markers[i],
-                    color=colors[j], label=None, markersize=8, alpha=0.75,
-                    capsize=0)
-        _p, = plt.plot(bohr, fc_mean, linestyle='none', marker=markers[i],
-                      markeredgewidth=2, markeredgecolor=colors[j],
-                      markerfacecolor='w', alpha=0.75)
 
-        handles.append(_p)
-plt.xlabel(r'Bohr parameter ($k_BT$ units)', fontsize=18)
-plt.ylabel('fold-change', fontsize=18)
-plt.ylim([-0.01, 1.1])
+        # plot the experimental data
+        # Distinguish between the fit data and the predictions
+        if (op == 'O2') & (rbs == 'RBS1027'):
+            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+                    fc_mean, yerr=fc_err, linestyle='none', color=colors[j])
+            ax[i].plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+                       fc_mean, marker='o', linestyle='none',
+                       markeredgewidth=2, markeredgecolor=colors[j],
+                       markerfacecolor='w', 
+                       label=df[df.rbs=='RBS1027'].repressors.unique()[0] * 2)
+        else:
+            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+                    fc_mean, yerr=fc_err,
+                    fmt='o', label=df[df.rbs==rbs].repressors.unique()[0] * 2,
+                color=colors[j])
 
-# Generate the legend handles. Extra is empty space.
-extra = pch.Rectangle((0, 0), 1, 1, fill=False, edgecolor='none',
-                      linewidth=0)
-leg_handles = [extra, extra, extra, extra, extra, extra, extra]
-slc = [0, 6, 12, 18]
-for i in range(len(slc) - 1):
-    leg_handles.append(extra)
-    sel_handles = handles[slc[i]:slc[i + 1]]
-    for j in range(len(sel_handles)):
-        leg_handles.append(sel_handles[j])
-labels = np.concatenate([label_col, label_O1, label_empty * 6, label_O2, label_empty * 6, label_O3, label_empty * 6])
-plt.legend(leg_handles, labels, loc='upper left', ncol=4, fontsize=13,
-           handletextpad=-1.5)
+    # Add operator and binding energy labels.
+    ax[i].text(0.8, 0.08, r'{0}'.format(op), transform=ax[i].transAxes, 
+            fontsize=14)
+    ax[i].text(0.65, 0.02,
+            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
+            transform=ax[i].transAxes, fontsize=12)
+    ax[i].set_xscale('log')
+    ax[i].set_xlabel('IPTG (M)', fontsize=15)
+    if i==0:
+        ax[i].set_ylabel('fold-change', fontsize=16)
+    ax[i].set_ylim([-0.01, 1.1])
+    ax[i].tick_params(labelsize=14)
+    ax[i].margins(0.02)
+ax[0].legend(loc='upper left', title='repressors / cell')
+# add plot letter labels
+plt.figtext(0.0, .9, 'A', fontsize=20)
+plt.figtext(0.35, .9, 'B', fontsize=20)
+plt.figtext(0.68, .9, 'C', fontsize=20)
 plt.tight_layout()
-plt.tick_params(labelsize=16)
-# output = '/Users/gchure/Dropbox/mwc_induction'
-plt.savefig(output + '/fig_data_collapse_O2_RBS1027_fit.pdf')
+plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_horizontal.pdf', 
+        bbox_inches='tight')
+
