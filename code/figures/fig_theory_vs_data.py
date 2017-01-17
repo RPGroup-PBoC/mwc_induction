@@ -123,9 +123,9 @@ for i, op in enumerate(operators):
         # Add operator and binding energy labels.
         ax[i+1].text(0.8, 0.08, r'{0}'.format(op), transform=ax[i+1].transAxes, 
                 fontsize=14)
-        ax[i+1].text(0.7, 0.02,
+        ax[i+1].text(0.65, 0.02,
                 r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
-                transform=ax[i+1].transAxes, fontsize=12)
+                transform=ax[i+1].transAxes, fontsize=14)
     ax[i+1].set_xscale('log')
     ax[i+1].set_xlabel('IPTG (M)', fontsize=15)
     ax[i+1].set_ylabel('fold-change', fontsize=16)
