@@ -51,19 +51,21 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 # O2 RBS1027
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/' + '20160815' + \
+with open('../../data/mcmc/' + '20161208' + \
                   '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
+    gauss_flatlnprobability = unpickler.load()
     
 # map value of the parameters
-ea, ei = np.mean(gauss_flatchain[:, [0, 1]], axis=0)
+max_idx = np.argmax(gauss_flatlnprobability, axis=0)
+ea, ei, sigma = gauss_flatchain[max_idx]
 
 #=============================================================================== 
 # Plot the theory vs data for all 4 operators with the credible region
 #=============================================================================== 
 # Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-8, -2, 100)
+IPTG = np.logspace(-11, -2, 100)
 
 # Set the colors for the strains
 colors = sns.color_palette(n_colors=7)
@@ -126,12 +128,12 @@ for i, op in enumerate(operators):
     ax[i].text(0.7, 0.02,
             r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
             transform=ax[i].transAxes, fontsize=12)
-    ax[i].set_xscale('log')
+    ax[i].set_xscale('symlog', linthreshx=1E-7)
     ax[i].set_xlabel('IPTG (M)', fontsize=15)
     ax[i].set_ylabel('fold-change', fontsize=16)
     ax[i].set_ylim([-0.01, 1.1])
+    ax[i].set_xlim(left=-5E-9)
     ax[i].tick_params(labelsize=14)
-    ax[i].margins(0.02)
 
 ax[0].legend(loc='upper left', title='repressors / cell')
 

@@ -65,7 +65,7 @@ ea, ei, sigma = gauss_flatchain[max_idx]
 # Plot the theory vs data for all 4 operators with the credible region
 #===============================================================================
 # Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-8, -2, 100)
+IPTG = np.logspace(-10, -2, 100)
 
 # Set the colors for the strains
 colors = sns.color_palette('colorblind', n_colors=7)
@@ -97,12 +97,12 @@ for i, op in enumerate(operators):
             epsilon_r=energies[op]),
             color=colors[j], label=None)
         # plot 95% HPD region using the variability in the MWC parameters
-        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j])
+#        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+#            gauss_flatchain, epsilon=4.5,
+#            R=df[(df.rbs == rbs)].repressors.unique(),
+#            epsilon_r=energies[op])
+#        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+#                        alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
@@ -131,12 +131,12 @@ for i, op in enumerate(operators):
     ax[i].text(0.65, 0.02,
             r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
             transform=ax[i].transAxes, fontsize=14)
-    ax[i].set_xscale('log')
+    ax[i].set_xscale('symlog', linthreshx=1E-7)
     ax[i].set_xlabel('IPTG (M)', fontsize=15)
     ax[i].set_ylabel('fold-change', fontsize=16)
     ax[i].set_ylim([-0.01, 1.1])
+    ax[i].set_xlim(left=-5E-9)
     ax[i].tick_params(labelsize=14)
-    ax[i].margins(0.02)
 ax[0].legend(loc='upper left', title='repressors / cell')
 # add plot letter labels
 plt.figtext(0.25, .95, 'A', fontsize=20)

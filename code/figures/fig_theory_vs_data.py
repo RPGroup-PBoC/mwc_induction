@@ -64,7 +64,7 @@ ea, ei, sigma = gauss_flatchain[max_idx]
 # Plot the theory vs data for all 4 operators with the credible region
 #===============================================================================
 # Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-8, -2, 100)
+IPTG = np.logspace(-11, -2, 100)
 
 # Set the colors for the strains
 colors = sns.color_palette('colorblind', n_colors=7)
@@ -126,12 +126,12 @@ for i, op in enumerate(operators):
         ax[i+1].text(0.65, 0.02,
                 r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
                 transform=ax[i+1].transAxes, fontsize=14)
-    ax[i+1].set_xscale('log')
+    ax[i+1].set_xscale('symlog', linthreshx=1E-7)
     ax[i+1].set_xlabel('IPTG (M)', fontsize=15)
     ax[i+1].set_ylabel('fold-change', fontsize=16)
     ax[i+1].set_ylim([-0.01, 1.1])
+    ax[i+1].set_xlim(left=-5E-9)
     ax[i+1].tick_params(labelsize=14)
-    ax[i+1].margins(0.02)
 ax[1].legend(loc='upper left', title='repressors / cell')
 ax[0].set_axis_off()
 # add plot letter labels
