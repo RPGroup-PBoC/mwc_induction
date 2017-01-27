@@ -1,7 +1,0 @@
-# Date : 2016-07-12
-# Equipment : MACSQuant (Bjorkman lab)
-# Description : 
-# LacI titration with 4 different operators (O1, O2, O3 and Oid) 
-# and 7 different RBS (delta, HG104, RBS1147, RBS446, RBS1027, RBS1 and RBS1L)
-# Comments : 
-# The equipment was not set to export the FITC-H channel but rather the FITC-A
