@@ -44,8 +44,7 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.operator != 'Oid')]
 # Load MCMC flatchain
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/' + '20170108' + \
-                  '_error_prop_pool_data_larger_sigma.pkl', 'rb') as file:
+with open('../../data/mcmc/error_prop_pool_data_large_sigma.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()   

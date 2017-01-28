@@ -44,8 +44,7 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 # O2 RBS1027
 #===============================================================================
 # Load the flat-chain
-with open('../../data/mcmc/' + '20161208' + \
-                  '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
+with open('../../data/mcmc/O2_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()

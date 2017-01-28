@@ -34,6 +34,3 @@ print('Number of unique microscopy data sets: {:d}'.format(len(read_files)))
 df = pd.concat(pd.read_csv(f, comment='#') for f in read_files)
 # Save compiled data frame
 df.to_csv(datadir + 'microscopy_master.csv', index=False)
-
-
-
