@@ -68,7 +68,8 @@ map_param = param_fit['mode'].to_dict()
 # Plot the theory vs data for all 4 operators with the credible region
 #=============================================================================== 
 # Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-11, -2, 100)
+IPTG = np.logspace(-7, -2, 100)
+IPTG_lin = np.array([0, 1E-7])
 
 # Set the colors for the strains
 colors = sns.color_palette('colorblind', n_colors=7)
@@ -94,17 +95,30 @@ for i, op in enumerate(operators):
     # loop through RBS mutants
     for j, rbs in enumerate(df.rbs.unique()):
         # plot the theory using the parameters from the fit.
+        # Log scale
         ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
             ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
             R=map_param[rbs],
             epsilon_r=map_param[op]),
             color=colors[j])
-
+        # Linear scale
+        ax[i].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6, 
+            ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
+            R=map_param[rbs],
+            epsilon_r=map_param[op]),
+            color=colors[j], linestyle='--')
         # plot 95% HPD region using the variability in the parameters
+        # Log scale
         flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
         cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6, 
             flatchain, epsilon=4.5)
         ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                        alpha=0.3, color=colors[j])
+        # Linear scale
+        flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
+        cred_region = mwc.mcmc_cred_reg_error_prop(IPTG_lin * 1E6, 
+            flatchain, epsilon=4.5)
+        ax[i].fill_between(IPTG_lin, cred_region[0,:], cred_region[1,:],
                         alpha=0.3, color=colors[j])
 
         # compute the mean value for each concentration

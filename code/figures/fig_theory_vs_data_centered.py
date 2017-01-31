@@ -57,7 +57,8 @@ ea, ei, sigma = gauss_flatchain[max_idx]
 # Plot the theory vs data for all 4 operators with the credible region
 #===============================================================================
 # Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-10, -2, 100)
+IPTG = np.logspace(-7, -2, 100)
+IPTG_lin = np.array([0, 1E-7])
 
 # Set the colors for the strains
 colors = sns.color_palette('colorblind', n_colors=7)
@@ -83,12 +84,20 @@ for i, op in enumerate(operators):
     # loop through RBS mutants
     for j, rbs in enumerate(df.rbs.unique()):
         # plot the theory using the parameters from the fit.
+        # Log-scale
         ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
             ea=ea, ei=ei, epsilon=4.5,
             R=np.array(df[(df.rbs == rbs)].repressors.unique()),
             epsilon_r=energies[op]),
             color=colors[j], label=None, zorder=1)
+        # Linear scale
+        ax[i].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
+            ea=ea, ei=ei, epsilon=4.5,
+            R=np.array(df[(df.rbs == rbs)].repressors.unique()),
+            epsilon_r=energies[op]),
+            color=colors[j], label=None, zorder=1, linestyle='--')
         # plot 95% HPD region using the variability in the MWC parameters
+        # Log scale
         cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
             gauss_flatchain, epsilon=4.5,
             R=df[(df.rbs == rbs)].repressors.unique(),
