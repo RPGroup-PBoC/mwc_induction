@@ -70,7 +70,7 @@ operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize subplots
-fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
 ax = ax.ravel()
 # Rearrange the axis
@@ -100,12 +100,12 @@ for i, op in enumerate(operators):
             color=colors[j], linestyle='--', label=None)
 
         # plot 95% HPD region using the variability in the MWC parameters
-        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j])
+#        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+#            gauss_flatchain, epsilon=4.5,
+#            R=df[(df.rbs == rbs)].repressors.unique(),
+#            epsilon_r=energies[op])
+#        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+#                        alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
@@ -130,7 +130,7 @@ for i, op in enumerate(operators):
     ax[i].text(0.67, 0.02,
             r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
             transform=ax[i].transAxes, fontsize=13)
-    ax[i].set_xscale('symlog', linthreshx=1E-7)
+    ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
     ax[i].set_xlabel('IPTG (M)', fontsize=15)
     ax[i].set_ylabel('fold-change', fontsize=16)
     ax[i].set_ylim([-0.01, 1.1])
@@ -148,5 +148,6 @@ plt.figtext(0.0, 0.46, 'C', fontsize=20)
 plt.figtext(0.5, 0.46, 'D', fontsize=20)
 
 plt.tight_layout()
+fig.subplots_adjust(wspace=0.4)
 plt.savefig(output + '/fig_theory_predictions_O2_RBS1027_fit.pdf',
             bbox_inches='tight')
