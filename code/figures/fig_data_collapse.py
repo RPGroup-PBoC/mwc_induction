@@ -25,12 +25,12 @@ mwc.set_plotting_style()
 #===============================================================================
 # Set output directory based on the graphicspath.tex file to print in dropbox
 #===============================================================================
-dropbox = open('../../doc/induction_paper/graphicspath.tex')
-output = dropbox.read()
-output = re.sub('\\graphicspath{{', '', output)
-output = output[1::]
-output = re.sub('}}\n', '', output)
-
+#dropbox = open('../../doc/induction_paper/graphicspath.tex')
+#output = dropbox.read()
+#output = re.sub('\\graphicspath{{', '', output)
+#output = output[1::]
+#output = re.sub('}}\n', '', output)
+#
 #===============================================================================
 # Read the data
 #===============================================================================
@@ -48,7 +48,7 @@ with open('../../data/mcmc/O2_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()
-    
+
 # map value of the parameters
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
 ea, ei, sigma = gauss_flatchain[max_idx]
@@ -95,8 +95,8 @@ for i, operator in enumerate(operators):
                       markerfacecolor='w', alpha=0.75)
 
         handles.append(_p)
-plt.xlabel(r'Bohr parameter ($k_BT$ units)', fontsize=18)
-plt.ylabel('fold-change', fontsize=18)
+plt.xlabel(r'free energy ($k_BT$ units)', fontsize=18.5)
+plt.ylabel('fold-change', fontsize=18.5)
 plt.ylim([-0.01, 1.1])
 
 # Generate the legend handles. Extra is empty space.
@@ -113,6 +113,6 @@ labels = np.concatenate([label_col, label_O1, label_empty * 6, label_O2, label_e
 plt.legend(leg_handles, labels, loc='upper left', ncol=4, fontsize=13,
            handletextpad=-1.5)
 plt.tight_layout()
-plt.tick_params(labelsize=16)
-# output = '/Users/gchure/Dropbox/mwc_induction'
+plt.tick_params(labelsize=17)
+output = '/Users/gchure/Dropbox/mwc_induction'
 plt.savefig(output + '/fig_data_collapse_O2_RBS1027_fit.pdf')
