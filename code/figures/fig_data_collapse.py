@@ -36,14 +36,7 @@ output = re.sub('}}\n', '', output)
 #===============================================================================
 
 datadir = '../../data/'
-# read the list of data-sets to ignore
-data_ignore = pd.read_csv(datadir + 'datasets_ignore.csv', header=None).values
-# read the all data sets except for the ones in the ignore list
-all_files = glob.glob(datadir + '*' + '_IPTG_titration_MACSQuant' + '*csv')
-ignore_files = [f for f in all_files for i in data_ignore if i[0] in f]
-read_files = [f for f in all_files if f not in ignore_files and 'dimer' not in f]
-print('Number of unique data-sets: {:d}'.format(len(read_files)))
-df = pd.concat(pd.read_csv(f, comment='#') for f in read_files)
+df = pd.read_csv(datadir + 'flow_master.csv', comment='#')
 
 # Now we remove the autofluorescence and delta values
 df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
@@ -51,9 +44,7 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 #===============================================================================
 # O2 RBS1027
 #===============================================================================
-# Load the flat-chain
-with open('../../data/mcmc/' + '20161208' + \
-                  '_gauss_homoscedastic_RBS1027.pkl', 'rb') as file:
+with open('../../data/mcmc/O2_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()
@@ -80,7 +71,7 @@ plt.figure(figsize=(8, 6))
 plt.plot(F, 1 / (1 + np.exp(-F)), '-', color='black')
 
 # Instantiate the legend.
-label_col = ['R', 1740, 1220, 260, 124, 60, 22]
+label_col = ['rep./cell', 1740, 1220, 260, 124, 60, 22]
 label_O1 = ['O1']
 label_O2 = ['O2']
 label_O3 = ['O3']
