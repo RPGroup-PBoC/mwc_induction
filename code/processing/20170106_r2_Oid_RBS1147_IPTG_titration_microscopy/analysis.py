@@ -100,9 +100,9 @@ fc_dict = {'date': DATE, 'username': 'gchure', 'operator': OPERATOR,
            'binding_energy': epr, 'rbs': STRAINS[-1],
            'repressors': R[0], 'IPTG_uM': df_IPTG, 'fold_change': fc_exp}
 fc_df = pd.DataFrame(fc_dict)
-fc_df.to_csv('output/' + str(DATE) + '_' + OPERATOR + '_r2_' + STRAINS[-1] +
+fc_df.to_csv('output/' + str(DATE) + '_r2_' + OPERATOR + '_' + STRAINS[-1] +
              '_IPTG_titration_microscopy_foldchange.csv', index=False)
-filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR + '_' +
+filenames = ['comments.txt', 'output/' + str(DATE) + '_r2_' + OPERATOR + '_' +
              STRAINS[-1] + '_IPTG_titration_microscopy_foldchange.csv']
 with open('../../../data/' + str(DATE) + '_r2_' + OPERATOR +
           '_IPTG_titration_microscopy_foldchange.csv', 'w') as output:

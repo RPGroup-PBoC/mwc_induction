@@ -21,10 +21,10 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Define the data directory.
-data_dir = '../../../data/microscopy/20170106_r1/'
+data_dir = '../../../data/microscopy/20170106_r3/'
 
 # Set details of the experiment.
-DATE = 20170107
+DATE = 20170106
 USERNAME = 'gchure'
 OPERATOR = 'Oid'
 BINDING_ENERGY = -17
@@ -47,7 +47,7 @@ average_dark = mwc.average_stack(dark_ims)
 ex_st = np.random.choice(STRAINS)
 ex_iptg = np.random.choice(IPTG_RANGE)
 
-# Iterate through each strain and concentration to make teh dataframes.
+# Iterate through each strain and concentration to make the dataframes.
 dfs = []
 for i, st in enumerate(STRAINS):
     for j, iptg in enumerate(IPTG_RANGE):

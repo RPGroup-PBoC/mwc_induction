@@ -104,7 +104,7 @@ fc_df.to_csv('output/' + str(DATE) + '_r1_' + OPERATOR + '_' + STRAINS[-1] +
              '_IPTG_titration_microscopy_foldchange.csv', index=False)
 filenames = ['comments.txt', 'output/' + str(DATE) + '_r1_' + OPERATOR + '_' +
              STRAINS[-1] + '_IPTG_titration_microscopy_foldchange.csv']
-with open('../../../data/' + str(DATE) + '_' + OPERATOR +
+with open('../../../data/' + str(DATE) + '_r1_' + OPERATOR + 
           '_IPTG_titration_microscopy_foldchange.csv', 'w') as output:
     for fname in filenames:
         with open(fname) as infile:
