@@ -17,8 +17,7 @@ for i in range(len(files)):
             data.insert(0, 'run_number', 3)
         else:
             data.insert(0,'run_number', 1)
-
-            dfs.append(data)
+        dfs.append(data)
 
 merged = pd.concat(dfs)
 merged.to_csv('merged_Oid_data_foldchange.csv', index=False)
