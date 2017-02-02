@@ -19,7 +19,7 @@ import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
 # Set some values.
-DATE = 20170106
+DATE = 20170107
 OPERATOR = 'Oid'
 STRAINS = ('auto', 'delta', 'HG104')
 IPTG_RANGE = [0, 0.1,  5, 10, 25, 50, 75, 100, 250, 500, 1000, 5000]
@@ -106,7 +106,7 @@ fc_dict = {'date': DATE, 'username': 'gchure', 'operator': OPERATOR,
 fc_df = pd.DataFrame(fc_dict)
 fc_df.to_csv('output/' + str(DATE) + '_r1_' + OPERATOR + '_' + STRAINS[-1] +
              '_IPTG_titration_microscopy_foldchange.csv', index=False)
-filenames = ['comments.txt', 'output/' + str(DATE) + '_' + OPERATOR + '_' +
+filenames = ['comments.txt', 'output/' + str(DATE) + '_r1_' + OPERATOR + '_' +
              STRAINS[-1] + '_IPTG_titration_microscopy_foldchange.csv']
 with open('../../../data/' + str(DATE) + '_r1_' + OPERATOR +
           '_IPTG_titration_microscopy_foldchange.csv', 'w') as output:
