@@ -71,18 +71,23 @@ df = df[df['rbs'] == 'RBS1027']
 grouped = pd.groupby(df, ['reversed', 'date', 'exp_run', 'rbs'])
 
 # Plot the fold change as a function of IPTG coloring the reverse runs.
-plt.figure(figsize=(9, 9))
+plt.figure(figsize=(6, 6))
 for group, data in grouped:
     if group[0] == 0:
-        fwd, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'ko',
-                        label="'forward'", alpha=0.75)
+        fwd, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'o',
+                        label="'forward'", alpha=0.75, markersize=5,
+                        markeredgecolor='k', markeredgewidth=2,
+                        markerfacecolor='w')
     else:
-        rev, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'ro',
-                        label="'reverse'", alpha=0.75)
+        rev, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'o',
+                        label="'reverse'", alpha=0.75, markersize=5,
+                        markeredgecolor='r', markeredgewidth=2,
+                        markerfacecolor='w')
 
 # Do some formatting.
 legend = plt.legend(handles=[fwd, rev], loc='upper left', fontsize=14,
-                    title='plate arrangement')
+                    title=r"""rep. / cell = 260
+$\Delta\varepsilon_{RA} = -13.9\, k_BT$""")
 plt.setp(legend.get_title(), fontsize=15)
 plt.xlabel('[IPTG] (M)', fontsize=20)
 plt.ylabel('fold-change', fontsize=20)
@@ -95,9 +100,9 @@ plt.xlim([1E-8, 1E-2])
 ax = plt.gca()
 
 # Add a descriptive label.
-plt.text(0.01, 0.79, '$\Delta\epsilon_{RA} = -13.9\,k_BT$', fontsize=18,
-         transform=ax.transAxes)
-plt.text(0.01, 0.82, 'repressors / cell $= 260$', fontsize=18,
-         transform=ax.transAxes)
+# plt.text(0.01, 0.79, '$\Delta\epsilon_{RA} = -13.9\,k_BT$', fontsize=18,
+        #  transform=ax.transAxes)
+# plt.text(0.01, 0.82, 'repressors / cell $= 260$', fontsize=18,
+        #  transform=ax.transAxes)
 plt.tight_layout()
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/figures/supplementary_figures/forward_vs_reverse.pdf', bbox_inches='tight')
