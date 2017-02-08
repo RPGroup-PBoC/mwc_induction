@@ -100,12 +100,12 @@ for i, op in enumerate(operators):
             color=colors[j], linestyle='--', label=None)
 
         # plot 95% HPD region using the variability in the MWC parameters
-#        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-#            gauss_flatchain, epsilon=4.5,
-#            R=df[(df.rbs == rbs)].repressors.unique(),
-#            epsilon_r=energies[op])
-#        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-#                        alpha=0.3, color=colors[j])
+        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+            gauss_flatchain, epsilon=4.5,
+            R=df[(df.rbs == rbs)].repressors.unique(),
+            epsilon_r=energies[op])
+        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                        alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
