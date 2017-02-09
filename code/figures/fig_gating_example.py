@@ -26,26 +26,29 @@ alpha_range = [0.8, 0.6, 0.4, 0.25, 0.05]
 
 # Generate an understandable legend.
 plt.close('all')
-plt.plot([], [], 'ko', label=100)
+plt.plot([], [], 'ko', label=r'100$^\mathrm{th}$')
 for i, a in enumerate(alpha_range):
-    plt.plot([], [], 'o', color=colors[i], label=a * 100)
-leg = plt.legend(title=r'''percentile
-  ($\alpha \times 100$)''', ncol=1, loc='upper left',
-                 fontsize=12)
+    plt.plot([], [], 'o', color=colors[i], label=str(int(a * 100)) + r'$^\mathrm{th}$')
+leg = plt.legend(title=r'percentile', ncol=1, loc='upper left',
+                 fontsize=14, bbox_to_anchor=(1.0, 1.0))
 leg.get_title().set_fontsize('15')
-means = []
 
 plt.plot(flow_data['FSC-A'], flow_data['SSC-A'], 'ko', markersize=2, rasterized=True)
-plt.xscale('log')
-plt.yscale('log')
+# plt.xscale('log')
+# plt.yscale('log')
 plt.xlabel('forward scatter (a.u.)')
 plt.ylabel('side scatter (a.u.)')
 
 # Plot the selected cells for a range of alpha
 for i, a in enumerate(alpha_range):
-    gated_cells = mwc.auto_gauss_gate(flow_data, a)
-    plt.plot(gated_cells['FSC-A'], gated_cells['SSC-A'], 'o',
+    gated_cells = mwc.auto_gauss_gate(np.log(flow_data), a)
+    plt.plot(np.exp(gated_cells['FSC-A']), np.exp(gated_cells['SSC-A']), 'o',
     markersize=2, color=colors[i], rasterized=True)
 plt.tight_layout()
+plt.xscale('log')
+plt.yscale('log')
+plt.ylim([0.5 * np.min(flow_data['SSC-A']), 1.2 * np.max(flow_data['SSC-A'])])
+plt.xlim([0.5 * np.min(flow_data['FSC-A']), 1.2 * np.max(flow_data['FSC-A'])])
+# plt.margins(0.2)
 # Save the figure.j
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/fig_example_gating.pdf', bbox_inches='tight')
