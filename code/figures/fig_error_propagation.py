@@ -138,7 +138,7 @@ for i, op in enumerate(operators):
     ax[i].text(0.67, 0.02,
             r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
             transform=ax[i].transAxes, fontsize=13)
-    ax[i].set_xscale('symlog', linthreshx=1E-7)
+    ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
     ax[i].set_xlabel('IPTG (M)', fontsize=15)
     ax[i].set_ylabel('fold-change', fontsize=16)
     ax[i].set_ylim([-0.01, 1.1])

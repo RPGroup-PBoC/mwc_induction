@@ -64,7 +64,7 @@ ea, ei, sigma = gauss_flatchain[max_idx]
 # Define the number of repressors for the theoretical predictions
 r_array = np.logspace(0, 3.5, 100)
 # Set the colors for the strains
-colors = sns.color_palette('colorblind', n_colors=3)
+colors = sns.color_palette('colorblind', n_colors=4)
 
 # Define the operators and their respective energies
 operators = ['O1', 'O2', 'O3']
@@ -123,8 +123,8 @@ ax.plot([], [], marker='o',
         markeredgecolor='k', markerfacecolor='w', markeredgewidth=2,
         label='flow cytometry', lw=0)
 ax.plot([], [], marker='o', color='k', alpha=0.75,
-        label=r'HG & RP, 2011 - $\beta$-gal', lw=0)
-ax.plot([], [], marker='d', color='k', alpha=0.75,
+        label=r'HG & RP, 2011 - miller assay', lw=0)
+ax.plot([], [], marker='D', color='k', alpha=0.75,
         label='RB et al. 2014 - microscopy', lw=0)
 ax.set_xscale('log')
 ax.set_yscale('log')
