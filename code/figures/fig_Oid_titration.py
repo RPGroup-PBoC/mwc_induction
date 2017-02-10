@@ -52,12 +52,12 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 # Load the flat-chain
 with open('../../data/mcmc/O2_RBS1027.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
-    gauss_flatchain = unpickler.load()
-    gauss_flatlnprobability = unpickler.load()
+    gauss_flatchain_O2 = unpickler.load()
+    gauss_flatlnprobability_O2 = unpickler.load()
     
 # map value of the parameters
-max_idx = np.argmax(gauss_flatlnprobability, axis=0)
-ea, ei, sigma = gauss_flatchain[max_idx]
+max_idx = np.argmax(gauss_flatlnprobability_O2, axis=0)
+ea, ei, sigma = gauss_flatchain_O2[max_idx]
 
 # Global fit
 # Load the flat-chain
@@ -108,7 +108,7 @@ for i, op in enumerate(operators):
         # Check if the RBS was measured for this operator
         if rbs in data.rbs.unique():
         # plot the theory using the parameters from the fit.
-        ## O2 - 1027 fit
+        ## O2 - 1027 fit ##
         # Log-scale
             ax.plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
                 ea=ea, ei=ei, epsilon=4.5,
@@ -136,9 +136,32 @@ for i, op in enumerate(operators):
                 epsilon_r=map_param[op]),
                 color=colors[j], linestyle='--')
         
+            # plot 95% HPD region using the variability in the MWC parameters
+            ## O2 - 1027 fit ##
+            # Log scale
+            cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+                gauss_flatchain_O2, epsilon=4.5,
+                R=df[(df.rbs == rbs)].repressors.unique(),
+                epsilon_r=energies[op])
+            ax.fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                            alpha=0.3, color=colors[j])
+            ## Global fit ##
+            # Log scale
+            flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
+            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6, 
+                flatchain, epsilon=4.5)
+            ax.fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                            alpha=0.3, color=colors[j])
+            # Linear scale
+            flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
+            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG_lin * 1E6, 
+                flatchain, epsilon=4.5)
+            ax.fill_between(IPTG_lin, cred_region[0,:], cred_region[1,:],
+                            alpha=0.3, color=colors[j])
+
         # Plot the raw data for Oid
         if rbs in data.rbs.unique():
-            label=df[df.rbs==rbs].repressors.unique()[0]
+            label=df[df.rbs==rbs].repressors.unique()[0] * 2
         else:
             label=''
         ax.plot(data[data.rbs==rbs].IPTG_uM / 1E6,
