@@ -172,7 +172,7 @@ from fit_bivariate_gaussian_astroML import *
 # #################
 
 # #################
-def pact_log(iptg, ea, ei, epsilon=4.5):
+def pact_log(iptg, ea, ei, epsilon=4.5, n=2):
     '''
     Returns the probability of a repressor being active as described
     by the MWC model.
@@ -188,7 +188,8 @@ def pact_log(iptg, ea, ei, epsilon=4.5):
     epsilon : float.
         Positive log of the energy difference between the active and the
         inactive state.
-
+    n : int
+        Number of inducer binding sites.
     Returns
     -------
     pact : float.
@@ -204,15 +205,15 @@ def pact_log(iptg, ea, ei, epsilon=4.5):
     if (iptg < 0).any():
         raise ValueError('iptg array cannot have negative values.')
 
-    pact = (1 + iptg * np.exp(ea))**2 / ((1 + iptg * np.exp(ea))**2 +
+    pact = (1 + iptg * np.exp(ea))**n / ((1 + iptg * np.exp(ea))**n +
                                          np.exp(-epsilon) *
-                                         (1 + iptg * np.exp(ei))**2)
+                                         (1 + iptg * np.exp(ei))**n)
 
     return pact
 
 
 # #################
-def fold_change_log(iptg, ea, ei, epsilon, R, epsilon_r,
+def fold_change_log(iptg, ea, ei, epsilon, R, epsilon_r, n=2,
                     quaternary_state=2, nonspec_sites=4.6E6):
     '''
     Returns the gene expression fold change according to the
@@ -269,7 +270,7 @@ def fold_change_log(iptg, ea, ei, epsilon, R, epsilon_r,
         than zero.')
 
     return (1 + quaternary_state * R / nonspec_sites *
-            pact_log(iptg, ea, ei, epsilon) * (1 + np.exp(-epsilon)) *
+            pact_log(iptg, ea, ei, epsilon, n) * (1 + np.exp(-epsilon)) *
             np.exp(-epsilon_r))**-1
 
 
