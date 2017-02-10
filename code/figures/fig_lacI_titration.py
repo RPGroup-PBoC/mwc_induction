@@ -71,8 +71,11 @@ operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize the plot to set the size
-fig = plt.figure(figsize=(4.5, 4.5))
-ax = plt.subplot(111)
+#fig = plt.figure(figsize=(4.5, 4.5))
+sns.set_context('paper')
+fig = plt.figure()
+ax = plt.subplot(111, aspect='equal')
+plt.axis('scaled')
 
 ## HG and RB data ##
 df_group = df_old.groupby('operator')
@@ -123,16 +126,17 @@ ax.plot([], [], marker='o',
         markeredgecolor='k', markerfacecolor='w', markeredgewidth=2,
         label='flow cytometry', lw=0)
 ax.plot([], [], marker='o', color='k', alpha=0.75,
-        label=r'HG & RP, 2011 - miller assay', lw=0)
+        label='HG & RP 2011,\nMiller assay', lw=0)
 ax.plot([], [], marker='D', color='k', alpha=0.75,
-        label='RB et al. 2014 - microscopy', lw=0)
+        label='RB et al. 2014,\ntime lapse microscopy', lw=0)
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_xlabel('repressors / cell')
 ax.set_ylabel('fold-change')
 ax.set_xlim(right=10**3.5)
 ax.set_ylim(top=2)
-ax.legend(loc='lower left', fontsize=8)
+leg = ax.legend(loc='lower left', fontsize=8)
+leg.set_zorder(1)
 
 plt.tight_layout()
 plt.savefig(output + '/fig_lacI_titration.pdf', bbox_inches='tight')
