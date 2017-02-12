@@ -135,4 +135,4 @@ for op in df.operator.unique():
     fig.text(0.4, 0.05, 'IPTG concentration (M)', va='bottom',fontsize=15)
     fig.suptitle('comparison strain', y=0.95, fontsize=18)
 
-    plt.savefig(output + '/fig_fitcompare_summary_' + op + '.pdf', bbox_inches='tight')
+    plt.savefig(output + '/fig_fitcompare_summary_' + op + '_large.pdf', bbox_inches='tight')

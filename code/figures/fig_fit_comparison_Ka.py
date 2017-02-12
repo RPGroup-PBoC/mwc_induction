@@ -40,14 +40,67 @@ df = pd.read_csv(datadir + 'flow_master.csv', comment='#')
 # Now we remove the autofluorescence and delta values and Oid data sets
 df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.operator != 'Oid')]
 
+
+#===============================================================================
+# We first need to summarized the Ka, Ki, and associated hpd values
+# Generate DataFrame to save parameter estimates
+#===============================================================================
+
+param_summary = pd.DataFrame()
+
+# Loop through each strain in groups and calculate HPD
+groups = df.groupby(['operator', 'rbs'])
+for g, subdata in groups:
+    if g[0] == 'Oid':
+        continue
+    with open('../../data/mcmc/' + '20170209' + \
+              '_gauss_' + g[0] + '_' + g[1] + '.pkl', 'rb') as file:
+        unpickler = pickle.Unpickler(file)
+        gauss_flatchain = unpickler.load()
+        gauss_flatlnprobability = unpickler.load()
+
+    # map value of the parameters
+    max_idx = np.argmax(gauss_flatlnprobability, axis=0)
+    ea, ei = gauss_flatchain[max_idx, [0, 1]]
+
+    # ea range
+    ea_hpd = mwc.hpd(gauss_flatchain[:, 0],0.95)
+    ei_hpd = mwc.hpd(gauss_flatchain[:, 1],0.95)
+
+    # add values to dataframe
+    param_summary_temp = pd.DataFrame({'rbs':g[1],
+                                'operator':g[0],
+                                'repressors':df[df['rbs']==g[1]].repressors.unique()[0],
+                                'ka_mode':[ea],
+                                'ka_hpd_max':[ea_hpd[0]],
+                                'ka_hpd_min':[ea_hpd[1]],
+                                'ki_mode':[ei],
+                                'ki_hpd_max':[ei_hpd[0]],
+                                'ki_hpd_min':[ei_hpd[1]]})
+
+    param_summary = param_summary.append(param_summary_temp, ignore_index=True)
+
+
 #===============================================================================
 # Plot the theory vs data across all strains for each operator
 #===============================================================================
 
-for op in df.operator.unique():
+# Define array of IPTG concentrations
+IPTG = np.logspace(-9, -1, 200)
 
+# current default color palette
+colors = sns.color_palette('colorblind', n_colors=8)
+colors[4] = sns.xkcd_palette(['dusty purple'])[0]
+gs_dict = {'hspace': 0.1, 'wspace':0.1}
+
+
+for op in df.operator.unique():
     # Load operator specific data from df
-    df_plot = df[df.operator==op]
+    df_plot = param_summary[param_summary.operator==op]
+
+
+
+
     # Initialize plot
     fig, ax = plt.subplots(nrows=6, ncols=6, figsize=(12,12), gridspec_kw=gs_dict)
 
