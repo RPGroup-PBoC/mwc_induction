@@ -509,7 +509,9 @@ for i, R in enumerate(R_range):
 leg = ax[0, -1].legend(bbox_to_anchor=(1.9, 0.3), title="""repressors / cell
   tetramer data""", fontsize=12)
 leg.get_title().set_fontsize(12)
-for i, op in enumerate(n2_op):
+ops = ['O1', 'O2', 'O3']
+for i, op in enumerate(ops):
+    print(i)
     for j, R in enumerate(n2_R):
         R = np.array(R)
         fc_dimer = mwc.fold_change_log(IPTG_range, n2_ka, n2_ki,
@@ -528,9 +530,10 @@ for i, op in enumerate(n2_op):
     ax[1, i].xaxis.set_ticks([1E-8, 1E-6, 1E-4, 1E-2])
     ax[0, i].xaxis.set_ticks([1E-8, 1E-6, 1E-4, 1E-2])
     for k in range(2):
-        ax[k, i].set_title(r'%s $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, operators[op]), fontsize=12, backgroundcolor='#ffedce')
+        print(op)
+        ax[k, i].set_title(r'%s $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, operators[op]), fontsize=12, backgroundcolor='#ffedce', position=(0.5,1.05), fontweight='bold')
 
-for i , op in enumerate(n4_op):
+for i , op in enumerate(ops):
     for j, R in enumerate(n4_R):
         R = np.array(R)
         fc_tetramer = mwc.fold_change_log(IPTG_range, n4_ka,
@@ -541,7 +544,7 @@ plt.tight_layout()
 
 
 # Now plot the data.
-for i, op in enumerate(operators):
+for i, op in enumerate(ops):
     for j, R in enumerate(R_range):
         data = df[(df['repressors'] == R/2) & (df['operator'] == op)]
 
@@ -554,7 +557,7 @@ for i, op in enumerate(operators):
                 ax[k, i].errorbar(group/1E6, mean_fluo, std_fluo, linestyle='none', color=colors[j])
 plt.show()
 
-plt.subplots_adjust(hspace=0.9)
+plt.subplots_adjust(hspace=1.0)
 plt.figtext(0, 1.02, 'A', fontsize=20)
 plt.figtext(0, 0.5, 'B', fontsize=20)
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/dimer_v_tetramer.pdf', bbox_inches='tight')
@@ -569,14 +572,14 @@ for i, R in enumerate(R_range):
 leg = ax[0, -1].legend(bbox_to_anchor=(1.9, 0.3), title="""repressors / cell
   tetramer data""", fontsize=12)
 leg.get_title().set_fontsize(12)
-for i, op in enumerate(n4_op):
+for i, op in enumerate(ops):
     for j, R in enumerate(n4_R):
         R = np.array(R)
         fc_dimer = mwc.fold_change_log(IPTG_range, n4_ka, n4_ki,
                                        ep_ai, R, n4_op[op], n=4)
 
         fc_tetramer = mwc.fold_change_log(IPTG_range, n4_ka, n4_ki,
-                                       ep_ai, R, n4_op[op], n=2 )
+                                       ep_ai, R, n4_op[op], n=2)
 
         ax[0, i].plot(IPTG_range, fc_dimer, '-', color=colors[j])
         ax[1, i].plot(IPTG_range, fc_tetramer, '-', color=colors[j])
@@ -591,13 +594,13 @@ for i, op in enumerate(n4_op):
     ax[1, i].xaxis.set_ticks([1E-8, 1E-6, 1E-4, 1E-2])
     ax[0, i].xaxis.set_ticks([1E-8, 1E-6, 1E-4, 1E-2])
     for k in range(2):
-        ax[k, i].set_title(r'%s $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, operators[op]), fontsize=12, backgroundcolor='#ffedce')
+        ax[k, i].set_title(r'%s $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, operators[op]), fontsize=12, position=(0.5,1.05), backgroundcolor='#ffedce')
 
 
 
 
 # Now plot the data.
-for i, op in enumerate(operators):
+for i, op in enumerate(ops):
     for j, R in enumerate(R_range):
         data = df[(df['repressors'] == R/2) & (df['operator'] == op)]
 
@@ -606,13 +609,14 @@ for i, op in enumerate(operators):
             mean_fluo = np.mean(d)
             std_fluo = np.std(d) / np.sqrt(len(d))
             for k in range(2):
-                alpha=0.45
-                ax[k, i].plot(group/1E6, mean_fluo, 'o', color=colors[j], markersize=5, alpha=alpha)
-                ax[k, i].errorbar(group/1E6, mean_fluo, std_fluo, linestyle='none', color=colors[j], alpha=alpha)
+                if k!=1:
+                    alpha = 1
+                    ax[k, i].plot(group/1E6, mean_fluo, 'o', color=colors[j], markersize=5, alpha=alpha)
+                    ax[k, i].errorbar(group/1E6, mean_fluo, std_fluo, linestyle='none', color=colors[j], alpha=alpha)
 plt.show()
 plt.tight_layout()
-plt.subplots_adjust(hspace=0.9)
+plt.subplots_adjust(hspace=1.0)
 plt.figtext(0, 1.02, 'A', fontsize=20)
 plt.figtext(0, 0.5, 'B', fontsize=20)
 #
-plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/dimer_v_tetramer_prediction.pdf', bbox_inches='tight')
+# plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/dimer_v_tetramer_prediction.pdf', bbox_inches='tight')
