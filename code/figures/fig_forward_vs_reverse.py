@@ -75,12 +75,12 @@ plt.figure(figsize=(6, 6))
 for group, data in grouped:
     if group[0] == 0:
         fwd, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'o',
-                        label="'forward'", alpha=0.75, markersize=5,
+                        label="forward", alpha=0.75, markersize=5,
                         markeredgecolor='k', markeredgewidth=2,
                         markerfacecolor='w')
     else:
         rev, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'o',
-                        label="'reverse'", alpha=0.75, markersize=,
+                        label="reverse", alpha=0.75, markersize=5,
                         markeredgecolor='r', markeredgewidth=2,
                         markerfacecolor='w')
 
@@ -105,4 +105,4 @@ ax = plt.gca()
 # plt.text(0.01, 0.82, 'repressors / cell $= 260$', fontsize=18,
         #  transform=ax.transAxes)
 plt.tight_layout()
-# plt.savefig('/Users/gchure/Dropbox/mwc_induction/figures/supplementary_figures/forward_vs_reverse.pdf', bbox_inches='tight')
+plt.savefig('/Users/gchure/Dropbox/mwc_induction/figures/supplementary_figures/forward_vs_reverse.pdf', bbox_inches='tight')
