@@ -557,7 +557,7 @@ for i, op in enumerate(ops):
                 ax[k, i].errorbar(group/1E6, mean_fluo, std_fluo, linestyle='none', color=colors[j])
 plt.show()
 
-plt.subplots_adjust(hspace=1.0)
+plt.subplots_adjust(hspace=.9)
 plt.figtext(0, 1.02, 'A', fontsize=20)
 plt.figtext(0, 0.5, 'B', fontsize=20)
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/dimer_v_tetramer.pdf', bbox_inches='tight')
