@@ -105,7 +105,12 @@ operators = ['Oid']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize the plot to set the size
-fig, ax = plt.subplots(1, 1, figsize=(6.5, 5))
+sns.set_context('paper')
+fig, ax = plt.subplots(1, 2, figsize=(11, 4))
+#fig = plt.figure()
+#ax1 = plt.subplot(121, aspect=2/3)
+#ax2 = plt.subplot(122, aspect=2/3)
+#ax = [ax1, ax2]
 
 # Loop through operators
 for i, op in enumerate(operators):
@@ -118,13 +123,13 @@ for i, op in enumerate(operators):
         # plot the theory using the parameters from the fit.
         ## O2 - 1027 fit ##
         # Log-scale
-            ax.plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
+            ax[0].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
                 ea=ea, ei=ei, epsilon=4.5,
                 R=np.array(df[(df.rbs == rbs)].repressors.unique()),
                 epsilon_r=energies[op]),
                 color=colors[j], label=None, zorder=1)
             # Linear scale
-            ax.plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
+            ax[0].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
                 ea=ea, ei=ei, epsilon=4.5,
                 R=np.array(df[(df.rbs == rbs)].repressors.unique()),
                 epsilon_r=energies[op]),
@@ -132,13 +137,13 @@ for i, op in enumerate(operators):
 
         ## Global fit ##
         # Log scale
-            ax.plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
+            ax[1].plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
                 ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
                 R=map_param[rbs],
                 epsilon_r=map_param[op]),
-                color=colors[j], linestyle=(0, (5, 1)), lw=2.5)
+                color=colors[j], lw=2.5)
             # Linear scale
-            ax.plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6, 
+            ax[1].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6, 
                 ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
                 R=map_param[rbs],
                 epsilon_r=map_param[op]),
@@ -151,20 +156,20 @@ for i, op in enumerate(operators):
                 gauss_flatchain_O2, epsilon=4.5,
                 R=df[(df.rbs == rbs)].repressors.unique(),
                 epsilon_r=energies[op])
-            ax.fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+            ax[0].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
                             alpha=0.3, color=colors[j])
             ## Global fit ##
             # Log scale
             flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
             cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6, 
                 flatchain, epsilon=4.5)
-            ax.fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+            ax[1].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
                             alpha=0.3, color=colors[j])
             # Linear scale
             flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
             cred_region = mwc.mcmc_cred_reg_error_prop(IPTG_lin * 1E6, 
                 flatchain, epsilon=4.5)
-            ax.fill_between(IPTG_lin, cred_region[0,:], cred_region[1,:],
+            ax[1].fill_between(IPTG_lin, cred_region[0,:], cred_region[1,:],
                             alpha=0.3, color=colors[j])
 
         # Plot the raw data for Oid
@@ -172,30 +177,43 @@ for i, op in enumerate(operators):
             label=df[df.rbs==rbs].repressors.unique()[0] * 2
         else:
             label=''
-        ax.plot(data[data.rbs==rbs].IPTG_uM / 1E6,
+        ax[0].plot(data[data.rbs==rbs].IPTG_uM / 1E6,
+                data[data.rbs==rbs].fold_change_A, marker='o', lw=0,
+                color=colors[j], label=label)
+        ax[1].plot(data[data.rbs==rbs].IPTG_uM / 1E6,
                 data[data.rbs==rbs].fold_change_A, marker='o', lw=0,
                 color=colors[j], label=label)
 
+
     # Add operator and binding energy labels.
-    ax.set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
-    ax.set_xlabel('IPTG (M)', fontsize=15)
-    ax.set_ylabel('fold-change', fontsize=16)
-    ax.set_ylim([-0.01, 1.1])
-    ax.set_xlim(left=-5E-9)
-    ax.tick_params(labelsize=14)
+    ax[0].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
+    ax[0].set_xlabel('IPTG (M)', fontsize=15)
+    ax[0].set_ylabel('fold-change', fontsize=16)
+    ax[0].set_ylim([-0.01, 1.1])
+    ax[0].set_xlim(left=-5E-9)
+    ax[0].tick_params(labelsize=14)
 
-main_legend = ax.legend(loc='upper left', title='repressors / cell')
+    ax[1].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
+    ax[1].set_xlabel('IPTG (M)', fontsize=15)
+    ax[1].set_ylabel('fold-change', fontsize=16)
+    ax[1].set_ylim([-0.01, 1.1])
+    ax[1].set_xlim(left=-5E-9)
+    ax[1].tick_params(labelsize=14)
 
-l1 = ax.plot([], [], color='k')
-l2 = ax.plot([], [], color='k', linestyle=(0, (5, 1)))
-extra_legend = [l1, l2]
-extra_labels = [r'HG $ RP 2011: -17', 
-                r'global fit (this study): {:.1f}'.format(map_param['Oid'])]
-ax.legend([l[0] for l in extra_legend], extra_labels,
-          loc='center left', 
-          title='binding energy $\Delta \epsilon _{RA}$ ($k_BT$)')
-# add main legend
-plt.gca().add_artist(main_legend)
+ax[0].text(0.67, 0.02,
+            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
+            transform=ax[0].transAxes, fontsize=13)
+ax[1].text(0.67, 0.02,
+            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %np.round(map_param[op], 1),
+            transform=ax[1].transAxes, fontsize=13)
+
+
+main_legend = ax[0].legend(loc='upper left', title='repressors / cell')
+
+
+
+plt.figtext(0.0, .95, 'A', fontsize=20)
+plt.figtext(0.50, .95, 'B', fontsize=20)
 
 plt.tight_layout()
-plt.savefig(output + '/fig_Oid_titration.pdf', bbox_inches='tight')
+plt.savefig(output + '/fig_Oid_titration_AB.pdf', bbox_inches='tight')
