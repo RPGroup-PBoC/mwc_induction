@@ -434,7 +434,8 @@ index = np.concatenate([['ka', 'ki', 'sigma'],\
 
 # Generate a data frame out of the MCMC chains
 mcmc_df = pd.DataFrame(gauss_flatchain, columns=index)
-
+mcmc_df['ka'] = np.exp(-mcmc_df['ka'])
+mcmc_df['ki'] = np.exp(-mcmc_df['ki'])
 
 # Generate data frame with mode values for each parameter
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
@@ -446,8 +447,7 @@ param_hpd = pd.DataFrame(columns=['hpd_max', 'hpd_min'])
 
 # # Loop through each parameter computing the 95% hpd
 for column in mcmc_df:
-    param_hpd = param_hpd.append(pd.Series(np.abs(mwc.hpd(mcmc_df[column], 0.95) - \
-                                           param_fit.ix[column, 'mode']),
+    param_hpd = param_hpd.append(pd.Series(np.abs(mwc.hpd(mcmc_df[column], 0.95) - param_fit.ix[column, 'mode']),
                                index=['hpd_min', 'hpd_max'], name=column))
 
 # # Combine the data frames into a single data frame
@@ -468,7 +468,8 @@ index = np.concatenate([['ka', 'ki', 'sigma'],\
 
 # Generate a data frame out of the MCMC chains
 mcmc_df = pd.DataFrame(gauss_flatchain, columns=index)
-
+mcmc_df['ka'] = np.exp(-mcmc_df['ka'])
+mcmc_df['ki'] = np.exp(-mcmc_df['ki'])
 
 # Generate data frame with mode values for each parameter
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
@@ -480,7 +481,7 @@ param_hpd = pd.DataFrame(columns=['hpd_max', 'hpd_min'])
 
 # # Loop through each parameter computing the 95% hpd
 for column in mcmc_df:
-    param_hpd = param_hpd.append(pd.Series(np.abs(mwc.hpd(mcmc_df[column], 0.95) - \
+    param_hpd = param_hpd.append(pd.Series(np.abs(mwc.hpd(mcmc_df[column], 0.95) -
                                            param_fit.ix[column, 'mode']),
                                index=['hpd_min', 'hpd_max'], name=column))
 
@@ -491,17 +492,13 @@ param_fit_n2 = pd.concat([param_fit, param_hpd], axis=1)
 # Make the plot of the fits.
 n2_R = list(param_fit_n2['mode'][3:9])
 n2_R.reverse()
-n2_ka = np.exp(-param_fit_n2['mode'][0].astype(float))/1E6
-n2_ka = -np.log(n2_ka)
-n2_ki = np.exp(-param_fit_n2['mode'][1].astype(float))/1E6
-n2_ki = -np.log(n2_ki)
+n2_ka =param_fit_n2['mode'][0].astype(float)/1E6
+n2_ki = param_fit_n2['mode'][1].astype(float)/1E6
 n2_op = dict(param_fit_n2['mode'][-3:])
 n4_R = list(param_fit_n4['mode'][3:9])
 n4_R.reverse()
-n4_ka = np.exp(-param_fit_n4['mode'][0].astype(float))/1E6
-n4_ka = -np.log(n4_ka)
-n4_ki = np.exp(-param_fit_n4['mode'][1].astype(float))/1E6
-n4_ki = -np.log(n4_ki)
+n4_ka = param_fit_n4['mode'][0].astype(float)/1E6
+n4_ki = param_fit_n4['mode'][1].astype(float)/1E6
 n4_op = dict(param_fit_n4['mode'][-3:])
 for i, R in enumerate(R_range):
     ax[0, -1].plot([], [], 'o', color=colors[i], label=R)
@@ -514,7 +511,7 @@ for i, op in enumerate(ops):
     print(i)
     for j, R in enumerate(n2_R):
         R = np.array(R)
-        fc_dimer = mwc.fold_change_log(IPTG_range, n2_ka, n2_ki,
+        fc_dimer = mwc.fold_change_log(IPTG_range, -np.log(n2_ka), -np.log(n2_ki),
                                        ep_ai, R, n2_op[op])
 
         ax[0, i].plot(IPTG_range, fc_dimer, '-', color=colors[j])
@@ -536,8 +533,8 @@ for i, op in enumerate(ops):
 for i , op in enumerate(ops):
     for j, R in enumerate(n4_R):
         R = np.array(R)
-        fc_tetramer = mwc.fold_change_log(IPTG_range, n4_ka,
-                                         n4_ki, ep_ai, R,
+        fc_tetramer = mwc.fold_change_log(IPTG_range, -np.log(n4_ka),
+                                         -np.log(n4_ki), ep_ai, R,
                                          n4_op[op], n=4)
         ax[1, i].plot(IPTG_range, fc_tetramer, '-', color=colors[j])
 plt.tight_layout()
@@ -557,14 +554,14 @@ for i, op in enumerate(ops):
                 ax[k, i].errorbar(group/1E6, mean_fluo, std_fluo, linestyle='none', color=colors[j])
 plt.show()
 
-plt.subplots_adjust(hspace=.9)
+plt.subplots_adjust(hspace=1.2)
 plt.figtext(0, 1.02, 'A', fontsize=20)
 plt.figtext(0, 0.5, 'B', fontsize=20)
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/dimer_v_tetramer.pdf', bbox_inches='tight')
 #
 
 
-# Now consider the case where the N=2 case has the same KA/KI from n=4 fit.
+# Now consider the case where the N=2 case has the same ka/ki from n=4 fit.
 fig, ax = plt.subplots(2, 3, figsize=(9,6.2), sharey=True)
 for i, R in enumerate(R_range):
     ax[0, -1].plot([], [], 'o', color=colors[i], label=R)
@@ -575,10 +572,10 @@ leg.get_title().set_fontsize(12)
 for i, op in enumerate(ops):
     for j, R in enumerate(n4_R):
         R = np.array(R)
-        fc_dimer = mwc.fold_change_log(IPTG_range, n4_ka, n4_ki,
+        fc_dimer = mwc.fold_change_log(IPTG_range, -np.log(n4_ka), -np.log(n4_ki),
                                        ep_ai, R, n4_op[op], n=4)
 
-        fc_tetramer = mwc.fold_change_log(IPTG_range, n4_ka, n4_ki,
+        fc_tetramer = mwc.fold_change_log(IPTG_range, -np.log(n4_ka), -np.log(n4_ki),
                                        ep_ai, R, n4_op[op], n=2)
 
         ax[0, i].plot(IPTG_range, fc_dimer, '-', color=colors[j])
@@ -595,8 +592,6 @@ for i, op in enumerate(ops):
     ax[0, i].xaxis.set_ticks([1E-8, 1E-6, 1E-4, 1E-2])
     for k in range(2):
         ax[k, i].set_title(r'%s $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, operators[op]), fontsize=12, position=(0.5,1.05), backgroundcolor='#ffedce')
-
-
 
 
 # Now plot the data.
@@ -619,4 +614,4 @@ plt.subplots_adjust(hspace=1.0)
 plt.figtext(0, 1.02, 'A', fontsize=20)
 plt.figtext(0, 0.5, 'B', fontsize=20)
 #
-# plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/dimer_v_tetramer_prediction.pdf', bbox_inches='tight')
+plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/dimer_v_tetramer_prediction.pdf', bbox_inches='tight')

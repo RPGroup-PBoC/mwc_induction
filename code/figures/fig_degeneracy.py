@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import mwc_induction_utils as mwc
 import pandas as pd
-sns.set_context('paper')
 mwc.set_plotting_style()
 # Load in the datasets
 data_a = pd.read_csv('../../data/figs9_part_A.csv')
@@ -20,7 +19,7 @@ ax[0].plot(ka.ep, ka.bestfit, '-', label=r'$\mathrm{log}\, \frac{K_A}{1\mathrm{M
 ax[0].plot(ki.ep, ki.bestfit, '-', label=r'$\mathrm{log}\, \frac{K_A}{1\mathrm{M}}$')
 ax[0].set_xlabel(r'allosteric parameter $\Delta\varepsilon_{AI}~(k_BT)$')
 ax[0].set_ylabel(r'best-fit parameter value')
-ax[0].legend(loc='lower left', fontsize=10)
+ax[0].legend(loc='lower left')
 
 
 IPTG_range = np.logspace(-8, -2, 500)
@@ -55,7 +54,10 @@ ax[1].set_xscale('log')
 ax[1].set_xlabel('[IPTG] (M)')
 ax[1].set_ylabel('fold-change')
 leg = ax[1].legend(loc='upper left', title=r"""allosteric parameter
-    $\Delta\varepsilon_{AI}\, (k_BT)$""", fontsize=10)
-leg.get_title().set_fontsize(18)
+    $\Delta\varepsilon_{AI}\, (k_BT)$""")
+leg.get_title().set_fontsize(12)
+fig.text(0, 0.92, 'A', fontsize=20)
+fig.text(0.5, 0.92, 'B', fontsize=20)
+plt.tight_layout()
 
-plt.show()
+plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/degeneracy.pdf', bbox_inches='tight')
