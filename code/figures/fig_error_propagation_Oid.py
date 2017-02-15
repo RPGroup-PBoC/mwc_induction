@@ -33,13 +33,21 @@ output = re.sub('}}\n', '', output)
 #=============================================================================== 
 # Read the data
 #=============================================================================== 
-
+# Define working directory
 datadir = '../../data/'
+# List files to be read
 files = ['flow_master.csv', 'merged_Oid_data_foldchange.csv']
+# Read flow cytometry data
 df_Oid = pd.read_csv(datadir + files[1], comment='#')
+# make an extra column to have consistent labeling
 df_Oid['fold_change_A'] = df_Oid.fold_change
+# Remove manually the outlier with an unphysical fold-change
+df_Oid = df_Oid[df_Oid.fold_change_A <= 1]
+# Read the flow cytometry data
 df = pd.read_csv(datadir + files[0], comment='#')
+# Attach both data frames into a single one
 df = pd.concat([df, df_Oid])
+# Drop rows containing NA values
 df.dropna(axis=1, inplace=True)
 
 # Now we remove the autofluorescence and delta values
@@ -49,7 +57,7 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 # Load MCMC flatchain
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/error_prop_global_Oid.pkl', 'rb') as file:
+with open('../../data/mcmc/error_prop_global_large_sigma.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()   
@@ -135,7 +143,8 @@ for i, op in enumerate(operators):
             
             # plot the experimental data
             ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                yerr=fc_err, fmt='o', label=df[df.rbs==rbs].repressors.unique()[0],
+                yerr=fc_err, fmt='o',
+                label=df[df.rbs==rbs].repressors.unique()[0] * 2,
                 color=colors[j])
         # Plot the raw data for Oid
         else:
@@ -147,7 +156,7 @@ for i, op in enumerate(operators):
     ax[i].text(0.8, 0.09, r'{0}'.format(op), transform=ax[i].transAxes, 
             fontsize=13)
     ax[i].text(0.67, 0.02,
-            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
+            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %np.round(map_param[op], 1),
             transform=ax[i].transAxes, fontsize=13)
     ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
     ax[i].set_xlabel('IPTG (M)', fontsize=15)

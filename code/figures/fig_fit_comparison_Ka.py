@@ -81,8 +81,26 @@ for g, subdata in groups:
     param_summary = param_summary.append(param_summary_temp, ignore_index=True)
 
 
+#==============
+# Load in flatchain from global fit
+#==============
+
+with open('../../data/mcmc/' + 'error_prop_global_Oid' + '.pkl', 'rb') as file:
+    unpickler_global = pickle.Unpickler(file)
+    gauss_flatchain_global = unpickler_global.load()
+    gauss_flatlnprobability_global = unpickler_global.load()
+
+# map value of the parameters
+max_idx = np.argmax(gauss_flatlnprobability_global, axis=0)
+Ka_global, Ki_global = np.exp(-gauss_flatchain_global[max_idx, [0, 1]])
+
+# ea range
+Ka_global_range = np.exp(-mwc.hpd(gauss_flatchain_global[:, 0],0.95))
+Ki_global_range = np.exp(-mwc.hpd(gauss_flatchain_global[:, 1],0.95))
+
+
 #===============================================================================
-# Plot the theory vs data across all strains for each operator
+# Plot the fitted Ka and Ki along with global fit for each operator strain set.
 #===============================================================================
 
 # Define array of IPTG concentrations
@@ -96,87 +114,59 @@ gs_dict = {'hspace': 0.1, 'wspace':0.1}
 
 for op in df.operator.unique():
     # Load operator specific data from df
-    df_plot = param_summary[param_summary.operator==op]
+    param_summary_op= param_summary[param_summary.operator==op]
 
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,2), gridspec_kw=gs_dict)
 
+    # plot kA
+    for i, rbs_fit in enumerate(df_plot.rbs.unique()[::-1]):
+        Ka = np.exp(-param_summary_op[param_summary_op['rbs']==rbs_fit].ka_mode)
+        Ka_hpd_max = np.exp(-param_summary_op[param_summary_op['rbs']==rbs_fit].ka_hpd_max)
+        Ka_hpd_min = np.exp(-param_summary_op[param_summary_op['rbs']==rbs_fit].ka_hpd_min)
 
+        plt.errorbar(i,Ka,
+                     yerr=[np.abs(Ka-Ka_hpd_min.values[0]),np.abs(Ka-Ka_hpd_max.values[0])],
+                     fmt='o', color=colors[-(i+3)])
 
-    # Initialize plot
-    fig, ax = plt.subplots(nrows=6, ncols=6, figsize=(12,12), gridspec_kw=gs_dict)
+    # Lets also plot the global best value of Ki using all
+    # data across all operators
+    plt.plot(np.arange(-2,7),np.ones(9)*Ka_global, linestyle='--',alpha=0.6)
+    plt.fill_between(np.arange(-2,7) , Ka_global_range[1], Ka_global_range[0],
+                             alpha=0.5, color=colors[i])
 
-    for j, rbs_fit in enumerate(df_plot.rbs.unique()):
+    ax.set_yscale('log')
+    plt.xticks(np.arange(0,6), 2*df_plot.repressors.unique()[::-1])#, rotation='vertical')
+    plt.xlim(-0.2,5.2)
+    plt.ylim(1E-1,1E4)
+    plt.ylabel('Best fit for $K_A$ ($\mu M$)')
+    plt.xlabel('LacI copy number')
+    plt.savefig(output + '/' + today + \
+               '_Ka_summary_' + op + '_wglobal.pdf',bbox_inches='tight')
 
-        with open('../../data/mcmc/' + '20170209' + \
-              '_gauss_' + op + '_' + rbs_fit + '.pkl', 'rb') as file:
-            unpickler = pickle.Unpickler(file)
-            gauss_pool_flatchain = unpickler.load()
+    # plot Ki
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(5,2), gridspec_kw=gs_dict)
 
+    for i, rbs_fit in enumerate(df_plot.rbs.unique()[::-1]):
 
-        # map value of the parameters
-        ea, ei = np.mean(gauss_pool_flatchain[:, [0, 1]], axis=0)
+        Ki = np.exp(-param_summary_op[param_summary_op['rbs']==rbs_fit].ki_mode)
+        Ki_hpd_max = np.exp(-param_summary_op[param_summary_op['rbs']==rbs_fit].ki_hpd_max)
+        Ki_hpd_min = np.exp(-param_summary_op[param_summary_op['rbs']==rbs_fit].ki_hpd_min)
 
-        for i, rbs in enumerate(df_plot.rbs.unique()):
-            # plot the theory using the parameters from the fit.
+        plt.errorbar(i,Ki,
+                     yerr=[np.abs(Ki-Ki_hpd_min.values[0]),np.abs(Ki-Ki_hpd_max.values[0])],
+                     fmt='o', color=colors[-(i+3)])
 
-            ax[j,i].plot(IPTG , mwc.fold_change_log(IPTG * 1E6,
-                ea=ea, ei=ei, epsilon=4.5,
-                R=df_plot[(df_plot.rbs == rbs)].repressors.unique(),
-                epsilon_r=df_plot.binding_energy.unique()),
-                color=colors[j])
+    # Lets also plot the global best value of Ki using all
+    # data across all operators
+    plt.plot(np.arange(-2,7),np.ones(9)*Ki_global, linestyle='--',alpha=0.6)
+    plt.fill_between(np.arange(-2,7) , Ki_global_range[1], Ki_global_range[0],
+                             alpha=0.5, color=colors[i])
 
-            # plot 95% HPD region using the variability in the MWC parameters
-
-            cred_region = mwc.mcmc_cred_region(IPTG * 1E6,
-                gauss_pool_flatchain, epsilon=4.5,
-                R=df_plot[(df_plot.rbs == rbs)].repressors.unique(),
-                epsilon_r=df_plot.binding_energy.unique())
-            ax[j,i].fill_between(IPTG , cred_region[0,:], cred_region[1,:],
-                            alpha=0.5, color=colors[j])
-
-            # compute the mean value for each concentration
-
-            fc_mean = df_plot[df_plot.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
-
-            # compute the standard error of the mean
-
-            fc_err = df_plot[df_plot.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
-            np.sqrt(df_plot[df_plot.rbs==rbs].groupby('IPTG_uM').size())
-
-            # plot the experimental data
-            if i == j:
-                ax[j,i].errorbar(np.sort(df_plot[df_plot.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                    yerr=fc_err, linestyle='none', label=rbs, color=colors[i])
-                ax[j,i].plot(np.sort(df_plot[df_plot.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                            'o', markeredgewidth=1, markeredgecolor=colors[i],
-                             markerfacecolor='w', markersize=7)
-                ax[j,i].set_axis_bgcolor("#DFDFE5")
-            else:
-                ax[j,i].errorbar(np.sort(df_plot[df_plot.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                    yerr=fc_err, fmt='o', markersize=7, label=rbs, color=colors[i])
-
-            if i == 0:
-                ax[j,i].set_ylabel('R = %s' %(df_plot[df_plot.rbs==rbs_fit].repressors.unique()[0] * 2), fontsize=14)
-            if j == 0:
-                ax[j,i].set_title('R = %s' %(df_plot[df_plot.rbs==rbs].repressors.unique()[0] * 2), fontsize=14)
-
-            # adjust axes, etc to clean up plots
-            ax[j,i].set_xlim(5E-8,9E-3)
-            ax[j,i].set_ylim(-0.05,1.1)
-            ax[j,i].set_xscale('log')
-            ax[j,i].set_xticks([1E-7, 1E-5, 1E-3])
-            ax[j,i].set_yticks([0, 0.5, 1])
-
-            if i > 0 and i < 6 and j < 5:
-                ax[j, i].set_xticklabels([])
-                ax[j, i].set_yticklabels([])
-            if i==0 and j < 5:
-                ax[j, i].set_xticklabels([])
-            if j==5 and i > 0 and i < 6:
-                ax[j, i].set_yticklabels([])
-
-    fig.text(0.01, 0.5, '$K_A, K_I$ fit strain', va='center', rotation='vertical',fontsize=18)
-    fig.text(0.05, 0.5, 'fold-change', va='center', rotation='vertical',fontsize=15)
-    fig.text(0.4, 0.05, 'IPTG concentration (M)', va='bottom',fontsize=15)
-    fig.suptitle('comparison strain', y=0.95, fontsize=18)
-
-    plt.savefig(output + '/fig_fitcompare_summary_' + op + '.pdf', bbox_inches='tight')
+    ax.set_yscale('log')
+    plt.xticks(np.arange(0,6), 2*df_plot.repressors.unique()[::-1])#, rotation='vertical')
+    plt.xlim(-0.2,5.2)
+    plt.ylim(5E-3,2)
+    plt.ylabel('Best fit for $K_I$ ($\mu M$)')
+    plt.xlabel('LacI copy number')
+    plt.savefig(output + '/' + today + \
+               '_Ki_summary_' + op + '_wglobal.pdf',bbox_inches='tight')

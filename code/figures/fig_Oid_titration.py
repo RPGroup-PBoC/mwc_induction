@@ -33,13 +33,21 @@ output = re.sub('}}\n', '', output)
 #=============================================================================== 
 # Read the data
 #=============================================================================== 
-
+# Define working directory
 datadir = '../../data/'
+# List files to be read
 files = ['flow_master.csv', 'merged_Oid_data_foldchange.csv']
+# Read flow cytometry data
 df_Oid = pd.read_csv(datadir + files[1], comment='#')
+# make an extra column to have consistent labeling
 df_Oid['fold_change_A'] = df_Oid.fold_change
+# Remove manually the outlier with an unphysical fold-change
+df_Oid = df_Oid[df_Oid.fold_change_A <= 1]
+# Read the flow cytometry data
 df = pd.read_csv(datadir + files[0], comment='#')
+# Attach both data frames into a single one
 df = pd.concat([df, df_Oid])
+# Drop rows containing NA values
 df.dropna(axis=1, inplace=True)
 
 # Now we remove the autofluorescence and delta values
@@ -61,7 +69,7 @@ ea, ei, sigma = gauss_flatchain_O2[max_idx]
 
 # Global fit
 # Load the flat-chain
-with open('../../data/mcmc/error_prop_global_Oid.pkl', 'rb') as file:
+with open('../../data/mcmc/error_prop_global_large_sigma.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()   
@@ -169,8 +177,6 @@ for i, op in enumerate(operators):
                 color=colors[j], label=label)
 
     # Add operator and binding energy labels.
-    ax.text(0.8, 0.02, r'{0}'.format(op), transform=ax.transAxes, 
-            fontsize=13)
     ax.set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
     ax.set_xlabel('IPTG (M)', fontsize=15)
     ax.set_ylabel('fold-change', fontsize=16)
@@ -183,8 +189,8 @@ main_legend = ax.legend(loc='upper left', title='repressors / cell')
 l1 = ax.plot([], [], color='k')
 l2 = ax.plot([], [], color='k', linestyle=(0, (5, 1)))
 extra_legend = [l1, l2]
-extra_labels = [r'HG et al. 2011: -17', 
-                r'fit: {:.1f}'.format(map_param['Oid'])]
+extra_labels = [r'HG $ RP 2011: -17', 
+                r'global fit (this study): {:.1f}'.format(map_param['Oid'])]
 ax.legend([l[0] for l in extra_legend], extra_labels,
           loc='center left', 
           title='binding energy $\Delta \epsilon _{RA}$ ($k_BT$)')
