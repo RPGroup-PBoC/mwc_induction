@@ -11,7 +11,7 @@ data_O2 = pd.read_csv('../../data/flow_master.csv')
 data_O2 = data_O2[(data_O2.operator == 'O2') & (data_O2.rbs=='RBS1027')]
 plt.close('all')
 
-fig, ax  = plt.subplots(1, 2, figsize=(9,5))
+fig, ax  = plt.subplots(1, 2, figsize=(9.5, 4))
 # Make the plots for part A
 ka = data_a[data_a.parameter=='logKA']
 ki = data_a[data_a.parameter=='logKI']
@@ -54,10 +54,10 @@ ax[1].set_xscale('log')
 ax[1].set_xlabel('[IPTG] (M)')
 ax[1].set_ylabel('fold-change')
 leg = ax[1].legend(loc='upper left', title=r"""allosteric parameter
-    $\Delta\varepsilon_{AI}\, (k_BT)$""")
+       $\Delta\varepsilon_{AI}\, (k_BT)$""")
 leg.get_title().set_fontsize(12)
-fig.text(0, 0.92, 'A', fontsize=20)
-fig.text(0.5, 0.92, 'B', fontsize=20)
+fig.text(-0.01, 0.92, 'A', fontsize=22)
+fig.text(0.5, 0.92, 'B', fontsize=22)
 plt.tight_layout()
 
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/Figures/supplementary_figures/degeneracy.pdf', bbox_inches='tight')
