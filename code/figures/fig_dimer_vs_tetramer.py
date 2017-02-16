@@ -253,7 +253,7 @@ def log_post(param, param_idx, unique_var, data, epsilon=4.5, n=2,
         This variable indicates the position of each of these variables such
         that  the function is robust and it works for a DataFrame with 1 RBS
         mutant and 1 energy as well as for multiple mutants and multiple enrgies.
-    unique_var : : list.
+    unique_var : list.
         A list whose first element is the list of the unique mean repressor
         copy number found in the DataFrame.
         The second element is the list of unique binding energies also found
