@@ -60,7 +60,7 @@ for op in df.operator.unique():
     # Initialize plot
     fig, ax = plt.subplots(nrows=6, ncols=6, figsize=(12,12), gridspec_kw=gs_dict)
 
-    for j, rbs_fit in enumerate(df_plot.rbs.unique()):
+    for j, rbs_fit in enumerate(df_plot.rbs.unique[::-1]()):
 
         with open('../../data/mcmc/' + '20170209' + \
               '_gauss_' + op + '_' + rbs_fit + '.pkl', 'rb') as file:
@@ -71,14 +71,14 @@ for op in df.operator.unique():
         # map value of the parameters
         ea, ei = np.mean(gauss_pool_flatchain[:, [0, 1]], axis=0)
 
-        for i, rbs in enumerate(df_plot.rbs.unique()):
+        for i, rbs in enumerate(df_plot.rbs.unique()[::-1]):
             # plot the theory using the parameters from the fit.
 
             ax[j,i].plot(IPTG , mwc.fold_change_log(IPTG * 1E6,
                 ea=ea, ei=ei, epsilon=4.5,
                 R=df_plot[(df_plot.rbs == rbs)].repressors.unique(),
                 epsilon_r=df_plot.binding_energy.unique()),
-                color=colors[j])
+                color=colors[-(j+3)])
 
             # plot 95% HPD region using the variability in the MWC parameters
 
@@ -87,7 +87,7 @@ for op in df.operator.unique():
                 R=df_plot[(df_plot.rbs == rbs)].repressors.unique(),
                 epsilon_r=df_plot.binding_energy.unique())
             ax[j,i].fill_between(IPTG , cred_region[0,:], cred_region[1,:],
-                            alpha=0.5, color=colors[j])
+                            alpha=0.5, color=colors[-(j+3)])
 
             # compute the mean value for each concentration
 
@@ -103,12 +103,12 @@ for op in df.operator.unique():
                 ax[j,i].errorbar(np.sort(df_plot[df_plot.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
                     yerr=fc_err, linestyle='none', label=rbs, color=colors[i])
                 ax[j,i].plot(np.sort(df_plot[df_plot.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                            'o', markeredgewidth=1, markeredgecolor=colors[i],
+                            'o', markeredgewidth=1, markeredgecolor=colors[-(i+3)],
                              markerfacecolor='w', markersize=7)
                 ax[j,i].set_axis_bgcolor("#DFDFE5")
             else:
                 ax[j,i].errorbar(np.sort(df_plot[df_plot.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                    yerr=fc_err, fmt='o', markersize=7, label=rbs, color=colors[i])
+                    yerr=fc_err, fmt='o', markersize=7, label=rbs, color=colors[-(i+3)])
 
             if i == 0:
                 ax[j,i].set_ylabel('R = %s' %(df_plot[df_plot.rbs==rbs_fit].repressors.unique()[0] * 2), fontsize=14)
