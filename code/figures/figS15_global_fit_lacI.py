@@ -58,7 +58,7 @@ df_old = pd.read_csv(datadir + 'tidy_lacI_titration_data.csv', comment='#')
 # Global fit
 #===============================================================================
 # Load the flat-chain
-with open('../../data/mcmc/error_prop_global_large_sigma.pkl', 'rb') as file:
+with open('../../data/mcmc/SI_E_global.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()   
@@ -187,5 +187,5 @@ plt.gca().add_artist(main_legend)
 leg.set_zorder(1)
 
 plt.tight_layout()
-plt.savefig(output + '/fig_error_propagation_lacI_titration.pdf', bbox_inches='tight')
+plt.savefig(output + '/figS15_global_fit_lacI.pdf', bbox_inches='tight')
 

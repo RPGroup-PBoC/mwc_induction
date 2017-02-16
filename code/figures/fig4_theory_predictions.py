@@ -44,7 +44,7 @@ df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 # O2 RBS1027
 #=============================================================================== 
 # Load the flat-chain
-with open('../../data/mcmc/O2_RBS1027.pkl', 'rb') as file:
+with open('../../data/mcmc/main_text_KaKi.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()
@@ -149,5 +149,4 @@ plt.figtext(0.5, 0.46, 'D', fontsize=20)
 
 plt.tight_layout()
 fig.subplots_adjust(wspace=0.4)
-plt.savefig(output + '/fig_theory_predictions_O2_RBS1027_fit.pdf',
-            bbox_inches='tight')
+plt.savefig(output + '/fig4.pdf', bbox_inches='tight')
