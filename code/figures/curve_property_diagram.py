@@ -21,7 +21,7 @@ p = sns.xkcd_palette(['dusty purple'])[0]
 fc = fold_change(1740, iptg_range, ka, ki, ep_ai, ep_ra)
 plt.close('all')
 plt.figure(figsize=(6,4))
-plt.xlabel('$c$ (M)', fontsize=18)
+plt.xlabel('[IPTG] (M)', fontsize=18)
 plt.ylabel('fold-change', fontsize=18)
 plt.tick_params(labelsize=14)
 plt.margins(0.02)
