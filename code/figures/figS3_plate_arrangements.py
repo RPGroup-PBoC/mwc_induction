@@ -1,18 +1,18 @@
 """
 Title:
-    fig_forward_vs_reverse.py
+    figS3_plate_arrangements.py
 Creation Date:
     20161026
+Last Modified:
+    20170215
 Author(s):
     Griffin Chure
 Purpose:
-    This script generates the plot from the supplementary figure showing
+    This script generates the plot from the supplementary figure S3 showing
     that there is no effect of running the flow-cytometry samples in 'reverse
-    mode'. A more detailed discussion can be seen in the Jupyter notebook
-    `comparing_forward_reverse_reading_methods.ipynb`.
-"""
+    mode'. Please see SI Section B2 for more information.
 
-# Import dependencies.
+"""
 # Import standard dependencies.
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,14 +26,6 @@ import mwc_induction_utils as mwc
 
 # Set the plotting environments.
 mwc.set_plotting_style()
-
-# Set output for figure saving.
-#dropbox = open('../../doc/induction_paper/graphicspath.tex')
-#output = dropbox.read()
-#output = re.sub('\\graphicspath{{', '', output)
-#output = output[1::].rstrip()
-#output = re.sub('}}\n', '', output + '/supplementary_figures')
-#
 
 # Load in all data files.
 data_sets = glob.glob('../../data/2016*O2_*titration*')
@@ -74,20 +66,18 @@ grouped = pd.groupby(df, ['reversed', 'date', 'exp_run', 'rbs'])
 plt.figure(figsize=(6, 6))
 for group, data in grouped:
     if group[0] == 0:
-        fwd, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'o',
-                        label="forward", alpha=0.75, markersize=5,
-                        markeredgecolor='k', markeredgewidth=2,
-                        markerfacecolor='w')
+        fwd, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'ko',
+        markersize=8, alpha=0.75, label='forward')
+
     else:
-        rev, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'o',
-                        label="reverse", alpha=0.75, markersize=5,
-                        markeredgecolor='r', markeredgewidth=2,
-                        markerfacecolor='w')
+        rev, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'ro',
+        markersize=8, alpha=0.75, label='reverse')
+
 
 # Do some formatting.
 legend = plt.legend(handles=[fwd, rev], loc='upper left', fontsize=14,
                     title=r"""rep. / cell = 260
-$\Delta\varepsilon_{RA} = -13.9\, k_BT$""")
+$\Delta\varepsilon_{RA} = -13.9$ $k_BT$""")
 plt.setp(legend.get_title(), fontsize=15)
 plt.xlabel('[IPTG] (M)', fontsize=20)
 plt.ylabel('fold-change', fontsize=20)
@@ -98,11 +88,5 @@ plt.ylim([0, 1.1])
 plt.tight_layout()
 plt.xlim([1E-8, 1E-2])
 ax = plt.gca()
-
-# Add a descriptive label.
-# plt.text(0.01, 0.79, '$\Delta\epsilon_{RA} = -13.9\,k_BT$', fontsize=18,
-        #  transform=ax.transAxes)
-# plt.text(0.01, 0.82, 'repressors / cell $= 260$', fontsize=18,
-        #  transform=ax.transAxes)
 plt.tight_layout()
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/figures/supplementary_figures/forward_vs_reverse.pdf', bbox_inches='tight')

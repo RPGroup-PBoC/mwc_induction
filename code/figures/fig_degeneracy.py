@@ -17,7 +17,7 @@ ka = data_a[data_a.parameter=='logKA']
 ki = data_a[data_a.parameter=='logKI']
 ax[0].plot(ka.ep, ka.bestfit, '-', label=r'$\mathrm{log}\, \frac{K_A}{1\mathrm{M}}$')
 ax[0].plot(ki.ep, ki.bestfit, '-', label=r'$\mathrm{log}\, \frac{K_A}{1\mathrm{M}}$')
-ax[0].set_xlabel(r'allosteric parameter $\Delta\varepsilon_{AI}~(k_BT)$')
+ax[0].set_xlabel(r'allosteric parameter $\Delta\varepsilon_{AI}\,(k_BT)$')
 ax[0].set_ylabel(r'best-fit parameter value')
 ax[0].legend(loc='lower left')
 
@@ -54,7 +54,7 @@ ax[1].set_xscale('log')
 ax[1].set_xlabel('[IPTG] (M)')
 ax[1].set_ylabel('fold-change')
 leg = ax[1].legend(loc='upper left', title=r"""allosteric parameter
-       $\Delta\varepsilon_{AI}\, (k_BT)$""")
+       $\Delta\varepsilon_{AI}$ $(k_BT)$""")
 leg.get_title().set_fontsize(12)
 fig.text(-0.01, 0.92, 'A', fontsize=22)
 fig.text(0.5, 0.92, 'B', fontsize=22)

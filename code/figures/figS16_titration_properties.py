@@ -1,15 +1,28 @@
+"""
+Title:
+    figS16_titration_properties.py
+Last Modified:
+    20170215
+Author:
+    Griffin Chure
+Purpose:
+    Generates figure S16 in SI Section G. This figure dshows some properties
+    of the titration curves.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
-# Define the fold change.
+# Define the parameters
 iptg_range = np.logspace(-7, -3, 1000)
 ka = 141E-6
 ki = 560E-9
 ep_ai = 4.5
 ep_ra = -9.7
+
 
 def fold_change(num_rep, iptg_range, ka, ki, ep_ai, ep_ra):
     pact = (1 + iptg_range / ka)**2 / ((1 + iptg_range/ka)**2 +
@@ -28,6 +41,7 @@ plt.margins(0.02)
 plt.ylim([0, 1.2])
 
 
+# Format the plot
 ax = plt.gca()
 plt.text(0.03, 0.82, 'saturation', color='w', backgroundcolor='g',
         fontsize=12, transform=ax.transAxes)
@@ -51,7 +65,6 @@ plt.hlines(np.max(fc), 1.2E-3, 1.55E-3, color=p, linewidth=3)
 plt.hlines(np.min(fc), 1.2E-3, 1.55E-3, color=p, linewidth=3)
 plt.text(0.3E-3, 0.57, 'dynamic range', color='w', backgroundcolor=p,
         fontsize=12)
-
 plt.xscale('log')
 plt.xlim([1E-7, 0.5E-2])
 plt.tight_layout()
