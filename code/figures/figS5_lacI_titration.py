@@ -47,7 +47,7 @@ df_old = df_old[df_old.operator!='Oid']
 # O2 RBS1027
 #===============================================================================
 # Load the flat-chain
-with open('../../data/mcmc/O2_RBS1027.pkl', 'rb') as file:
+with open('../../data/mcmc/main_text_KaKi.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()
@@ -139,5 +139,5 @@ leg = ax.legend(loc='lower left', fontsize=8)
 leg.set_zorder(1)
 
 plt.tight_layout()
-plt.savefig(output + '/fig_lacI_titration.pdf', bbox_inches='tight')
+plt.savefig(output + '/figS5_lacI_titration.pdf', bbox_inches='tight')
 
