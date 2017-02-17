@@ -33,33 +33,54 @@ output = re.sub('}}\n', '', output)
 #===============================================================================
 # Read the data
 #===============================================================================
-
+# Define working directory
 datadir = '../../data/'
-df = pd.read_csv(datadir + 'flow_master.csv', comment='#')
-
-# Now we remove the autofluorescence and delta values
+# List files to be read
+files = ['flow_master.csv', 'merged_Oid_data_foldchange.csv']
+# Read flow cytometry data
+df_Oid = pd.read_csv(datadir + files[1], comment='#')
+# make an extra column to have consistent labeling
+df_Oid['fold_change_A'] = df_Oid.fold_change
+# Remove manually the outlier with an unphysical fold-change
+df_Oid = df_Oid[df_Oid.fold_change_A <= 1]
+# Read the flow cytometry data
+df = pd.read_csv(datadir + files[0], comment='#')
+# Attach both data frames into a single one
+df = pd.concat([df, df_Oid])
+# Drop rows containing NA values
+df.dropna(axis=1, inplace=True)
+# Now we remove the autofluorescence, delta, and higher IPTG values
 df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.IPTG_uM==0)]
 
 # Let's import the data from HG 2011 and RB 2014
 df_old = pd.read_csv(datadir + 'tidy_lacI_titration_data.csv', comment='#')
-df_old = df_old[df_old.operator!='Oid']
 #===============================================================================
-# O2 RBS1027
+# Global fit
 #===============================================================================
 # Load the flat-chain
-with open('../../data/mcmc/O2_RBS1027.pkl', 'rb') as file:
+with open('../../data/mcmc/SI_E_global.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
-    gauss_flatlnprobability = unpickler.load()
-    
-# map value of the parameters
+    gauss_flatlnprobability = unpickler.load()   
+
+# Generate a Pandas Data Frame with the mcmc chain
+columns = np.concatenate([['ea', 'ei', 'sigma'],\
+          [df[df.repressors==r].rbs.unique()[0] for r in \
+              np.sort(df.repressors.unique())],
+          [df[df.binding_energy==o].operator.unique()[0] for o in \
+              np.sort(df.binding_energy.unique())]])
+
+mcmc_df = pd.DataFrame(gauss_flatchain, columns=columns)
+# Generate data frame with mode values for each parameter
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
-ea, ei, sigma = gauss_flatchain[max_idx]
+param_fit = pd.DataFrame(gauss_flatchain[max_idx, :], index=columns,
+                         columns=['mode'])
+# map value of the parameters
+map_param = param_fit['mode'].to_dict()
 
 #===============================================================================
 # Plot the theory vs data for all 3 operators
 #===============================================================================
-
 ## Flow Data ##
 # Define the number of repressors for the theoretical predictions
 r_array = np.logspace(0, 3.5, 100)
@@ -67,15 +88,15 @@ r_array = np.logspace(0, 3.5, 100)
 colors = sns.color_palette('colorblind', n_colors=4)
 
 # Define the operators and their respective energies
-operators = ['O1', 'O2', 'O3']
+operators = ['O1', 'O2', 'O3', 'Oid']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize the plot to set the size
 #fig = plt.figure(figsize=(4.5, 4.5))
 sns.set_context('paper')
 fig = plt.figure()
-ax = plt.subplot(111, aspect='equal')
-plt.axis('scaled')
+ax = plt.subplot(111, aspect=2/3)
+#plt.axis('scaled')
 
 ## HG and RB data ##
 df_group = df_old.groupby('operator')
@@ -99,11 +120,20 @@ i = 0
 
 for group, data in df_group:
     # Compute the theoretical fold change for this operator
-    fc = mwc.fold_change_log(np.array([0]), ea, ei, 4.5,
+    #### Hernan energies ####
+    fc = mwc.fold_change_log(np.array([0]), map_param['ea'],
+                                            map_param['ei'], 4.5,
                                 r_array / 2, data.binding_energy.unique())
     ax.plot(r_array, fc, color=colors[i], 
-            label=group + r' $\Delta\varepsilon_{RA} =$' + \
-            str(data.binding_energy.unique()[0]) + ' $k_BT$')
+            label=group)
+
+    #### Global fit energies ####
+    fc = mwc.fold_change_log(np.array([0]), map_param['ea'],
+                                            map_param['ei'], 4.5,
+                                r_array / 2, map_param[group])
+    ax.plot(r_array, fc, color=colors[i], linestyle='--',
+            label='')# str(np.round(map_param[group], 1))
+
     # compute the mean value for each concentration
     fc_mean = data.groupby('repressors').fold_change_A.mean()
     # compute the standard error of the mean
@@ -122,22 +152,40 @@ for group, data in df_group:
                 markerfacecolor='white', markeredgewidth=2)
     i+=1
 
-ax.plot([], [], marker='o',
+main_legend = ax.legend(loc='center left', title='operator')
+
+l1 = ax.plot([], [], marker='o',
         markeredgecolor='k', markerfacecolor='w', markeredgewidth=2,
         label='flow cytometry', lw=0)
-ax.plot([], [], marker='o', color='k', alpha=0.75,
+l2 = ax.plot([], [], marker='o', color='k', alpha=0.75,
         label='HG & RP 2011,\nMiller assay', lw=0)
-ax.plot([], [], marker='D', color='k', alpha=0.75,
+l3 = ax.plot([], [], marker='D', color='k', alpha=0.75,
         label='RB et al. 2014,\ntime lapse microscopy', lw=0)
+l4 = ax.plot([], [], color='k', alpha=0.75,
+        label='HG & RP 2011 fit')
+l5 = ax.plot([], [], color='k', alpha=0.75, linestyle='--',
+        label='global fit')
+extra_legend = [l1, l2, l3, l4, l5]
+
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_xlabel('repressors / cell')
 ax.set_ylabel('fold-change')
 ax.set_xlim(right=10**3.5)
 ax.set_ylim(top=2)
-leg = ax.legend(loc='lower left', fontsize=8)
+
+# Add the extra legend
+labels = ['this study',
+          'HG & RP 2011',
+          'RB et al. 2014',
+          'HG & RP 2011 fit',
+          'global fit']
+leg = ax.legend([l[0] for l in extra_legend], labels,
+                loc='lower left', fontsize=8)
+plt.gca().add_artist(main_legend)
+                
 leg.set_zorder(1)
 
 plt.tight_layout()
-plt.savefig(output + '/fig_lacI_titration.pdf', bbox_inches='tight')
+plt.savefig(output + '/figS15_global_fit_lacI.pdf', bbox_inches='tight')
 

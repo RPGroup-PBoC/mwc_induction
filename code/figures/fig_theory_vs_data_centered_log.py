@@ -134,6 +134,7 @@ for i, op in enumerate(operators):
             r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
             transform=ax[i].transAxes, fontsize=13)
     ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
+    ax[i].set_yscale('log')
     ax[i].set_xlabel('IPTG (M)', fontsize=15)
     ax[i].set_ylabel('fold-change', fontsize=16)
     ax[i].set_ylim([-0.01, 1.1])
@@ -145,6 +146,6 @@ plt.figtext(0.25, .95, 'A', fontsize=20)
 plt.figtext(0.0, .46, 'B', fontsize=20)
 plt.figtext(0.50, .46, 'C', fontsize=20)
 plt.tight_layout()
-plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_centered.pdf', 
+plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_centered_log.pdf', 
         bbox_inches='tight')
 
