@@ -1,0 +1,11 @@
+{
+  "projectPath": "/Users/gchure/Lab/PhillipsLab201401-XXX/lab_code/mwc_induction",
+  "title": "LaTeX-Plus Project",
+  "root": "code/figures/figS1_allosteric_dependence.py",
+  "program": "pdflatex",
+  "latexmkOptions": "-bibtex -pdf -shell-escape",
+  "output": ".latex",
+  "openOutput": "true",
+  "postAction": "link",
+  "postPath": "./"
+}
