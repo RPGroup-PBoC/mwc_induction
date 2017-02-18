@@ -1,0 +1,1 @@
+note that 100 uM HG105 had to be re-imaged several times and may not be good if the same spot was re-imaged. We might want to ignore if data point is strange.
