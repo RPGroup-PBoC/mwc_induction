@@ -32,7 +32,7 @@ mwc.set_plotting_style()
 # change the allosteric state n. We include those functions below.
 # #################
 
-def log_likelihood(param, indep_var, dep_var, epsilon=4.5):
+def log_likelihood(param, indep_var, dep_var, epsilon=4.5, n=2):
     """
     Computes the log likelihood probability.
     Parameters
@@ -54,6 +54,10 @@ def log_likelihood(param, indep_var, dep_var, epsilon=4.5):
         array should be the same as the number of rows in indep_var.
     epsilon : float.
         Energy difference between the active and inactive state of the repressor.
+    n : int
+        Degree of cooperativity between subunits. Allosterically independent
+        LacI molecules will have an n of 2 while alllosterically dependent will
+        have an n of 4. Default value is 2.
     Returns
     -------
     log_like : float.
@@ -68,12 +72,12 @@ def log_likelihood(param, indep_var, dep_var, epsilon=4.5):
                          indep_var.iloc[:, 2]
 
     # compute the theoretical fold-change
-    fc_theory = mwc.fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r, n=4)
+    fc_theory = mwc.fold_change_log(IPTG, ea, ei, epsilon, R, epsilon_r, n=n)
 
-    log_like =  np.sum((fc_theory - dep_var)**2) / 2 / sigma**2
+    log_like = np.sum((fc_theory - dep_var)**2) / 2 / sigma**2
     return log_like
 
-def regression_log_post(param, indep_var, dep_var):
+def regression_log_post(param, indep_var, dep_var, n=2):
     '''
     Computes the log posterior for a single set of parameters.
     Parameters
@@ -89,7 +93,10 @@ def regression_log_post(param, indep_var, dep_var):
     dep_var : array-like
         dependent variable, i.e. experimental fold-change. Then length of this
         array should be the same as the number of rows in indep_var.
-
+    n : int
+        Degree of cooperativity between subunits. Allosterically independent
+        LacI molecules will have an n of 2 while alllosterically dependent will
+        have an n of 4. Default value is 2.
     Returns
     -------
     log_post : float.
@@ -102,13 +109,13 @@ def regression_log_post(param, indep_var, dep_var):
     IPTG, R, epsilon_r = indep_var[:, 0], indep_var[:, 1], indep_var[:, 2]
 
     # compute the theoretical fold-change
-    fc_theory = mwc.fold_change_log(IPTG, ea, ei, 4.5, R, epsilon_r, n=4)
+    fc_theory = mwc.fold_change_log(IPTG, ea, ei, 4.5, R, epsilon_r, n=n)
 
     # return the log posterior
     return -len(dep_var) / 2 * np.log(np.sum((dep_var - fc_theory)**2))
 
 
-def log_post(param, indep_var, dep_var, epsilon=4.5,
+def log_post(param, indep_var, dep_var, epsilon=4.5, n=2,
              ea_range=[6 -6], ei_range=[6, -6], sigma_range=[0, 1]):
     '''
     Computes the log posterior probability.
@@ -137,6 +144,10 @@ def log_post(param, indep_var, dep_var, epsilon=4.5,
         Range of variables to use in the prior as boundaries for the sigma param.
     epsilon : float.
         Energy difference between the active and inactive state of the repressor.
+    n : int
+        Degree of cooperativity between subunits. Allosterically independent
+        LacI molecules will have an n of 2 while alllosterically dependent will
+        have an n of 4. Default value is 2.
     '''
     # unpack parameters
     ea, ei, sigma = param
@@ -149,11 +160,11 @@ def log_post(param, indep_var, dep_var, epsilon=4.5,
         return -np.inf
 
     return -(len(indep_var) + 1) * np.log(sigma) \
-    - log_likelihood(param, indep_var, dep_var, epsilon)
+    - log_likelihood(param, indep_var, dep_var, epsilon, n=n)
 
 
 # #################
-def resid(param, indep_var, dep_var, epsilon=4.5):
+def resid(param, indep_var, dep_var, epsilon=4.5, n=2):
     '''
     Residuals for the theoretical fold change.
 
@@ -171,6 +182,10 @@ def resid(param, indep_var, dep_var, epsilon=4.5):
     dep_var : array-like
         dependent variable, i.e. experimental fold-change. Then length of
         this array should be the same as the number of rows in indep_var.
+    n : int
+        Degree of cooperativity between subunits. Allosterically independent
+        LacI molecules will have an n of 2 while alllosterically dependent will
+        have an n of 4. Default value is 2.
 
     Returns
     -------
@@ -183,14 +198,14 @@ def resid(param, indep_var, dep_var, epsilon=4.5):
     iptg, R, epsilon_r = indep_var[:, 0], indep_var[:, 1], indep_var[:, 2]
 
     # compute the theoretical fold-change
-    fc_theory = mwc.fold_change_log(iptg, ea, ei, epsilon, R, epsilon_r, n=4)
+    fc_theory = mwc.fold_change_log(iptg, ea, ei, epsilon, R, epsilon_r, n=n)
 
     # return the log posterior
     return dep_var - fc_theory
 
 def non_lin_reg_mwc(df, p0,
                     indep_var=['IPTG_uM', 'repressors', 'binding_energy'],
-                    dep_var='fold_change_A', epsilon=4.5, diss_const=False):
+                    dep_var='fold_change_A', epsilon=4.5, n=2, diss_const=False):
     '''
     Performs a non-linear regression on the lacI IPTG titration data assuming
     Gaussian errors with constant variance. Returns the parameters
@@ -219,6 +234,10 @@ def non_lin_reg_mwc(df, p0,
     epsilon : float.
         Value of the allosteric parameter, i.e. the energy difference between
         the active and the inactive state.
+    n : int
+        Degree of cooperativity between subunits. Allosterically independent
+        LacI molecules will have an n of 2 while alllosterically dependent will
+        have an n of 4. Default value is 2.
     diss_const : bool.
         Indicates if the dissociation constants should be returned instead of
         the e_A and e_I parameteres.
@@ -249,7 +268,7 @@ def non_lin_reg_mwc(df, p0,
 
     # Compute the Hessian at the map
     hes = smnd.approx_hess(popt, regression_log_post,
-                           args=(df_indep.values, df_dep.values))
+                           args=(df_indep.values, df_dep.values,  n))
 
     # Compute the covariance matrix
     cov = -np.linalg.inv(hes)
@@ -276,8 +295,8 @@ indep_var = df[['IPTG_uM', 'repressors', 'binding_energy']]
 dep_var = df.fold_change_A
 
 # Begin the analysis with the n=4 state.
-map_param = non_lin_reg_mwc(df, p0=[0, 1], diss_const=False)
-
+allo = 4
+map_param = non_lin_reg_mwc(df, p0=[0, 1], n=allo, diss_const=False)
 mean = [map_param[0], map_param[2]]
 cov = np.array([[map_param[1], 0], [0, map_param[3]]])
 
@@ -287,6 +306,8 @@ n_dim = 3 # number of parameters to fit
 n_walkers = 50
 n_burn = 500
 n_steps = 5000
+
+
 
 # Initialize the walkers.
 p0 = np.empty((n_walkers, n_dim))
@@ -298,9 +319,10 @@ p0[:,2] = np.random.uniform(1E-5, 0.2, n_walkers)
 ea_range = [-7, 7]
 ei_range = [-7, 7]
 sigma_range = [0, df.groupby('rbs').fold_change_A.std().max()]
+
 # Call the sampler.
 sampler = emcee.EnsembleSampler(n_walkers, n_dim, log_post,
-                                args=(indep_var, dep_var, 4.5, ea_range,
+                                args=(indep_var, dep_var, 4.5, allo, ea_range,
                                       ei_range, sigma_range), threads=6)
 sample = False
 if sample:
@@ -339,8 +361,8 @@ Ka_hpd = mwc.hpd(mcmc_rbs.ix[:, 3], 0.95)
 Ki_hpd = mwc.hpd(mcmc_rbs.ix[:, 4], 0.95)
 # Print results
 print("""
-The most probable parameters for the MWC model
-----------------------------------------------
+The most probable parameters for the MWC model with n=4
+-------------------------------------------------------
 Ka = {0:.2f} -{1:0.2f} +{2:0.2f} µM
 Ki = {3:.2f} -{4:0.3f} +{5:0.3f} µM
 """.format(Ka, np.abs(Ka-Ka_hpd[0]), np.abs(Ka-Ka_hpd[1]),\
@@ -348,6 +370,73 @@ Ki = {3:.2f} -{4:0.3f} +{5:0.3f} µM
 
 ka_n4 = Ka_hpd[0] / 1E6
 ki_n4 = Ki_hpd[0] / 1E6
+
+
+# Perform the MCMC for the n=2 case.
+allo = 2
+map_param = non_lin_reg_mwc(df, p0=[0, 1], diss_const=False, n=allo)
+mean = [map_param[0], map_param[2]]
+cov = np.array([[map_param[1], 0], [0, map_param[3]]])
+
+
+p0 = np.empty((n_walkers, n_dim))
+p0[:,[0, 1]] = np.random.multivariate_normal(mean, cov, n_walkers)
+p0[:,2] = np.random.uniform(1E-5, 0.2, n_walkers)
+
+# Execute the MCMC.
+# Set the ranges for the MCMC
+ea_range = [-7, 7]
+ei_range = [-7, 7]
+sigma_range = [0, df.groupby('rbs').fold_change_A.std().max()]
+# Call the sampler.
+sampler = emcee.EnsembleSampler(n_walkers, n_dim, log_post,
+                                args=(indep_var, dep_var, 4.5, allo, ea_range,
+                                      ei_range, sigma_range), threads=6)
+sample = False
+if sample:
+    # Do the burn in
+    pos, prob, state = sampler.run_mcmc(p0, n_burn, storechain=False)
+    # Perform the real MCMC
+    _ = sampler.run_mcmc(pos, n_steps)
+    output = open('../../data/mcmc/SI_A_all_data_KaKi_allosteric_independence.pkl', 'wb')
+    pickle.dump(sampler.flatchain, output)
+    pickle.dump(sampler.flatlnprobability, output)
+
+# read the flat-chain
+with open('../../data/mcmc/SI_A_all_data_KaKi_allosteric_independence.pkl', 'rb') as file:
+    unpickler = pickle.Unpickler(file)
+    gauss_flatchain = unpickler.load()
+    gauss_flatlnprobability = unpickler.load()
+
+index = ['ka', 'ki', 'sigma']
+mcmc_rbs = pd.DataFrame(gauss_flatchain, columns=index)
+mcmc_rbs['Ka'] = np.exp(-mcmc_rbs['ka'])
+mcmc_rbs['Ki'] = np.exp(-mcmc_rbs['ki'])
+
+# Reassign the index with the new entries
+index = mcmc_rbs.columns
+
+# map value of the parameters
+max_idx = np.argmax(gauss_flatlnprobability, axis=0)
+ea, ei, sigma, Ka, Ki = mcmc_rbs.ix[max_idx, :]
+
+# ea range
+Ka_hpd = mwc.hpd(mcmc_rbs.ix[:, 3], 0.95)
+Ki_hpd = mwc.hpd(mcmc_rbs.ix[:, 4], 0.95)
+# Print results
+print("""
+The most probable parameters for the MWC model with n=4
+-------------------------------------------------------
+Ka = {0:.2f} -{1:0.2f} +{2:0.2f} µM
+Ki = {3:.2f} -{4:0.3f} +{5:0.3f} µM
+""".format(Ka, np.abs(Ka-Ka_hpd[0]), np.abs(Ka-Ka_hpd[1]),\
+           Ki,np.abs(Ki-Ki_hpd[0]), np.abs(Ki-Ki_hpd[1])))
+
+ka_n2 = Ka_hpd[0] / 1E6
+ki_n2 = Ki_hpd[0] / 1E6
+
+
+
 # Plot the predictions.
 fig, ax = plt.subplots(2, 3, figsize=(9,6.2), sharey=True)
 
@@ -355,8 +444,6 @@ fig, ax = plt.subplots(2, 3, figsize=(9,6.2), sharey=True)
 operators = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7}
 R_range = [1740, 1220, 260, 124, 60, 22]
 IPTG_range = np.logspace(-8, -2, 500)
-ka_n2 = 139E-6
-ki_n2 = 0.53E-6
 ep_ai = 4.5
 
 
