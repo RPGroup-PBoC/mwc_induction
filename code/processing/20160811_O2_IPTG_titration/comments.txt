@@ -1,7 +1,7 @@
 # Date : 2016-08-11
 # Equipment : MACSQuant (Bjorkman lab)
 # User : mrazomej
-# Description : 
+# Description :
 # IPTG titration with all the O2+11 YFP strains RBS (delta, HG104, RBS1147, RBS446, RBS1027, RBS1 and RBS1L)
 # The strains were grown in deep 96-well plates in 1 mL of LB + Kan + Spec and then
 # diluted next morning 1:1000 into 0.5 mL of M9 + 0.5% glucose also in deep 96-well plates with the following
@@ -10,4 +10,4 @@
 # Comments :
 # This plate was set "in reverse mode" such that the high concentration was read first by the flow cytometer.
 # This serves as a control to see if the time that the strains spend in the plate while being read affects
-# somehow the measurement differently for different IPTG concentrations.
+# the measurement for different IPTG concentrations.
