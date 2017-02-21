@@ -23,8 +23,8 @@ The following list contains all products and their corresponding catalog numbers
 
 * Isopropylthiogalactopyranoside (IPTG) Dioxane Free
   - Use: Inducer of repressor molecules.
-  - Manufacturer: ThermoFisher Scientific
-  - Cat. No.: R0392
+  - Manufacturer: Research Products International
+  - Cat. No.: I56000-0.5
 
 * Chloramphenicol
   - Use: Selection in overnight growth.
