@@ -473,7 +473,7 @@ for i, op in enumerate(ops):
     ax[0, i].xaxis.set_ticks([1E-8, 1E-6, 1E-4, 1E-2])
     for k in range(2):
 
-        ax[k, i].set_title(r'%s $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, operators[op]), fontsize=12, backgroundcolor='#ffedce', position=(0.5,1.05), fontweight='bold')
+        ax[k, i].set_title(r'%s $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, operators[op]), fontsize=16, backgroundcolor='#ffedce', position=(0.5,1.05), fontweight='bold')
 #
 for i , op in enumerate(ops):
     for j, R in enumerate(R_range):
