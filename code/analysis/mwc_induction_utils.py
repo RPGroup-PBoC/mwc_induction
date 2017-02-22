@@ -4,7 +4,7 @@ Title:
 Creation Date:
     2016-07-16
 Author(s):
-    Manuel Razo-Mejia, Nathan Belliveau, Griffin Chure, Stephanie Barnes
+    Manuel Razo-Mejia, Griffin Chure
 Purpose:
     This file contains a myriad of functions used for data processing, analysis
     and inference of a variety of data types. These functions are split into
@@ -124,12 +124,9 @@ Purpose:
             Formats plotting enviroment to that used in Physical Biology of
             the Cell, 2nd edition. To format all plots within a script, simply
             execute `mwc_induction_utils.set_plotting_style() in the preamble.
-Notes:
-    All functions in this file have been throroughly unit tested. See the
-    associated file `mwc_induction_utils_test.py`
 
 License: MIT
-    Copyright (c) 2016 Rob Phillips group @ California Institute of Technology
+    Copyright (c) 2017 Rob Phillips group @ California Institute of Technology
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
