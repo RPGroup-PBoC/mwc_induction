@@ -1,0 +1,13 @@
+# Date : 2016-08-12
+# Equipment : MACSQuant (Bjorkman lab)
+# User : gchure
+# Description :
+# IPTG titration with all the O2+11 YFP strains RBS (delta, HG104, RBS1147, RBS446, RBS1027, RBS1 and RBS1L)
+# The strains were grown in deep 96-well plates in 1 mL of LB + Kan + Spec and then
+# diluted next morning 1:1000 into 0.5 mL of M9 + 0.5% glucose also in deep 96-well plates with the following
+# IPTG concentrations:
+# 0uM, 0.1uM, 5uM, 10uM, 25uM, 50uM, 75uM, 100uM, 250uM, 500uM, 1000uM, 5000uM
+# Comments :
+# Nathan started LB culture; Nathan performed 1:1000 M9 dilution at 11:07 PST;
+# Griffin ran the plate at 18:10 PST. There appeared to be variations in the
+# density of cells in each well. Events per second ranged from 2000 to 10000.
