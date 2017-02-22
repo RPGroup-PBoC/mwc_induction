@@ -1,9 +1,9 @@
-for dir in *IPTG_titration/; do
+for dir in *microscopy*/; do
 	cd $dir
 	NOM=$dir
 	NOM=${NOM%/}_comments.txt
 	echo $NOM
-	cp comments.txt ../flow_comments/$NOM
+	cp comments.txt ../microscopy_comments/$NOM
 	cd ../
 done
 
