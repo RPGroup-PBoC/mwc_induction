@@ -2,8 +2,8 @@
 
 This repository contains all experimental data and programs for the analysis
 found in "An Allosteric Theory of Transcription Factor Induction" by Manuel
-Razo-Mejia^*^, Stephanie Barnes^*^, Nathan Belliveau^*^, Griffin Chure^*^,
-Tal Einav^*^, and Rob Phillips.
+Razo-Mejia<sup>\*</sup>, Stephanie Barnes<sup>\*</sup>, Nathan Belliveau<sup>\*</sup>, Griffin Chure<sup>\*</sup>,
+Tal Einav<sup>\*</sup>, and Rob Phillips.
 
 An index for the structure of this repository is given below.
 
