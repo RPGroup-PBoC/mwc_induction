@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Acknowledgements
-cover: readings.jpg
+cover: analysis.png
 categories: posts
 ---
 
