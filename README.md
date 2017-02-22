@@ -12,11 +12,11 @@ An index for the structure of this repository is given below.
 This folder contains the hand-written Python programs for processing,
 analyzing, and displaying the data presented in this work.
 
-* **`notebooks/` \|** Jupyter Notebooks containing Python code and explanation
+* **`analysis/` \|** Jupyter Notebooks containing Python code and explanation
     for the myriad analyses described in the main text and supplemental
     information.
 
-* **`scripts/` \|** Example Python scripts used for processing and analysis of raw data
+* **`examples/` \|** Example Python scripts used for processing and analysis of raw data
     as well as for generating the figures found in the main text and the
     supplemental information.
 
@@ -28,40 +28,28 @@ analyzing, and displaying the data presented in this work.
 This folder contains all experimental data used in the publication. All `csv`
 files obey the [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf) guidelines.
 
-* **`mwc_induction_flow_cytometry_fold_change.csv` \|** All experimentally
+* **`flow_master.csv` \|** All experimentally
     measured fold-change values obtained through flow cytometry.
 
-* **`mwc_induction_microscopy_fold_change.csv` \|** All experimentally
+* **`microscopy_master.csv` \|** All experimentally
     measured fold-change values obtained through single-cell microscopy. Please
     see the supplemental information for a more detailed description.
 
-* **`mwc_induction_mcmc_flatchains.pkl` \|** The result of the markov chain monte carlo sampling used in the Bayesian parameter estimation.
+* **`Oid_microscopy_master.csv` \|** All microscopy measurments of the Oid synthetic operator used in the Supplemental Information F.
 
-* **`example_fcs_file.fcs` \|** A representative flow cytometry standard (`fcs`)
-    file used in the `example_processing.py` Python script. 
+* **`flow_cytometry_comments/` \|** All comments associated with the experimental runs shown in the `flow_master.csv` file.
 
-* **`example_flow_cytometry_intensity_set.zip \|** A representative flow
-    cytometry data set stored as comma separated values (`csv`) used for the
-    `example_analysis.py` Python script.
+* **`microscopy_comments/` \|** All comments associated with the experimental runs shown in `microscopy_master.csv` and `Oid_microscopy_master.csv`.
 
-* **`example_microscopy_image_set.zip \|** A representative image set used in
-    the `image_processing.ipynb` Jupyter notebook.
+* **`mcmc_flatchains/` \|** All Markov Chain Monte Carlo sampler flatchains used for parameter estimation saved as `.pkl` files.
 
-* **`example_titration_fold_change_set.csv \|** A representative complete IPTG
-    titration data set used for the `bayesian_parameter_estimation.ipynb`
-    Jupyter notebook.
-
-* **`comments/` \|** A folder containing all comments for each experimental run
-    including flow cytometry and microscopy.
+* **`example_flow_csv/` \|** A collection of representative flow cytometry `.csv` files used for the example `processing.py` file.
 
 ## `other`
-This folder contains other various files used in the publication. 
+This folder contains other various files used in the publication.
 
 * **`plasmid_maps/` \|** A collection of the plasmid sequences used in this work
     as GenBank (`.gb`) files.
 
 * **`materials_list.txt` \|** A list of the materials used in this work along
     with their catalog numbers.
-
-
-
