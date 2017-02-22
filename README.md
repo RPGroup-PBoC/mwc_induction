@@ -37,6 +37,8 @@ files obey the [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf) guideline
 
 * **`Oid_microscopy_master.csv` \|** All microscopy measurments of the Oid synthetic operator used in the Supplemental Information F.
 
+* **`tidy_lacI_titration_data.csv` \|** The LacI repressor titration data from [Garcia and Phillips 2011](http://www.pnas.org/content/108/29/12173.abstract) and [Brewster *et al.* 2014](ihttp://www.cell.com/abstract/S0092-8674(14)00221-9).
+
 * **`flow_cytometry_comments/` \|** All comments associated with the experimental runs shown in the `flow_master.csv` file.
 
 * **`microscopy_comments/` \|** All comments associated with the experimental runs shown in `microscopy_master.csv` and `Oid_microscopy_master.csv`.
