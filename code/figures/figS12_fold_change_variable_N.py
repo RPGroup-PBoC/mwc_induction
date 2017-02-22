@@ -63,7 +63,7 @@ Reff = np.arange(0., 1000., 1)
 N = 10
 N_vals = np.array(df.N.unique(), dtype=float)
 e_AI = 4.5
-e_AI_array = [-2.5, -1.0, 0, 1.0, 2.5]
+e_AI_array = [-4.0, -2.0, 0, 2.0, 4.0]
 O1 = -15.3
 
 # Set color palette
