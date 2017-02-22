@@ -5,10 +5,11 @@ cover: readings.jpg
 categories: posts
 ---
 
+# Acknowledgements
 
 This work has been a wonderful exercise in scientific collaboration. We thank
 [Hernan Garcia](http://physics.berkeley.edu/people/faculty/hernan-garcia) for information and advice for working with these bacterial
-strains, [Pamela Bj\"{o}rkman and Rachel Galimidi](http://www.its.caltech.edu/~bjorker/labdir.html) for access and training for use
+strains, [Pamela Björkman and Rachel Galimidi](http://www.its.caltech.edu/~bjorker/labdir.html) for access and training for use
 of the Miltenyi Biotec MACSQuant flow cytometer, and Colin deBakker of Milteny
 Biotec for useful advice and instruction in flow cytometry. The experimental
 front of this work began at the [Physiology summer course at the Marine Biological Laboratory](http://www.mbl.edu/physiology/) in Woods Hole, MA operated by the University of Chicago.
