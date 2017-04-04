@@ -173,7 +173,7 @@ plt.legend(leg_handles, labels, loc='upper left', ncol=4, fontsize=13,
            handletextpad=-1.5)
 plt.tight_layout()
 plt.tick_params(labelsize=17)
-plt.xlabel(r'$F_{bound} - F_{bound}^{(R = 0)}\,\, (k_BT)$', fontsize=18.5)
+plt.xlabel('$F_\mathrm{bound} - F_{\mathrm{bound}}^{(R = 0)}\,\, (k_BT)$', fontsize=18.5)
 plt.ylabel('fold-change', fontsize=18.5)
 plt.ylim([-0.05, 1.1])
 # plt.yscale('log')
