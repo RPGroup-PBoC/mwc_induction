@@ -84,6 +84,7 @@ energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 fig, ax = plt.subplots(2, 2, figsize=(11,8))
 ax = ax.ravel()
 
+
 #
 # Loop through operators
 for i, op in enumerate(operators):
@@ -106,12 +107,12 @@ for i, op in enumerate(operators):
             color=colors[j], label=None, zorder=1, linestyle='--')
         # plot 95% HPD region using the variability in the MWC parameters
         # Log scale
-        # cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-        #     gauss_flatchain, epsilon=4.5,
-        #     R=df[(df.rbs == rbs)].repressors.unique(),
-        #     epsilon_r=energies[op])
-        # ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-        #                 alpha=0.3, color=colors[j])
+        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+            gauss_flatchain, epsilon=4.5,
+            R=df[(df.rbs == rbs)].repressors.unique(),
+            epsilon_r=energies[op])
+        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+                        alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
@@ -149,8 +150,11 @@ for i, op in enumerate(operators):
     ax[i].tick_params(labelsize=14)
 
 
+
+
 # Separate the data for the dynamic range calculation.
-grouped = pd.groupby(data, ['operator', 'repressors', 'IPTG_uM'])
+grouped = pd.groupby(df, 'operator')
+
 # Now compute the dynamic range and credible regions.
 def dyn_range(num_rep, ep_r, ka_ki, ep_ai=4.5, n_sites=2, n_ns=4.6E6):
     pact_leak = 1 / (1 + np.exp(-ep_ai))
@@ -170,31 +174,75 @@ def dyn_cred_region(num_rep, ka_flatchain, ki_flatchain,
         cred_region[:, i] = mwc.hpd(drng, mass_frac)
     return cred_region
 
+# Compute the dynamic range
+drs = []
+for g, d in grouped:
+    unique_IPTG = d.IPTG_uM.unique()
+    min_IPTG = np.min(unique_IPTG)
+    max_IPTG = np.max(unique_IPTG)
+    # Group the new data by repressors.
+    grouped_rep = pd.groupby(d, ['rbs', 'date', 'username'])
+    rbs_ind = {'HG104' : 0, 'RBS1147': 1, 'RBS446' : 2, 'RBS1027': 3,
+               'RBS1': 4, 'RBS1L': 5}
+    rep_dr = [[], [], [], [], [], []]
+    rep_std = []
+    for g_rep, d_rep in grouped_rep:
+        if g_rep[2] != 'sloosbarnes':
+            dr = d_rep[d_rep.IPTG_uM==max_IPTG].fold_change_A.values - d_rep[d_rep.IPTG_uM==min_IPTG].fold_change_A.values
+            rep_dr[rbs_ind[g_rep[0]]].append(dr[0])
+
+    # Compute the means.
+    for i, dr in enumerate(rep_dr):
+        rep_dr[i] = np.mean(dr)
+        rep_std.append(np.std(dr) / np.sqrt(len(dr)))
+
+    reps = np.sort(df.repressors.unique())
+    dr_df = pd.DataFrame([reps, rep_dr, rep_std]).T
+    dr_df.columns = ['repressors', 'dynamic_range', 'err']
+    dr_df.insert(0, 'operator', g)
+    drs.append(dr_df)
+
+drng = pd.concat(drs, axis=0)
+
 rep_range = np.logspace(0, 5, 200)
 ka_ki = np.exp(-ea) / np.exp(-ei)
 en_colors = sns.color_palette('viridis', n_colors=len(operators))
 for i, op in enumerate(operators):
     # Compute the dynamic range.
     dyn_rng = dyn_range(rep_range, energies[op], ka_ki)
-    ax[-1].plot(rep_range, dyn_rng, color=en_colors[i], label=energies[op])
+    ax[-1].plot(rep_range, dyn_rng, color=en_colors[i], label='_nolegend_')
     cred_region = dyn_cred_region(rep_range,
          ka_fc, ki_fc, epsilon=4.5,
          ep_r=energies[op])
     ax[-1].fill_between(rep_range, cred_region[0,:], cred_region[1,:],
                     alpha=0.3, color=en_colors[i])
-    # Now plot the data.
 
 
+# Get the dynamic range data.
+for i, op in enumerate(operators):
+    dyn_rng = drng[drng.operator==op]
+    ax[-1].plot(2 * dyn_rng.repressors, dyn_rng.dynamic_range, 'o',
+                color=en_colors[i], label='_nolegend_')
+    ax[-1].errorbar(2 * dyn_rng.repressors, dyn_rng.dynamic_range, yerr=dyn_rng.err, color=en_colors[i], fmt='o', linestyle='none',
+                    label=energies[op])
+
+# Add a legend for the dynamic range
 ax[-1].legend(title='   binding\n energy ($k_BT$)', loc='center right')
 ax[-1].set_xscale('log')
 ax[-1].set_xlabel('number of repressors', fontsize=15)
 ax[-1].set_ylabel('dynamic range', fontsize=15)
 
+
+# Now plot the dynamic
+
+
 ax[0].legend(loc='upper left', title='repressors / cell')
 # add plot letter labels
-plt.figtext(0.25, .95, 'A', fontsize=20)
-plt.figtext(0.0, .46, 'B', fontsize=20)
-plt.figtext(0.50, .46, 'C', fontsize=20)
+plt.figtext(0., .95, 'A', fontsize=20)
+plt.figtext(0.5, .95, 'B', fontsize=20)
+plt.figtext(0.0, .46, 'C', fontsize=20)
+plt.figtext(0.50, .46, 'D', fontsize=20)
 plt.tight_layout()
 # plt.savefig(output + '/fig5.pdf',
         # bbox_inches='tight')
+# plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission_figures/theory_v_data.pdf', bbox_inches='tight')
