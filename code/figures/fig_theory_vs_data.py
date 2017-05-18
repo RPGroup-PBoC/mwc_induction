@@ -24,12 +24,12 @@ mwc.set_plotting_style()
 #===============================================================================
 # Set output directory based on the graphicspath.tex file to print in dropbox
 #===============================================================================
-dropbox = open('../../doc/induction_paper/graphicspath.tex')
-output = dropbox.read()
-output = re.sub('\\graphicspath{{', '', output)
-output = output[1::]
-output = re.sub('}}\n', '', output)
-
+# dropbox = open('../../doc/induction_paper/graphicspath.tex')
+# output = dropbox.read()
+# output = re.sub('\\graphicspath{{', '', output)
+# output = output[1::]
+# output = re.sub('}}\n', '', output)
+# 
 #===============================================================================
 # Read the data
 #===============================================================================
@@ -55,7 +55,7 @@ with open('../../data/mcmc/' + '20161208' + \
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()
-    
+
 # map value of the parameters
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
 ea, ei, sigma = gauss_flatchain[max_idx]
@@ -112,7 +112,7 @@ for i, op in enumerate(operators):
             ax[i+1].plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
                        fc_mean, marker='o', linestyle='none',
                        markeredgewidth=2, markeredgecolor=colors[j],
-                       markerfacecolor='w', 
+                       markerfacecolor='w',
                        label=df[df.rbs=='RBS1027'].repressors.unique()[0] * 2)
         else:
             ax[i+1].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
@@ -121,7 +121,7 @@ for i, op in enumerate(operators):
                 color=colors[j])
 
         # Add operator and binding energy labels.
-        ax[i+1].text(0.8, 0.08, r'{0}'.format(op), transform=ax[i+1].transAxes, 
+        ax[i+1].text(0.8, 0.08, r'{0}'.format(op), transform=ax[i+1].transAxes,
                 fontsize=14)
         ax[i+1].text(0.65, 0.02,
                 r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
@@ -140,6 +140,5 @@ plt.figtext(0.5, .95, 'B', fontsize=20)
 plt.figtext(0.0, .46, 'C', fontsize=20)
 plt.figtext(0.5, .46, 'D', fontsize=20)
 plt.tight_layout()
-plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_with_data.pdf', 
-        bbox_inches='tight')
-
+# plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_with_data.pdf',
+        # bbox_inches='tight')

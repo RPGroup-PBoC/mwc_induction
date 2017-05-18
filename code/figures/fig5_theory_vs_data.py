@@ -24,12 +24,12 @@ mwc.set_plotting_style()
 #===============================================================================
 # Set output directory based on the graphicspath.tex file to print in dropbox
 #===============================================================================
-dropbox = open('../../doc/induction_paper/graphicspath.tex')
-output = dropbox.read()
-output = re.sub('\\graphicspath{{', '', output)
-output = output[1::]
-output = re.sub('}}\n', '', output)
-
+# dropbox = open('../../doc/induction_paper/graphicspath.tex')
+# output = dropbox.read()
+# output = re.sub('\\graphicspath{{', '', output)
+# output = output[1::]
+# output = re.sub('}}\n', '', output)
+#
 #===============================================================================
 # Read the data
 #===============================================================================
@@ -48,10 +48,14 @@ with open('../../data/mcmc/main_text_KaKi.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
     gauss_flatlnprobability = unpickler.load()
-    
+
 # map value of the parameters
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
 ea, ei, sigma = gauss_flatchain[max_idx]
+
+# Convert the flatchains to units of concentration.
+ka_fc = np.exp(-gauss_flatchain[:,0])
+ki_fc = np.exp(-gauss_flatchain[:,1])
 
 #===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
@@ -69,14 +73,18 @@ operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize the plot to set the size
-fig = plt.figure(figsize=(11, 8))
+# fig = plt.figure(figsize=(11, 8))
 
 # Define the GridSpec to center the lower plot
-ax1 = plt.subplot2grid((2, 4), (0, 1), colspan=2)
-ax2 = plt.subplot2grid((2, 4), (1, 0), colspan=2)
-ax3 = plt.subplot2grid((2, 4), (1, 2), colspan=2)
-ax = [ax1, ax2, ax3]
+# ax1 = plt.subplot2grid((2, 4), (0, 1), colspan=2)
+# ax2 = plt.subplot2grid((2, 4), (1, 0), colspan=2)
+# ax3 = plt.subplot2grid((2, 4), (1, 2), colspan=2)
+# ax = [ax1, ax2, ax3]
 
+fig, ax = plt.subplots(2, 2, figsize=(11,8))
+ax = ax.ravel()
+
+#
 # Loop through operators
 for i, op in enumerate(operators):
     print(op)
@@ -98,12 +106,12 @@ for i, op in enumerate(operators):
             color=colors[j], label=None, zorder=1, linestyle='--')
         # plot 95% HPD region using the variability in the MWC parameters
         # Log scale
-        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j])
+        # cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+        #     gauss_flatchain, epsilon=4.5,
+        #     R=df[(df.rbs == rbs)].repressors.unique(),
+        #     epsilon_r=energies[op])
+        # ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+        #                 alpha=0.3, color=colors[j])
         # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
@@ -118,7 +126,7 @@ for i, op in enumerate(operators):
             ax[i].plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
                        fc_mean, marker='o', linestyle='none',
                        markeredgewidth=2, markeredgecolor=colors[j],
-                       markerfacecolor='w', 
+                       markerfacecolor='w',
                        label=df[df.rbs=='RBS1027'].repressors.unique()[0] * 2,
                        zorder=100)
         else:
@@ -128,7 +136,7 @@ for i, op in enumerate(operators):
                 color=colors[j], zorder=100)
 
     # Add operator and binding energy labels.
-    ax[i].text(0.8, 0.09, r'{0}'.format(op), transform=ax[i].transAxes, 
+    ax[i].text(0.8, 0.09, r'{0}'.format(op), transform=ax[i].transAxes,
             fontsize=13)
     ax[i].text(0.67, 0.02,
             r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
@@ -139,12 +147,54 @@ for i, op in enumerate(operators):
     ax[i].set_ylim([-0.01, 1.1])
     ax[i].set_xlim(left=-5E-9)
     ax[i].tick_params(labelsize=14)
+
+
+# Separate the data for the dynamic range calculation.
+grouped = pd.groupby(data, ['operator', 'repressors', 'IPTG_uM'])
+# Now compute the dynamic range and credible regions.
+def dyn_range(num_rep, ep_r, ka_ki, ep_ai=4.5, n_sites=2, n_ns=4.6E6):
+    pact_leak = 1 / (1 + np.exp(-ep_ai))
+    pact_sat = 1 / (1 + np.exp(-ep_ai) * (ka_ki)**n_sites)
+    leak = (1 + pact_leak * (num_rep / n_ns) * np.exp(-ep_r))**-1
+    sat = (1 + pact_sat * (num_rep / n_ns) * np.exp(-ep_r))**-1
+    return sat - leak
+
+def dyn_cred_region(num_rep, ka_flatchain, ki_flatchain,
+                    ep_r, mass_frac=0.95, epsilon=4.5):
+    cred_region = np.zeros([2, len(num_rep)])
+    # Loop through each repressor copy number and compute the fold-changes
+    # for each concentration.
+    ka_ki = ka_flatchain / ki_flatchain
+    for i, R in enumerate(num_rep):
+        drng = dyn_range(R, ep_r, ka_ki, ep_ai=epsilon)
+        cred_region[:, i] = mwc.hpd(drng, mass_frac)
+    return cred_region
+
+rep_range = np.logspace(0, 5, 200)
+ka_ki = np.exp(-ea) / np.exp(-ei)
+en_colors = sns.color_palette('viridis', n_colors=len(operators))
+for i, op in enumerate(operators):
+    # Compute the dynamic range.
+    dyn_rng = dyn_range(rep_range, energies[op], ka_ki)
+    ax[-1].plot(rep_range, dyn_rng, color=en_colors[i], label=energies[op])
+    cred_region = dyn_cred_region(rep_range,
+         ka_fc, ki_fc, epsilon=4.5,
+         ep_r=energies[op])
+    ax[-1].fill_between(rep_range, cred_region[0,:], cred_region[1,:],
+                    alpha=0.3, color=en_colors[i])
+    # Now plot the data.
+
+
+ax[-1].legend(title='   binding\n energy ($k_BT$)', loc='center right')
+ax[-1].set_xscale('log')
+ax[-1].set_xlabel('number of repressors', fontsize=15)
+ax[-1].set_ylabel('dynamic range', fontsize=15)
+
 ax[0].legend(loc='upper left', title='repressors / cell')
 # add plot letter labels
 plt.figtext(0.25, .95, 'A', fontsize=20)
 plt.figtext(0.0, .46, 'B', fontsize=20)
 plt.figtext(0.50, .46, 'C', fontsize=20)
 plt.tight_layout()
-plt.savefig(output + '/fig5.pdf', 
-        bbox_inches='tight')
-
+# plt.savefig(output + '/fig5.pdf',
+        # bbox_inches='tight')
