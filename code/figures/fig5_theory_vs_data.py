@@ -245,4 +245,4 @@ plt.figtext(0.50, .46, 'D', fontsize=20)
 plt.tight_layout()
 # plt.savefig(output + '/fig5.pdf',
         # bbox_inches='tight')
-# plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission_figures/theory_v_data.pdf', bbox_inches='tight')
+plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission_figures/theory_v_data.pdf', bbox_inches='tight')

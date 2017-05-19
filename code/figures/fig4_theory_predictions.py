@@ -16,7 +16,7 @@ import mwc_induction_utils as mwc
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.gridspec as gridspec
-import matplotlib.colors
+import matplotlib.colors as plc
 import corner
 
 # Seaborn, useful for graphics
@@ -60,7 +60,7 @@ ki_fc = np.exp(-gauss_flatchain[:,1])
 #===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
 #===============================================================================
-"""
+
 # Define the IPTG concentrations to evaluate
 IPTG = np.logspace(-7, -2, 100)
 IPTG_lin = np.array([0, 1E-7])
@@ -70,6 +70,7 @@ IPTG_lin = np.array([0, 1E-7])
 colors = sns.color_palette(n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
+"""
 # Define the operators and their respective energies
 operators = ['O2', 'O1', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
@@ -213,27 +214,19 @@ np.random.seed(666)
 # choices = np.random.choice(inds, size=1E4, replace=False)
 plt.close('all')
 g = sns.JointGrid(lab[0], lab[1], ka_ki_df, xlim=(100, 200), ylim=(0.45, 0.625), space=0.05)
-# colors = sns.cubehelix_palette(n_colors=20,as_cmap=True)
-#
-# g.plot_joint(plt.hexbin, cmap=colors)
-x = np.linspace(100, 200, 100)
-y = np.linspace(0.45, 0.625, 100)
-xy = np.meshgrid((x, y))
-g.ax_joint.contourf(xy, z=np.meshgrid([ka_fc, ki_fc]))
-g.plot_marginals(sns.kdeplot, shade=True, color='#8e7191', zorder=1)
+
+
+# g.ax_joint.scatter(ka_fc[::10], ki_fc[::10],  s=3, marker='.', alpha=0.8, c=gauss_flatlnprobability[::10], cmap='Blues')
+g.ax_joint.plot(ka_fc, ki_fc, 'k.', ms=2, alpha=0.1, rasterized=True, zorder=1)
+g.plot_joint(sns.kdeplot, cmap='Blues_r', zorder=10, linewidth=1, n_levels=5)
+
+g.ax_joint.set_xlim([100, 230])
+g.ax_joint.set_ylim([0.45, 0.65])
+g.plot_marginals(sns.kdeplot, shade=True, color='b', zorder=1, linewidth=1)
 
 # # Plot the mode and HPD for each marginal distribution
-# ind = np.where(gauss_flatlnprobability == np.max(gauss_flatlnprobability))
-# ka_mode = ka_fc[ind][0]
-# ki_mode = ki_fc[ind][0]
-# ka_cred = mwc.hpd(ka_fc, mass_frac=0.95)
-# ki_cred = mwc.hpd(ki_fc, mass_frac=0.95)
-# g.ax_marg_x.plot(ka_mode, 0.015, 'o', color='#523987')
-# g.ax_marg_x.hlines(0.015, ka_cred[0], ka_cred[1], '#523987', lw=2, zorder=10)
-# g.ax_marg_y.vlines(7, ki_cred[0], ki_cred[1], '#523987', lw=2, zorder=10)
-# g.ax_marg_y.plot(7, ki_mode, 'o', color='#523987', zorder=10)
-# g.fig.set_figwidth(6)
-# g.fig.set_figheight(4)
+g.fig.set_figwidth(5.75)
+g.fig.set_figheight(3.25)
 #
 
 
@@ -241,4 +234,6 @@ g.plot_marginals(sns.kdeplot, shade=True, color='#8e7191', zorder=1)
 
 # plt.tight_layout()
 # plt.savefig('/Users/gchure/Desktop/ka_ki_distplot.svg', bbox_inches='tight')
+# plt.savefig('/Users/gchure/Desktop/test.svg', bbox_inches='tight')
+plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/ka_ki_distribution.pdf', bbox_inches='tight')
 plt.show()
