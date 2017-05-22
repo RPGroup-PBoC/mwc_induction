@@ -24,12 +24,12 @@ mwc.set_plotting_style()
 #===============================================================================
 # Set output directory based on the graphicspath.tex file to print in dropbox
 #===============================================================================
-# dropbox = open('../../doc/induction_paper/graphicspath.tex')
-# output = dropbox.read()
-# output = re.sub('\\graphicspath{{', '', output)
-# output = output[1::]
-# output = re.sub('}}\n', '', output)
-# 
+dropbox = open('../../doc/induction_paper/graphicspath.tex')
+output = dropbox.read()
+output = re.sub('\\graphicspath{{', '', output)
+output = output[1::]
+output = re.sub('}}\n', '', output)
+
 #===============================================================================
 # Read the data
 #===============================================================================
@@ -75,7 +75,7 @@ operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7}
 
 # Initialize subplots
-fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+fig, ax = plt.subplots(2, 3, figsize=(11, 8))
 
 ax = ax.ravel()
 
@@ -140,5 +140,5 @@ plt.figtext(0.5, .95, 'B', fontsize=20)
 plt.figtext(0.0, .46, 'C', fontsize=20)
 plt.figtext(0.5, .46, 'D', fontsize=20)
 plt.tight_layout()
-# plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_with_data.pdf',
-        # bbox_inches='tight')
+plt.savefig(output + '/fig_predictions_O2_RBS1027_fit_with_data.pdf',
+        bbox_inches='tight')
