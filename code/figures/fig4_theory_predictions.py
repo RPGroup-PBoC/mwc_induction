@@ -76,7 +76,7 @@ operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize the figure.
-fig, ax = plt.subplots(2, 3, figsize=(12, 8))
+fig, ax = plt.subplots(3, 3, figsize=(12, 10))
 ax = ax.ravel()
 
 
@@ -112,7 +112,7 @@ for i, op in enumerate(operators):
         ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
                         alpha=0.3, color=colors[j]) # compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
-        # compute the standard error of the mean
+        # # compute the standard error of the mean
         fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
         np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
 
@@ -130,11 +130,6 @@ for i, op in enumerate(operators):
 
     # Add operator and binding energy labels.
     ax[i].set_title(r'%s  $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, energies[op]), backgroundcolor='#ffedce', fontsize=14, y=1.03)
-    # ax[i].text(0.75, 0.09, r'{0}'.format(op), transform=ax[i].transAxes,
-            # fontsize=13, backgroundcolor='#ffedce')
-    # ax[i].text(0.6, 0.02,
-            # r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
-            # transform=ax[i].transAxes, fontsize=13, backgroundcolor='#ffedce')
     ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
     ax[i].set_xlabel('IPTG (M)', fontsize=15)
     ax[i].set_ylabel('fold-change', fontsize=16)
@@ -169,6 +164,55 @@ def dyn_range(num_rep, ep_r, ka_ki, ep_ai=4.5, n_sites=2, n_ns=4.6E6):
     sat = (1 + pact_sat * (num_rep / n_ns) * np.exp(-ep_r))**-1
     return sat - leak
 
+
+"""
+The following equations are borrowed from Stephanie Barnes.
+"""
+def pact(IPTG, K_A, K_I, e_AI):
+    '''
+    Computes the probability that a repressor is active
+    Parameters
+    ----------
+    IPTG : array-like
+        Array of IPTG concentrations in uM
+    K_A : float
+        Dissociation constant for active repressor
+    K_I : float
+        Dissociation constant for inactive repressor
+    e_AI : float
+        Energetic difference between the active and inactive state
+    Returns
+    -------
+    probability that repressor is active
+    '''
+    pact = (1 + IPTG * 1 / K_A)**2 / \
+    (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
+    return pact
+
+
+def fold_change(IPTG, K_A, K_I, e_AI, R, Op):
+    '''
+    Computes fold-change for simple repression
+    Parameters
+    ----------
+    IPTG : array-like
+        Array of IPTG concentrations in uM
+    K_A : float
+        Dissociation constant for active repressor
+    K_I : float
+        Dissociation constant for inactive repressor
+    e_AI : float
+        Energetic difference between the active and inactive state
+    R : float
+        Number of repressors per cell
+    Op : float
+        Operator binding energy
+    Returns
+    -------
+    probability that repressor is active
+    '''
+    return 1 / (1 + R / 5E6 * pact(IPTG, K_A, K_I, e_AI) * np.exp(-Op))
+
 def dyn_cred_region(num_rep, ka_flatchain, ki_flatchain, ep_r, mass_frac=0.95, epsilon=4.5):
     cred_region = np.zeros([2, len(num_rep)])
     ka_ki = ka_flatchain / ki_flatchain
@@ -177,48 +221,126 @@ def dyn_cred_region(num_rep, ka_flatchain, ki_flatchain, ep_r, mass_frac=0.95, e
         cred_region[:, i] = mwc.hpd(drng, mass_frac)
     return cred_region
 
-    # Loop through each repressor copy number and compute the fold-changes
-    # for each concentration.
-    ka_ki = ka_flatchain / ki_flatchain
+def EC50(K_A, K_I, e_AI, R, Op):
+    '''
+    Computes the concentration at which half of the repressors are in the active state
+    Parameters
+    ----------
+    K_A : float
+        Dissociation constant for active repressor
+    K_I : float
+        Dissociation constant for inactive repressor
+    e_AI : float
+        Energetic difference between the active and inactive state
+
+    Returns
+    -------
+    Concentration at which half of repressors are active (EC50)
+    '''
+    t = 1 + (R / 4.6E6) * np.exp(-Op) + (K_A / K_I)**2 * (2 * np.exp(-e_AI) + 1 + (R / 4.6E6) * np.exp(-Op))
+    b = 2 * (1 + (R / 4.6E6) * np.exp(-Op)) + np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
+    return K_A * ((K_A / K_I - 1)/(K_A / K_I - (t/b)**(1/2)) -1)
+
+def ec50_cred_region(num_rep, Op, e_AI, K_A, K_I,
+                     mass_frac=0.95):
+    cred_region = np.zeros([2, len(num_rep)])
     for i, R in enumerate(num_rep):
-        drng = dyn_range(R, ep_r, ka_ki, ep_ai=epsilon)
-        cred_region[:, i] = mwc.hpd(drng, mass_frac)
+        t = 1 + (R / 4.6E6) * np.exp(-Op) + (K_A / K_I)**2 * (2 * np.exp(-e_AI) + 1 + (R / 4.6E6) * np.exp(-Op))
+        b = 2 * (1 + (R / 4.6E6) * np.exp(-Op)) + np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
+        ec50_rng = K_A * ((K_A / K_I - 1)/(K_A / K_I - (t/b)**(1/2)) -1)
+        cred_region[:, i] = mwc.hpd(ec50_rng, mass_frac)
     return cred_region
+
+def effective_Hill(K_A, K_I, e_AI, R, Op):
+    '''
+    Computes the effective Hill coefficient
+    Parameters
+    ----------
+    K_A : float
+        Dissociation constant for active repressor
+    K_I : float
+        Dissociation constant for inactive repressor
+    e_AI : float
+        Energetic difference between the active and inactive state
+    Returns
+    -------
+    effective Hill coefficient
+    '''
+    c = EC50(K_A, K_I, e_AI, R, Op)
+    return 2/(fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op))*\
+           (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) * \
+            2 * c * np.exp(-e_AI) * (1/K_A * (1 + c/K_A) * (1 + c/K_I)**2 - 1/K_I *\
+           (1 + c/K_A)**2 * (1 + c/K_I)) / ((1 + c/K_A)**2 + np.exp(-e_AI) * (1 + c/K_I)**2)**2)
+
+def effective_hill_cred(num_rep, Op, e_AI, K_A, K_I,
+                        mass_frac=0.95):
+    cred_region = np.zeros([2, len(num_rep)])
+    for i, R in enumerate(num_rep):
+        # Compute the EC50
+        c = EC50(K_A, K_I, e_AI, R, Op)
+        # Compute the hill
+        e_hill = 2/(fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op))*\
+           (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) * \
+            2 * c * np.exp(-e_AI) * (1/K_A * (1 + c/K_A) * (1 + c/K_I)**2 - 1/K_I *\
+           (1 + c/K_A)**2 * (1 + c/K_I)) / ((1 + c/K_A)**2 + np.exp(-e_AI) * (1 + c/K_I)**2)**2)
+        cred_region[:, i] = mwc.hpd(e_hill, mass_frac)
+
+    return cred_region
+
 rep_range = np.logspace(0, 4, 200)
 ka_ki = np.exp(-ea) / np.exp(-ei)
 en_colors = sns.color_palette('viridis', n_colors=len(operators))
-titles = ['leakiness', 'saturation', 'dynamic range']
+titles = ['leakiness', 'saturation', 'dynamic range', 'EC50 ($\mu$M)', 'effective Hill coefficient']
 for i, op in enumerate(operators):
     # Compute the properties
     leak = leakiness(rep_range, energies[op], ep_ai=4.5)
     sat = saturation(rep_range, energies[op], 4.5, np.exp(-ea)/np.exp(-ei))
     dyn_rng = dyn_range(rep_range, energies[op], ka_ki)
+    ec50 = EC50(np.exp(-ea), np.exp(-ei), 4.5, rep_range, energies[op])
+    e_hill = effective_Hill(np.exp(-ea), np.exp(-ei), 4.5, rep_range, energies[op])
 
     ax[3].plot(rep_range, leak, color=en_colors[i], label=energies[op])
     ax[4].plot(rep_range, sat, color=en_colors[i], label=energies[op])
     ax[5].plot(rep_range, dyn_rng, color=en_colors[i], label=energies[op])
+    ax[6].plot(rep_range, ec50 / 1E6, color=en_colors[i])
+    ax[7].plot(rep_range, e_hill, color=en_colors[i])
     ax[i+3].set_xlabel('number of repressors', fontsize=14)
     ax[i+3].set_ylabel(titles[i], fontsize=15)
 
     # Plot the credible regions
+    sat_cred = saturation_cred_region(rep_range, energies[op], 4.5, ka_fc, ki_fc)
     dyn_cred = dyn_cred_region(rep_range,
          ka_fc, ki_fc, epsilon=4.5,
          ep_r=energies[op])
-    sat_cred = saturation_cred_region(rep_range, energies[op], 4.5, ka_fc, ki_fc)
+    ec50_cred = ec50_cred_region(rep_range, energies[op], 4.5, ka_fc,
+                                 ki_fc, mass_frac=0.95)
+    hill_cred = effective_hill_cred(rep_range, energies[op], 4.5, ka_fc, ki_fc, mass_frac=0.95)
     ax[5].fill_between(rep_range, dyn_cred[0,:], dyn_cred[1,:],
-                    alpha=0.3, color=en_colors[i])
+                        alpha=0.3, color=en_colors[i])
     ax[4].fill_between(rep_range, sat_cred[0,:], sat_cred[1,:],
                     alpha=0.3, color=en_colors[i])
-    ax[i+3].set_xlim([1, 1E4])
+    ax[6].fill_between(rep_range, ec50_cred[0, :]/1E6, ec50_cred[1, :]/1E6,
+                       alpha=0.3, color=en_colors[i])
+    ax[7].fill_between(rep_range, hill_cred[0, :], hill_cred[1, :],
+                       alpha=0.3, color=en_colors[i])
 
+    ax[i+3].set_xlim([1, 1E4])
+    #
+
+ax[6].set_ylabel('EC50 (M)', fontsize=15)
+ax[7].set_ylabel('effective Hill coefficient', fontsize=15)
 ax[0].legend(loc='upper left', title='rep. / cell')
 ax[3].legend(title='   binding\n energy ($k_BT$)', loc='lower left')
 ax[3].set_yscale('log')
-# ax[4].set_yscale('log')
-# ax[5].set_yscale('log')
+ax[6].set_yscale('log')
+ax[6].set_yticks([1E-5, 1E-4, 1E-3])
+ax[7].set_yticks([1.2, 1.4, 1.6, 1.8])
+ax[8].set_axis_off()
 
 for i in range(3, len(ax)):
     ax[i].set_xscale('log')
+    ax[i].set_xticks([1, 10, 100, 1000, 1E4])
+    ax[i].set_xlabel('number of repressors', fontsize=14)
 
 
 # ax[0].set_axis_off()
@@ -227,15 +349,18 @@ for i in range(3, len(ax)):
 plt.figtext(0.01, 0.96, 'C', fontsize=20)
 plt.figtext(0.35, 0.96, 'D', fontsize=20)
 plt.figtext(0.66, 0.96, 'E', fontsize=20)
-plt.figtext(0.01, 0.47, 'F', fontsize=20)
-plt.figtext(0.35, 0.47, 'G', fontsize=20)
-plt.figtext(0.66, 0.47, 'H', fontsize=20)
+plt.figtext(0.01, 0.64, 'F', fontsize=20)
+plt.figtext(0.35, 0.64, 'G', fontsize=20)
+plt.figtext(0.66, 0.64, 'H', fontsize=20)
+plt.figtext(0.01, 0.32, 'I', fontsize=20)
+plt.figtext(0.35, 0.32, 'J', fontsize=20)
+
 
 plt.tight_layout()
 plt.show()
-plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/theory_predictions.pdf')
+# plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/theory_predictions.pdf')
 # plt.savefig(output + '/fig4.pdf', bbox_inches='tight')
-# plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission_figures/fig_theory_predictions.pdf', bbox_inches='tight')
+plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/fig_theory_predictions.svg', bbox_inches='tight')
 
 
 # Generate the jointplot to insert into the figure via illustrator.
@@ -245,7 +370,7 @@ inds = np.arange(0, len(ka_fc), 1)
 np.random.seed(666)
 
 # Calculate the point density
-
+"""
 # choices = np.random.choice(inds, size=1E4, replace=False)
 plt.close('all')
 g = sns.JointGrid(lab[0], lab[1], ka_ki_df, xlim=(100, 200), ylim=(0.45, 0.625), space=0.05)
@@ -280,5 +405,6 @@ g.fig.set_figheight(3.25)
 # plt.tight_layout()
 # plt.savefig('/Users/gchure/Desktop/ka_ki_distplot.svg', bbox_inches='tight')
 # plt.savefig('/Users/gchure/Desktop/test.svg', bbox_inches='tight')
-plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/ka_ki_distribution.pdf', bbox_inches='tight')
-plt.show()
+# plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/ka_ki_distribution.pdf', bbox_inches='tight')
+# plt.show()
+"""
