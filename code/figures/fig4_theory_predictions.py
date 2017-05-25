@@ -102,7 +102,7 @@ for i, op in enumerate(operators):
             ea=ea, ei=ei, epsilon=4.5,
             R=df[(df.rbs == rbs)].repressors.unique(),
             epsilon_r=energies[op]),
-            color=colors[j], linestyle='--', label=None)
+            color=colors[j], linestyle=':', label=None)
 
         # plot 95% HPD region using the variability in the MWC parameters
         cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
@@ -123,7 +123,7 @@ for i, op in enumerate(operators):
                     fc_mean, yerr=fc_err, linestyle='none', color=colors[j],
                     label=None)
             ax[i].plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
-                       fc_mean, marker='o', markersize=5, linestyle='none',
+                       fc_mean, marker='o', markersize=6, linestyle='none',
                        markeredgewidth=1, markeredgecolor=colors[j],
                        markerfacecolor='w',
                        label=df[df.rbs=='RBS1027'].repressors.unique()[0] * 2)
@@ -165,9 +165,9 @@ def dyn_range(num_rep, ep_r, ka_ki, ep_ai=4.5, n_sites=2, n_ns=4.6E6):
     return sat - leak
 
 
-"""
-The following equations are borrowed from Stephanie Barnes.
-"""
+
+#The following equations are borrowed from Stephanie Barnes.
+
 def pact(IPTG, K_A, K_I, e_AI):
     '''
     Computes the probability that a repressor is active
@@ -304,8 +304,8 @@ for i, op in enumerate(operators):
     ax[5].plot(rep_range, dyn_rng, color=en_colors[i], label=energies[op])
     ax[6].plot(rep_range, ec50 / 1E6, color=en_colors[i])
     ax[7].plot(rep_range, e_hill, color=en_colors[i])
-    ax[i+3].set_xlabel('number of repressors', fontsize=14)
-    ax[i+3].set_ylabel(titles[i], fontsize=15)
+    ax[i+3].set_xlabel('repressors per cell', fontsize=14)
+    ax[i+3].set_ylabel(titles[i], fontsize=14)
 
     # Plot the credible regions
     sat_cred = saturation_cred_region(rep_range, energies[op], 4.5, ka_fc, ki_fc)
@@ -327,33 +327,35 @@ for i, op in enumerate(operators):
     ax[i+3].set_xlim([1, 1E4])
     #
 
-ax[6].set_ylabel('EC50 (M)', fontsize=15)
-ax[7].set_ylabel('effective Hill coefficient', fontsize=15)
+ax[6].set_xlim([1, 1E4])
+ax[7].set_xlim([1, 1E4])
+ax[6].set_ylabel('$[EC_{50}]\,\, (M)$', fontsize=14)
+ax[7].set_ylabel('effective Hill coefficient', fontsize=14)
 ax[0].legend(loc='upper left', title='rep. / cell')
 ax[3].legend(title='   binding\n energy ($k_BT$)', loc='lower left')
 ax[3].set_yscale('log')
 ax[6].set_yscale('log')
-ax[6].set_yticks([1E-5, 1E-4, 1E-3])
+ax[6].set_yticks([1E-6, 1E-5, 1E-4])
 ax[7].set_yticks([1.2, 1.4, 1.6, 1.8])
 ax[8].set_axis_off()
 
 for i in range(3, len(ax)):
     ax[i].set_xscale('log')
     ax[i].set_xticks([1, 10, 100, 1000, 1E4])
-    ax[i].set_xlabel('number of repressors', fontsize=14)
+    ax[i].set_xlabel('repressors per cell', fontsize=14)
 
 
 # ax[0].set_axis_off()
 # ax[1].set_axis_off()
 # Add plot letter label
 plt.figtext(0.01, 0.96, 'C', fontsize=20)
-plt.figtext(0.35, 0.96, 'D', fontsize=20)
-plt.figtext(0.66, 0.96, 'E', fontsize=20)
-plt.figtext(0.01, 0.64, 'F', fontsize=20)
-plt.figtext(0.35, 0.64, 'G', fontsize=20)
-plt.figtext(0.66, 0.64, 'H', fontsize=20)
+plt.figtext(0.33, 0.96, 'D', fontsize=20)
+plt.figtext(0.64, 0.96, 'E', fontsize=20)
+plt.figtext(0.01, 0.65, 'F', fontsize=20)
+plt.figtext(0.34, 0.65, 'G', fontsize=20)
+plt.figtext(0.64, 0.65, 'H', fontsize=20)
 plt.figtext(0.01, 0.32, 'I', fontsize=20)
-plt.figtext(0.35, 0.32, 'J', fontsize=20)
+plt.figtext(0.34, 0.32, 'J', fontsize=20)
 
 
 plt.tight_layout()
@@ -362,15 +364,15 @@ plt.show()
 # plt.savefig(output + '/fig4.pdf', bbox_inches='tight')
 plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/fig_theory_predictions.svg', bbox_inches='tight')
 
-
+"""
 # Generate the jointplot to insert into the figure via illustrator.
-lab = ['$K_A\,(\mu\mathrm{M})$', '$K_I\,(\mu\mathrm{M})$']
+lab = ['$K_A\,\,(\mu\mathrm{M})$', '$K_I\,\,(\mu\mathrm{M})$']
 ka_ki_df = pd.DataFrame(np.array([ka_fc, ki_fc]).T, columns=lab)
 inds = np.arange(0, len(ka_fc), 1)
 np.random.seed(666)
 
 # Calculate the point density
-"""
+
 # choices = np.random.choice(inds, size=1E4, replace=False)
 plt.close('all')
 g = sns.JointGrid(lab[0], lab[1], ka_ki_df, xlim=(100, 200), ylim=(0.45, 0.625), space=0.05)
@@ -405,6 +407,6 @@ g.fig.set_figheight(3.25)
 # plt.tight_layout()
 # plt.savefig('/Users/gchure/Desktop/ka_ki_distplot.svg', bbox_inches='tight')
 # plt.savefig('/Users/gchure/Desktop/test.svg', bbox_inches='tight')
-# plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/ka_ki_distribution.pdf', bbox_inches='tight')
-# plt.show()
+plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/ka_ki_distribution.pdf', bbox_inches='tight')
+plt.show()
 """
