@@ -106,13 +106,13 @@ for i, op in enumerate(operators):
                    color=colors[j], label=None, zorder=1, linestyle=':')
         # plot 95% HPD region using the variability in the MWC parameters
         # Log scale
-        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j])
-        # Compute the mean value for each concentration
+        # cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
+        #     gauss_flatchain, epsilon=4.5,
+        #     R=df[(df.rbs == rbs)].repressors.unique(),
+        #     epsilon_r=energies[op])
+        # ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
+        #                 alpha=0.3, color=colors[j])
+        # # Compute the mean value for each concentration
         fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
         # compute the standard error of the mean
         fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
@@ -160,18 +160,22 @@ for i, c in enumerate(chains):
         unpickler = pickle.Unpickler(file)
         flatchain = unpickler.load()
         flatlnprob = unpickler.load()
-        max_idx = np.argmax(flatlnprob, axis=0)
-        ea, ei, sigma = flatchain[max_idx]
-        ka_mode = np.exp(-ea)
-        ki_mode = np.exp(-ei)
-        ka= np.exp(-flatchain[:, 0])
-        ki = np.exp(-flatchain[:, 1])
-        ka_hpd = mwc.hpd(ka, mass_frac=0.95)
-        ki_hpd = mwc.hpd(ki, mass_frac=0.95)
+    max_idx = np.argmax(flatlnprob, axis=0)
+    ea, ei, sigma = flatchain[max_idx]
+    ka_mode = np.exp(-ea)
+    ki_mode = np.exp(-ei)
+    ea = flatchain[:, 0]
+    ei = flatchain[:, 1]
+    ka_hpd = mwc.hpd(ea, mass_frac=0.95)
+    ka_hpd = np.exp(-ka_hpd)
+    ki_hpd = mwc.hpd(ei, mass_frac=0.95)
+    ki_hpd = np.exp(-ki_hpd)
     # Parse the file name for operator and repressor copy number.
     split = c.split('_')
     op = split[2]
+    print(op)
     R = int(split[3].rstrip('.pkl')[1:])
+    print(R)
 
     # Make a DataFrame
     df = pd.DataFrame([op, R, ka_mode, ki_mode, ka_hpd[0], ka_hpd[1],
@@ -199,7 +203,7 @@ for o in glyph.keys():
 ax[4].legend(loc='lower center', ncol=3)
 for g, d in grouped:
     ax[3].plot(i + ff[g[1]], d['Ka_uM'], glyph[g[1]], markerfacecolor='w', markeredgecolor=rep_colors[g[0]], markeredgewidth=2, ms=5.5)
-    ax[3].vlines(i, d['Ka_low'], d['Ka_high'], color=rep_colors[g[0]],
+    ax[3].vlines(i + ff[g[1]], d['Ka_low'], d['Ka_high'], color=rep_colors[g[0]],
                  lw=1.5)
 
     ax[4].plot(i + ff[g[1]], d['Ki_uM'], glyph[g[1]], markerfacecolor='w', markeredgecolor=rep_colors[g[0]], markeredgewidth=2, ms=5.5)
