@@ -441,7 +441,7 @@ param_fit = pd.concat([param_fit, param_hpd], axis=1)
 
 # Make a new figure and plot the properties.
 plt.close('all')
-fig, ax = plt.subplots(2, 3, figsize=(8, 8))
+fig, ax = plt.subplots(2, 3, figsize=(9, 5))
 ax = ax.ravel()
 ops = ['O1', 'O2', 'O3']
 colors = sns.color_palette('viridis', n_colors=len(ops))
@@ -500,7 +500,7 @@ for i, op in enumerate(ops):
                        color=en_colors[op], alpha=0.4)
     ax[2].fill_between(num_rep, dyn_cred[0, :], dyn_cred[1, :],
                        color=en_colors[op], alpha=0.4)
-    ax[3].fill_between(num_rep, ec50_cred[0, :], ec50_cred[1, :],
+    ax[3].fill_between(num_rep, ec50_cred[0, :]/1E6, ec50_cred[1, :]/1E6,
                        color=en_colors[op], alpha=0.4)
     ax[4].fill_between(num_rep, hill_cred[0, :], hill_cred[1, :],
                        color=en_colors[op], alpha=0.4)
