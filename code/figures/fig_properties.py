@@ -168,7 +168,7 @@ def EC50(K_A, K_I, e_AI, R, Op):
     '''
     t = 1 + (R / 4.6E6) * np.exp(-Op) + (K_A / K_I)**2 * (2 * np.exp(-e_AI) + 1 + (R / 4.6E6) * np.exp(-Op))
     b = 2 * (1 + (R / 4.6E6) * np.exp(-Op)) + np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
-    return K_A * ((K_A / K_I - 1)/(K_A / K_I - (t/b)**(1/2)) -1)
+    return K_A * (((K_A / K_I) - 1)/((K_A / K_I) - (t/b)**(1/2)) -1)
 
 
 def ec50_cred_region(num_rep, Op, e_AI, K_A, K_I,
@@ -215,7 +215,7 @@ def effective_hill_cred(num_rep, Op, e_AI, K_A, K_I,
 
     return cred_region
 
-"""
+
 # Compute the dynamic range
 drs = []
 for g, d in grouped:
@@ -245,7 +245,7 @@ for g, d in grouped:
     drs.append(dr_df)
 drng = pd.concat(drs, axis=0)
 
-
+"""
 # Load in the flatchains for the calculation of the effective hill and EC50
 repressors = ['R22', 'R60', 'R124', 'R260', 'R1220', 'R1740']
 flatchains = [[], [], []]
@@ -441,9 +441,9 @@ param_fit = pd.concat([param_fit, param_hpd], axis=1)
 
 # Make a new figure and plot the properties.
 plt.close('all')
-fig, ax = plt.subplots(2, 3, figsize=(8, 6))
+fig, ax = plt.subplots(2, 3, figsize=(9, 5))
 ax = ax.ravel()
-ops = ['O3', 'O2', 'O1']
+ops = ['O1', 'O2', 'O3']
 colors = sns.color_palette('viridis', n_colors=len(ops))
 for i, o in enumerate(ops):
     if i == 0:
@@ -452,74 +452,128 @@ for i, o in enumerate(ops):
         en_colors[o] = colors[i]
 num_rep = np.logspace(0, 4, 500)
 reps = np.array([22, 60, 124, 260, 1220, 1740])
-ka = param_fit.loc['Ka'].loc['mode']
-ki = param_fit.loc['Ki'].loc['mode']
+rbs = ['HG104', 'RBS1147', 'RBS446', 'RBS1027', 'RBS1', 'RBS1L']
+c= np.logspace(-9, -2, 500)
+ka_gf = param_fit.loc['Ka'].loc['mode']
+ki_gf = param_fit.loc['Ki'].loc['mode']
+
+colors = sns.color_palette('deep', n_colors=len(rbs))
+
+
+for op in ops:
+    ax[0].plot([], [], label=np.round(param_fit.loc[op].loc['mode'], 2),
+               color=en_colors[op])
+ax[0].legend(title='    binding\n energy ($k_BT$)', loc='lower left')
+
+ax[-1].set_axis_off()
 for i, op in enumerate(ops):
     print(op)
     # Plot the predictions.
     ep_r = param_fit.loc[op].loc['mode']
+    print(ep_r)
     leak = leakiness(num_rep, ep_r, 4.5)
-    sat = saturation(num_rep, ep_r, 4.5, ka/ki)
-    dyn_rng = dyn_range(num_rep, ep_r, ka/ki)
-    ec50 = EC50(ka, ki, 4.5, num_rep, ep_r)
-    hill = effective_Hill(ka, ki, 4.5, num_rep, ep_r)
+    sat = saturation(num_rep, ep_r, 4.5, ka_gf/ki_gf)
+    dyn_rng = dyn_range(num_rep, ep_r, ka_gf/ki_gf, ep_ai=4.5)
+    ec50 = EC50(ka_gf, ki_gf, 4.5, num_rep, ep_r)
+    hill = effective_Hill(ka_gf, ki_gf, 4.5, num_rep, ep_r)
     ax[0].plot(num_rep, leak, '-', color=en_colors[op])
     ax[1].plot(num_rep, sat, '-', color=en_colors[op])
-    ax[2].plot(num_rep, sat - leak, '-', color=en_colors[op])
-    ax[3].plot(num_rep, ec50, '-', color=en_colors[op])
+    ax[2].plot(num_rep, dyn_rng, '-', color=en_colors[op])
+    ax[3].plot(num_rep, ec50/1E6, '-', color=en_colors[op])
     ax[4].plot(num_rep, hill, '-', color=en_colors[op])
 
 
+
     # Compute and plot the credible regions.
-    # leak_cred = leakiness_cred_region(num_rep, global_df[op], 4.5)
-    # sat_cred = saturation_cred_region(num_rep, global_df[op], 4.5, global_df['Ka'], global_df['Ki'])
-    # dyn_cred = dyn_cred_region(num_rep, global_df['Ka'], global_df['Ki'], global_df[op])
-    # ec50_cred = ec50_cred_region(num_rep, global_df[op], 4.5, global_df['Ka'],
-    #                              global_df['Ki'])
-    # hill_cred = effective_hill_cred(num_rep, global_df[op], 4.5,
-    #                                 global_df['Ka'], global_df['Ki'])
-    #
-    # ax[0].fill_between(num_rep, leak_cred[0, :], leak_cred[1, :],
-    #                     color=en_colors[op], alpha=0.4)
-    #
-    # ax[1].fill_between(num_rep, sat_cred[0, :], sat_cred[1, :],
-    #                    color=en_colors[op], alpha=0.4)
-    # ax[2].fill_between(num_rep, dyn_cred[0, :], dyn_cred[1, :],
-    #                    color=en_colors[op], alpha=0.4)
-    # ax[3].fill_between(num_rep, ec50_cred[0, :], ec50_cred[1, :],
-    #                    color=en_colors[op], alpha=0.4)
-    # ax[4].fill_between(num_rep, hill_cred[0, :], hill_cred[1, :],
-    #                    color=en_colors[op], alpha=0.4)
-    #
-    #
+    leak_cred = leakiness_cred_region(num_rep, global_df[op], 4.5)
+    sat_cred = saturation_cred_region(num_rep, global_df[op], 4.5, global_df['Ka'], global_df['Ki'])
+    dyn_cred = dyn_cred_region(num_rep, global_df['Ka'], global_df['Ki'], global_df[op])
+    ec50_cred = ec50_cred_region(num_rep, global_df[op], 4.5, global_df['Ka'],
+                                 global_df['Ki'])
+    hill_cred = effective_hill_cred(num_rep, global_df[op], 4.5,
+                                    global_df['Ka'], global_df['Ki'])
+
+    ax[0].fill_between(num_rep, leak_cred[0, :], leak_cred[1, :],
+                        color=en_colors[op], alpha=0.4)
+
+    ax[1].fill_between(num_rep, sat_cred[0, :], sat_cred[1, :],
+                       color=en_colors[op], alpha=0.4)
+    ax[2].fill_between(num_rep, dyn_cred[0, :], dyn_cred[1, :],
+                       color=en_colors[op], alpha=0.4)
+    ax[3].fill_between(num_rep, ec50_cred[0, :]/1E6, ec50_cred[1, :]/1E6,
+                       color=en_colors[op], alpha=0.4)
+    ax[4].fill_between(num_rep, hill_cred[0, :], hill_cred[1, :],
+                       color=en_colors[op], alpha=0.4)
+
+
 
     # Compute the EC50 and effective hill and plot.
-    for i, R in enumerate(reps):
+    for j, R in enumerate(reps):
         # Load the single fit data.
-        chain = glob.glob('../../data/mcmc/SI_I_{0}_R{1}.pkl'.format(op, R))
+        chain = glob.glob('../../data/mcmc/SI_G_{0}_{1}.pkl'.format(op, rbs[j]))
         with open(chain[0], 'rb') as file:
             unpickler = pickle.Unpickler(file)
-            flatchain = unpickler.load()
-            flat_lnprob = unpickler.load()
-            max_idx = np.argmax(flat_lnprob)
-            ea, ei, _ = flatchain[max_idx]
-            ka_fc, ki_fc = np.exp(-flatchain[:,0]), np.exp(-flatchain[:,1])
-            ka, ki = np.exp(-ea), np.exp(-ei)
+            flatchain2 = unpickler.load()
+            flat_lnprob2 = unpickler.load()
+        max_idx = np.argmax(flat_lnprob2)
+        ea, ei, _, rep, ep = flatchain2[max_idx]
+        rep *= 2
+        rep_cred = 2 * mwc.hpd(flatchain2[:,3], 0.95)
+        print(ep)
+        ka_fc, ki_fc = np.exp(-flatchain2[:,0]), np.exp(-flatchain2[:,1])
+        ep_fc = flatchain2[:,4]
+        ka, ki = np.exp(-ea), np.exp(-ei)
 
-        ec50 = EC50(ka, ki, 4.5, R, ep_r)
-        R = np.array([R,])
-        ec50_cred = ec50_cred_region(R, energies[op], 4.5, ka_fc,
+
+        ec502 = EC50(ka, ki, 4.5, rep, ep)
+        rep = np.array([rep,])
+        ec50_cred = ec50_cred_region(rep, ep_fc, 4.5, ka_fc,
                                  ki_fc)
-        hill = effective_Hill(ka, ki, 4.5, R, energies[op])
-        hill_cred = effective_hill_cred(R, energies[op], 4.5, ka_fc,
+        hill = effective_Hill(ka, ki, 4.5, rep, ep)
+        hill_cred = effective_hill_cred(rep, ep_fc, 4.5, ka_fc,
                                     ki_fc)
-        ax[3].plot(R, ec50, 's', markerfacecolor='w', markeredgecolor=en_colors[op], markersize=6, markeredgewidth=1.5)
-        ax[4].plot(R, hill, 's', markerfacecolor='w', markeredgecolor=en_colors[op], markersize=6, markeredgewidth=1.5)
-        ax[3].vlines(R, ec50_cred[0], ec50_cred[1], color=en_colors[op])
-        ax[4].vlines(R, hill_cred[0], hill_cred[1], color=en_colors[op])
 
 
-ylabs = ['leakiness', 'saturation', 'dynamic range', '$[EC_{50}]$',
+
+        ax[3].plot(rep, ec502/1E6, 's', markerfacecolor='w', markeredgecolor=en_colors[op], markersize=6, markeredgewidth=1.5)
+
+
+
+        ax[4].plot(rep, hill, 's', markerfacecolor='w', markeredgecolor=en_colors[op], markersize=6, markeredgewidth=1.5)
+        ax[3].vlines(rep, ec50_cred[0]/1E6, ec50_cred[1]/1E6, color=en_colors[op])
+        ax[4].vlines(rep, hill_cred[0], hill_cred[1], color=en_colors[op])
+
+        # Load data for leakiness and saturation plots
+        dat = df[(df['repressors']==(R/2)) & (df['operator']==op)]
+        iptg = dat.IPTG_uM.unique()
+        grouped = dat.groupby('IPTG_uM').fold_change_A.mean()
+
+        unique_IPTG = dat['IPTG_uM'].unique()
+
+        #   Slice the min and max IPTG values.
+        leak_vals = dat[dat['IPTG_uM'] == np.min(unique_IPTG)].fold_change_A
+        sat_vals = dat[dat['IPTG_uM'] == np.max(unique_IPTG)].fold_change_A
+
+        #Compute the mean and standard errors of reach.
+        mean_leak = np.mean(leak_vals)
+        sem_leak = np.std(leak_vals) / np.sqrt(len(leak_vals))
+        mean_sat = np.mean(sat_vals)
+        sem_sat =  np.std(sat_vals) / np.sqrt(len(sat_vals))
+
+
+        # Plot the data for every point.
+        rep = rep[0]
+        ax[0].plot(rep, mean_leak, 'o', color=en_colors[op], ms=5)
+        ax[0].errorbar(rep, mean_leak, yerr=sem_leak, color=en_colors[op])
+        ax[1].plot(rep, mean_sat, 'o', color=en_colors[op], ms=5)
+        ax[1].errorbar(rep, mean_sat, yerr=sem_sat, color=en_colors[op])
+        d = drng[(drng.repressors == (0.5 * R)) & (drng.operator == op)]
+        ax[2].plot(rep, d.dynamic_range, 'o', color=en_colors[op], ms=5)
+        ax[2].errorbar(rep, d.dynamic_range, yerr=d.err, color=en_colors[op])
+
+
+
+ylabs = ['leakiness', 'saturation', 'dynamic range', '$[EC_{50}]$ (M)',
          'effective Hill coefficient', '']
 for i, a in enumerate(ax):
     a.set_xscale('log')
@@ -528,3 +582,5 @@ for i, a in enumerate(ax):
 
 ax[0].set_yscale('log')
 ax[3].set_yscale('log')
+
+plt.savefig('/Users/gchure/Dropbox/mwc_indution/resubmission figures/figSX_global_properties.svg', bbox_inches='tight')
