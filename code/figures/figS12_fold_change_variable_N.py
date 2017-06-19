@@ -1,99 +1,94 @@
-from Bio import SeqIO
+# Import numerical and plotting modules/functions
 import numpy as np
 import matplotlib.pyplot as plt
-import mpmath as mp
-import math
-import itertools
-import sys
-import os
 import seaborn as sns
 import pandas as pd
+from scipy.optimize import fsolve
+
+# Import the project utils
+import sys
+sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
-def fold_change_var_N(Reff, e_AI, N, Op):
+colors=sns.color_palette('colorblind').as_hex()
+colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
+sns.set_palette(colors)
+
+# Define functions to be used in figure
+
+def fugacity_leakiness(R, Ns, e_s, e_AI=4.5, Nc=0, e_c=0):
     '''
-    Computes the fold-change for N >= 1
+    Solves for the leakiness of a simple repression construct with
+    multiple promoter copies (Ns, with energy e_s) or competitor sites
+    (Nc, with energy e_c).
     Parameters
     ----------
-    Reff : array-like
-        Array with the values of all repressor copy numbers
+    R : float
+        Number of repressors per cell
     e_AI : float
         Energetic difference between the active and inactive state
-    N : float
-        Number of operators available for repressor binding
-    Op : float
-        Binding energy between operator and repressor as inferred in Garcia 2011
+    Ns : float
+        Number of specific operators available for repressor binding
+    Nc : float
+        Number of competitor operators available for repressor binding
+    e_s : float
+        Binding energy between specific operator and repressor as inferred in Garcia 2011
+    e_c : float
+        Binding energy between competitor operator and repressor
+    e_AI : float
+        Energetic difference between the active and inactive state
     Returns
     -------
-    fold-change
+    leakiness
     '''
+    NNS = 4.6E6
+    p_A = 1/(1 + np.exp(-e_AI))
+    Reff = R * p_A
+    leakiness = []
+    for R in R:
+        Reff = R * p_A
+        func = lambda x: -Reff + Ns*(x * np.exp(-e_s))/(1 + x * np.exp(-e_s)) +\
+                             NNS * (x)/(1 + x) + \
+                             Nc*(x * np.exp(-e_c))/(1 + x * np.exp(-e_c))
+        lam = fsolve(func, 0)
+        leakiness.append(1/(1 + lam * np.exp(-(e_s))))
+    return np.array(leakiness)
 
-    pA = 1/(1 + np.exp(-e_AI))     #probability that a given repressor is active
-    Rtot = Reff/pA
-    Op = Op + np.log(pA)    #Convert Hernan energy values to actual energy values
-    NNS = 4.6E6    #Number of nonspecific sites
-    fc = []      #This will be my fold-change array
+# Set parameter values
+reps = np.logspace(0, 3, 100)
+op_H = -15.3
+N = 10
+N_vals = [64, 52, 10]
+ops = [-15.3, -15.3, -17.0]
+e_AI_vals = [-4, -2, 0, 2, 4]
 
-    if type(Reff)==np.ndarray:
-        for R in Reff: #Here I use a loop to perform the summation and calculate fold-change
-            t = 0
-            b = 0
-            for m in range(0, min(int(mp.floor(R)), int(mp.floor(N)))+1):
-                t += mp.fprod([mp.fdiv(mp.factorial(mp.floor(R)), mp.fmul(mp.mpf(NNS)**m, mp.factorial(mp.floor(R - m)))), mp.binomial(mp.floor(N),m), mp.exp(-m*Op), mp.floor(N)-mp.mpf(m)])
-                b += mp.fprod([mp.fdiv(mp.factorial(mp.floor(R)), mp.fmul(mp.mpf(NNS)**m, mp.factorial(mp.floor(R - m)))), mp.binomial(mp.floor(N),m), mp.exp(-m*Op)])
-            fc.append(float(t/(mp.floor(N)*b)))
-    else:
-        t = 0
-        b = 0
-        for m in range(0, min(int(mp.floor(Reff)), int(mp.floor(N)))+1):
-            t += mp.fprod([mp.fdiv(mp.factorial(mp.floor(Reff)), mp.fmul(mp.mpf(NNS)**m, mp.factorial(mp.floor(Reff - m)))), mp.binomial(mp.floor(N),m), mp.exp(-m*Op), mp.floor(N)-mp.mpf(m)])
-            b += mp.fprod([mp.fdiv(mp.factorial(mp.floor(Reff)), mp.fmul(mp.mpf(NNS)**m, mp.factorial(mp.floor(Reff - m)))), mp.binomial(mp.floor(N),m), mp.exp(-m*Op)])
-        fc.append(float(t/(mp.floor(N)*b)))
-    return (Rtot, fc)
-
-# Load data from Brewster 2014
-
-data_file = 'C:/Users/Stephanie/Dropbox/mwc_induction/tidy_lacI_multiple_operator_data.csv'
+# Load data from Brewster et al. 2014
+data_file = '/Users/sbarnes/Dropbox/mwc_induction_team/tidy_lacI_multiple_operator_data.csv'
 df= pd.read_csv(data_file)
 
-# Establish parameters
-
-Reff = np.arange(0., 1000., 1)
-N = 10
-N_vals = np.array(df.N.unique(), dtype=float)
-e_AI = 4.5
-e_AI_array = [-4.0, -2.0, 0, 2.0, 4.0]
-O1 = -15.3
-
-# Set color palette
-colors = sns.color_palette('colorblind', n_colors=7)
-colors[4] = sns.xkcd_palette(['dusty purple'])[0]
-
-
-#Plot a) curves showing how e_AI affects curve and b) plots showing fits to Brewster 2014 data
+# Plot figures
 
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(11.5, 4))
 
-for i in range(0,len(e_AI_array)):
-    fold_change = fold_change_var_N(Reff, e_AI_array[i], N, O1)
-    x_coord = N * (1 + np.exp(-e_AI_array[i]))
-    x_coord_Reff = x_coord/(1 + np.exp(-e_AI_array[i]))
-    point = fold_change_var_N(x_coord_Reff, e_AI_array[i], N, O1)
-    ax1.plot(x_coord, point[1], marker='^', fillstyle='full',\
+for i, val in enumerate(e_AI_vals):
+    op_true = op_H - np.log(1 + np.exp(-val))
+    ax1.plot(reps, fugacity_leakiness(reps, N, op_true, e_AI=val),\
+             label=val, color=colors[i])
+    x_coord = N * (1 + np.exp(-val))
+    y_coord = fugacity_leakiness([x_coord], N, op_true, e_AI=val)
+    ax1.plot(x_coord, y_coord, marker='^', fillstyle='full',\
              markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=2.0, zorder=(i + 5))
-    ax1.plot([x_coord, x_coord], [0, point[1][0]], '--', color=colors[i])
-    ax1.plot(fold_change[0], fold_change[1], color = colors[i], label = e_AI_array[i])
+    ax1.plot([x_coord, x_coord], [0, y_coord], '--', color=colors[i])
 
-for j in range(len(N_vals)):
-    val = N_vals[j]
+
+for j, val in enumerate(N_vals):
     energy = df.energy[df.N==val].unique()[0]
-    reps = np.array(df.repressor[df.N==val])
+    R = np.array(df.repressor[df.N==val])
     fc = np.array(df.fold_change[df.N==val])
-    ax2.plot(reps, fc, 'o', color=colors[j], label=None)
-    ax2.plot(fold_change_var_N(Reff, e_AI, val, energy)[0],\
-             fold_change_var_N(Reff, e_AI, val, energy)[1], color=colors[j], label=('%.1f, %.0f' % (energy, val)))
-
+    ax2.plot(R, fc, 'o', color=colors[j], label=None)
+    ax2.plot(reps, fugacity_leakiness(reps, val, ops[j], e_AI=4.5),\
+             label=('%s, %s' % (str(ops[j]), val)), color=colors[j])
 # Make labels
 
 title_dict = {ax1:r'$\Delta \varepsilon_{AI}\ (k_BT)$', ax2:r'$\Delta \varepsilon_{RA}\ (k_BT),\ N$'}
@@ -110,4 +105,4 @@ for ax in (ax1, ax2):
 plt.figtext(0.005, 0.95, 'A', fontsize=20)
 plt.figtext(0.5, 0.95, 'B', fontsize=20)
 plt.tight_layout()
-plt.show()
+plt.savefig('fold_change_variable_N.pdf', bbox_inches='tight')
