@@ -59,5 +59,6 @@ graphicspath.tex
 /data/microscopy/*
 /data/mcmc/*
 /data/misc/*
+figures/
 doc/induction_paper/graphicspath.tex
 code/analysis/2016-06-11 Stephanie FACS Analysis.nb

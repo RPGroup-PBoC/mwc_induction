@@ -22,14 +22,6 @@ import seaborn as sns
 
 mwc.set_plotting_style()
 
-
-# dropbox = open('../../doc/induction_paper/graphicspath.tex')
-# output = dropbox.read()
-# output = re.sub('\\graphicspath{{', '', output)
-# output = output[1::]
-# output = re.sub('}}\n', '', output)
-#
-
 # Load the master data file
 datadir = '../../data/'
 df = pd.read_csv(datadir + 'flow_master.csv', comment='#')
@@ -48,9 +40,10 @@ with open('../../data/mcmc/main_text_KaKi.pkl', 'rb') as file:
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
 ea, ei, sigma = gauss_flatchain[max_idx]
 ka, ki = np.exp(-ea), np.exp(-ei)
+
 # Convert the flatchains to units of concentration.
-ka_fc = np.exp(-gauss_flatchain[:,0])
-ki_fc = np.exp(-gauss_flatchain[:,1])
+ka_fc = np.exp(-gauss_flatchain[:, 0])
+ki_fc = np.exp(-gauss_flatchain[:, 1])
 
 # Plot the theory vs data for the titration curves
 # Define the IPTG concentrations to evaluate
@@ -592,4 +585,4 @@ ax[4].set_ylabel('$K_I\,\,(\mu\mathrm{M})$', fontsize=13)
 ## plt.savefig(output + '/fig5.pdf',
         ## bbox_inches='tight')
 
-plt.savefig('/Users/gchure/Dropbox/mwc_induction/resubmission figures/theory_v_data.svg', bbox_inches='tight')
+plt.savefig('../../figures/main_figs/fig6.svg', bbox_inches='tight')

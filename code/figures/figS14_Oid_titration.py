@@ -21,18 +21,18 @@ import seaborn as sns
 
 mwc.set_plotting_style()
 
-#=============================================================================== 
+#===============================================================================
 # Set output directory based on the graphicspath.tex file to print in dropbox
-#=============================================================================== 
+#===============================================================================
 dropbox = open('../../doc/induction_paper/graphicspath.tex')
 output = dropbox.read()
 output = re.sub('\\graphicspath{{', '', output)
 output = output[1::]
 output = re.sub('}}\n', '', output)
 
-#=============================================================================== 
+#===============================================================================
 # Read the data
-#=============================================================================== 
+#===============================================================================
 # Define working directory
 datadir = '../../data/'
 # List files to be read
@@ -53,16 +53,16 @@ df.dropna(axis=1, inplace=True)
 # Now we remove the autofluorescence and delta values
 df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
 
-#=============================================================================== 
+#===============================================================================
 # Load MCMC flatchain
-#=============================================================================== 
+#===============================================================================
 # O2 - RBS1027 fit
 # Load the flat-chain
 with open('../../data/mcmc/main_text_KaKi.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain_O2 = unpickler.load()
     gauss_flatlnprobability_O2 = unpickler.load()
-    
+
 # map value of the parameters
 max_idx = np.argmax(gauss_flatlnprobability_O2, axis=0)
 ea, ei, sigma = gauss_flatchain_O2[max_idx]
@@ -72,7 +72,7 @@ ea, ei, sigma = gauss_flatchain_O2[max_idx]
 with open('../../data/mcmc/SI_E_global.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
     gauss_flatchain = unpickler.load()
-    gauss_flatlnprobability = unpickler.load()   
+    gauss_flatlnprobability = unpickler.load()
 
 # Generate a Pandas Data Frame with the mcmc chain
 columns = np.concatenate([['ea', 'ei', 'sigma'],\
@@ -89,9 +89,9 @@ param_fit = pd.DataFrame(gauss_flatchain[max_idx, :], index=columns,
 # map value of the parameters
 map_param = param_fit['mode'].to_dict()
 
-#=============================================================================== 
+#===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
-#=============================================================================== 
+#===============================================================================
 # Define the IPTG concentrations to evaluate
 IPTG = np.logspace(-7, -2, 100)
 IPTG_lin = np.array([0, 1E-7])
@@ -137,18 +137,18 @@ for i, op in enumerate(operators):
 
         ## Global fit ##
         # Log scale
-            ax[1].plot(IPTG, mwc.fold_change_log(IPTG * 1E6, 
+            ax[1].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
                 ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
                 R=map_param[rbs],
                 epsilon_r=map_param[op]),
                 color=colors[j])
             # Linear scale
-            ax[1].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6, 
+            ax[1].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
                 ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
                 R=map_param[rbs],
                 epsilon_r=map_param[op]),
                 color=colors[j], linestyle='--')
-        
+
             # plot 95% HPD region using the variability in the MWC parameters
             ## O2 - 1027 fit ##
             # Log scale
@@ -161,13 +161,13 @@ for i, op in enumerate(operators):
             ## Global fit ##
             # Log scale
             flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
-            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6, 
+            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6,
                 flatchain, epsilon=4.5)
             ax[1].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
                             alpha=0.3, color=colors[j])
             # Linear scale
             flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
-            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG_lin * 1E6, 
+            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG_lin * 1E6,
                 flatchain, epsilon=4.5)
             ax[1].fill_between(IPTG_lin, cred_region[0,:], cred_region[1,:],
                             alpha=0.3, color=colors[j])
