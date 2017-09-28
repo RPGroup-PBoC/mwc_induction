@@ -115,7 +115,7 @@ def compute_statistics(df, ignore_vars='logp'):
     return var_stats
 
 # %% Load the data set.
-data = pd.read_csv('../../data/flow_master.csv', comment='#')
+data = pd.read_csv('data/flow_master.csv', comment='#')
 
 # Slice out the O2 RBS1027 data.
 leak_data = data[(data['IPTG_uM'] == 0) & (data['operator']=='O2')]
@@ -123,7 +123,7 @@ leak_data = data[(data['IPTG_uM'] == 0) & (data['operator']=='O2')]
 # Fit parameter "a" just from the leakiness.
 model = pm.Model()
 with model:
-    a = pm.Uniform('a', lower=0, upper=1, testval=0.1)
+    a = pm.Uniform('a', lower=0, upper=2, testval=0.9)
     R = 2 * leak_data['repressors'].values
     ep_r = leak_data['binding_energy'].unique()
     sigma = pm.DensityDist('sigma', jeffreys, testval=1)
@@ -146,13 +146,13 @@ with model:
     a_df = trace_to_df(trace, model=model)
     stats = compute_statistics(a_df)
 
+# %%
 O2_data = data[(data['operator'] == 'O2') & (data['rbs'] == 'RBS1027')]
 # Set up the MCMC.
 model = pm.Model()
 with model:
     # Define the priors
-    # a = pm.Uniform('a', lower=0, upper=1, testval=0.1)
-    a =  pm.Normal('a', mu=stats['a'][0], sd=stats['a'][0] - stats['a'][1])
+    a = pm.Uniform('a', lower=0, upper=1, testval=0.9)
     b = pm.Uniform('b', lower=-1.0, upper=1.0, testval=0)
     ep = pm.Uniform('ep', lower=-7, upper=7, testval=4)
     n = pm.Uniform('n', lower=0, upper=10, testval=2)
@@ -174,9 +174,9 @@ with model:
     # Find the MAP and sample.
     start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
     step = pm.Metropolis()
-    burn = pm.sample(draws=10000, start=start, step=step, njobs=None)
+    burn = pm.sample(draws=100000, start=start, step=step, njobs=None)
     step = pm.Metropolis()
-    trace = pm.sample(draws=50000, njobs=None,
+    trace = pm.sample(draws=1000, njobs=None,
                       start=burn[-1], step=step)
 
     # Convert the trace to a dataframe and compute the statistics.
@@ -212,13 +212,13 @@ color_key = {i:j for i, j in zip([870, 610, 130, 62, 30, 11], colors)}
 # Plot the fit of a from the leakiness.
 rep_range = np.logspace(0, 4, 500)
 a_stats = compute_statistics(a_df)
-a_fit = fc_function(rep_range, binding_energy['O2'], (a_stats['a'][0], 0,
+a_fit = fc_function(rep_range, binding_energy['O2'], (stats['a'][0], 0,
                                                       0, 0, 0))
 
 
 leak_cred_region = np.zeros((2, len(rep_range)))
 for i, R in enumerate(rep_range):
-    a_chain_fit = fc_function(R, binding_energy['O2'], (a_df['a'], 0, 0, 0, 0))
+    a_chain_fit = fc_function(R, binding_energy['O2'], (df['a'], 0, 0, 0, 0))
     leak_cred_region[:, i] = mwc.hpd(a_chain_fit, mass_frac=0.95)
 
 ax[0].loglog(rep_range, a_fit, color='r')
@@ -238,6 +238,8 @@ ax[0].set_title('Operator O2, $c = 0$', fontsize=12, y=1.03,
 ax[0].set_xlabel('repressors per cell', fontsize=11)
 ax[0].set_ylabel('fold-change', fontsize=11)
 ax[0].set_xlim([1E0, 1E4])
+ax[0].xaxis.set_tick_params(labelsize=10)
+ax[0].yaxis.set_tick_params(labelsize=10)
 
 # Set the concentrations overwhich to plot.
 c_range = np.logspace(-2, 4, 500)
@@ -246,20 +248,21 @@ c_range = np.logspace(-2, 4, 500)
 grouped = data.groupby(['operator', 'repressors'])
 for g, d in grouped:
     # Compute the mode fit and plot.
-    fit = fc_function(2 * g[1], binding_energy[g[0]], (modes['a'], modes['b'], c_range,
-                                   modes['ep'], modes['n']))
+    fit = fc_function(2 * g[1], binding_energy[g[0]], (modes['a'],
+                                                       modes['b'], c_range,
+                                                       modes['ep'],
+                                                       modes['n']))
 
     # Compute the credible regions.
     # cred_region = np.zeros([2, len(c_range)])
     # for i, c in enumerate(c_range):
-    #     val = fc_function(2 * g[1], binding_energy[g[0]],
-    #                       (df['a'], df['b'], c, df['ep'], df['n']))
-    #     cred_region[:, i] = mwc.hpd(val, mass_frac=0.95)
+        # val = fc_function(2 * g[1], binding_energy[g[0]],
+                        #   (df['a'], df['b'], c, df['ep'], df['n']))
+        # cred_region[:, i] = mwc.hpd(val, mass_frac=0.95)
     #
-
     axes[g[0]].plot(c_range / 1E6, fit, color=color_key[g[1]], zorder=1,
                     label=str(2 * g[1]))
-    # axes[g[0]].fill_between(c_range / 1E6, fit, cred_region[0,:],
+    # axes[g[0]].fill_between(c_range / 1E6, fit, cred_region[0, :],
                             # cred_region[1, :], color=color_key[g[1]],
                             # alpha=0.5, zorder=0)
 
@@ -293,7 +296,7 @@ for a in ax[1:]:
     a.set_xlabel('[IPTG] (M)', fontsize=10)
     a.set_ylabel('fold-change', fontsize=10)
 
-ax[1].legend(title='rep. / cell', loc='upper left')
+ax[1].legend(title='rep. / cell', loc='upper left', fontsize=10)
 
 ax[0].text(-0.25, 1.05, '(A)', fontsize=15, transform=ax[0].transAxes)
 ax[1].text(-0.20, 1.05, '(B)', fontsize=15, transform=ax[1].transAxes)
@@ -302,3 +305,16 @@ ax[3].text(-0.20, 1.05, '(D)', fontsize=15, transform=ax[3].transAxes)
 # ax[0].set_axis_off()
 plt.tight_layout()
 plt.savefig('/Users/gchure/Desktop/test.pdf')
+
+a_stats['a']
+
+# %%
+_ = corner.corner(a_df.drop('logp', axis=1))
+plt.savefig('/Users/gchure/Desktop/a_corner.pdf')
+_ = corner.corner(df.drop('logp', axis=1))
+plt.savefig('/Users/gchure/Desktop/corner.pdf')
+
+
+# %%
+stats
+# a_df.iloc[max_logp]
