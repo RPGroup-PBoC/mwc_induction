@@ -5,14 +5,19 @@ import mwc_induction_utils as mwc
 import scipy.optimize
 from tqdm import tqdm
 import glob
+import corner
 
 import pymc3 as pm
 import theano.tensor as tt
 import pandas as pd
 
+# For rendering in Hydrogen.
+# %matplotlib inline
 mwc.set_plotting_style()
-colors = sns.color_palette('colorblind', n_colors=8)
-colors[4] = sns.xkcd_palette(['dusty purple'])[0]
+colors=sns.color_palette('colorblind').as_hex()
+colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
+sns.set_palette(colors)
+
 # colors.reverse()
 
 # Define the relevant functions.
@@ -109,11 +114,11 @@ def compute_statistics(df, ignore_vars='logp'):
 
     return var_stats
 
-# Load the data set.
+# %% Load the data set.
 data = pd.read_csv('../../data/flow_master.csv', comment='#')
 
 # Slice out the O2 RBS1027 data.
-leak_data = data[(data['IPTG_uM'] == 0) & (data['operator']=='O2')]    
+leak_data = data[(data['IPTG_uM'] == 0) & (data['operator']=='O2')]
 
 # Fit parameter "a" just from the leakiness.
 model = pm.Model()
@@ -140,8 +145,6 @@ with model:
     # Convert the trace to a dataframe and compute the statistics.
     a_df = trace_to_df(trace, model=model)
     stats = compute_statistics(a_df)
-
-
 
 O2_data = data[(data['operator'] == 'O2') & (data['rbs'] == 'RBS1027')]
 # Set up the MCMC.
@@ -190,19 +193,51 @@ for g, d in grouped:
     modes[g] = d[0]
 
 
-# Define the figure axis.
+# %% Define the figure axis.
 plt.close('all')
-fig, ax = plt.subplots(2, 2, figsize=(6, 4))
+fig, ax = plt.subplots(2, 2, figsize=(8,8))
 ax = ax.ravel()
 
 # Define the data and plotting information.
-data = pd.read_csv('../../data/flow_master.csv', comment='#')
+data = pd.read_csv('data/flow_master.csv', comment='#')
+np.sort(data.repressors.unique())
 data = data[data['repressors'] > 0]
-axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
+axes = {'O1': ax[1], 'O2': ax[2], 'O3': ax[3]}
 binding_energy = {i: j for i, j in zip(data['operator'].unique(),
                                   data['binding_energy'].unique())}
-color_key = {i:j for i, j in zip(np.sort(data['repressors'].unique()), colors)}
+color_key = {i:j for i, j in zip([870, 610, 130, 62, 30, 11], colors)}
 
+
+
+# Plot the fit of a from the leakiness.
+rep_range = np.logspace(0, 4, 500)
+a_stats = compute_statistics(a_df)
+a_fit = fc_function(rep_range, binding_energy['O2'], (a_stats['a'][0], 0,
+                                                      0, 0, 0))
+
+
+leak_cred_region = np.zeros((2, len(rep_range)))
+for i, R in enumerate(rep_range):
+    a_chain_fit = fc_function(R, binding_energy['O2'], (a_df['a'], 0, 0, 0, 0))
+    leak_cred_region[:, i] = mwc.hpd(a_chain_fit, mass_frac=0.95)
+
+ax[0].loglog(rep_range, a_fit, color='r')
+ax[0].fill_between(rep_range, leak_cred_region[0, :], leak_cred_region[1, :],
+                   color='r', alpha=0.5)
+
+grouped = leak_data.groupby('repressors')
+for g, d in grouped:
+    mean_fc = d['fold_change_A'].mean()
+    sem_fc = d['fold_change_A'].std() / np.sqrt(len(d))
+    ax[0].errorbar(2 * g, mean_fc, yerr=sem_fc, linestyle='none', color='r')
+    ax[0].loglog(2 * g, mean_fc, marker='o', linestyle='none',
+                 markerfacecolor='w', markeredgecolor='r', markeredgewidth=1,
+                 markersize=5)
+ax[0].set_title('Operator O2, $c = 0$', fontsize=12, y=1.03,
+                backgroundcolor='#FFEDCE')
+ax[0].set_xlabel('repressors per cell', fontsize=11)
+ax[0].set_ylabel('fold-change', fontsize=11)
+ax[0].set_xlim([1E0, 1E4])
 
 # Set the concentrations overwhich to plot.
 c_range = np.logspace(-2, 4, 500)
@@ -215,18 +250,18 @@ for g, d in grouped:
                                    modes['ep'], modes['n']))
 
     # Compute the credible regions.
-    cred_region = np.zeros([2, len(c_range)])
-    for i, c in enumerate(c_range):
-        val = fc_function(2 * g[1], binding_energy[g[0]],
-                          (df['a'], df['b'], c, df['ep'], df['n']))
-        cred_region[:, i] = mwc.hpd(val, mass_frac=0.95)
-
+    # cred_region = np.zeros([2, len(c_range)])
+    # for i, c in enumerate(c_range):
+    #     val = fc_function(2 * g[1], binding_energy[g[0]],
+    #                       (df['a'], df['b'], c, df['ep'], df['n']))
+    #     cred_region[:, i] = mwc.hpd(val, mass_frac=0.95)
+    #
 
     axes[g[0]].plot(c_range / 1E6, fit, color=color_key[g[1]], zorder=1,
-                    label='__nolegend__')
-    axes[g[0]].fill_between(c_range / 1E6, fit, cred_region[0,:],
-                            cred_region[1, :], color=color_key[g[1]],
-                            alpha=0.5, zorder=0)
+                    label=str(2 * g[1]))
+    # axes[g[0]].fill_between(c_range / 1E6, fit, cred_region[0,:],
+                            # cred_region[1, :], color=color_key[g[1]],
+                            # alpha=0.5, zorder=0)
 
     # Groupby the concentration and plot the mean/sem
     _grouped = d.groupby('IPTG_uM')
@@ -248,12 +283,22 @@ for g, d in grouped:
                                 markersize=5,
                             markeredgecolor=color_key[g[1]],
                             markeredgewidth=1)
-
-for a in ax:
+    axes[g[0]].set_title(r'Operator %s, $\Delta\varepsilon_{RA} = %s\, k_BT$'
+                         %(g[0], binding_energy[g[0]]), backgroundcolor='#FFEDCE', y=1.03, fontsize=12)
+for a in ax[1:]:
     a.set_xscale('log')
-    a.set_xlabel('[IPTG] (M)')
-    a.set_ylabel('fold-change')
+    a.set_xlim([1E-8, 1E-2])
+    a.xaxis.set_tick_params(labelsize=10)
+    a.yaxis.set_tick_params(labelsize=10)
+    a.set_xlabel('[IPTG] (M)', fontsize=10)
+    a.set_ylabel('fold-change', fontsize=10)
 
-ax[-1].set_axis_off()
+ax[1].legend(title='rep. / cell', loc='upper left')
+
+ax[0].text(-0.25, 1.05, '(A)', fontsize=15, transform=ax[0].transAxes)
+ax[1].text(-0.20, 1.05, '(B)', fontsize=15, transform=ax[1].transAxes)
+ax[2].text(-0.25, 1.05, '(C)', fontsize=15, transform=ax[2].transAxes)
+ax[3].text(-0.20, 1.05, '(D)', fontsize=15, transform=ax[3].transAxes)
+# ax[0].set_axis_off()
 plt.tight_layout()
-plt.show()
+plt.savefig('/Users/gchure/Desktop/test.pdf')
