@@ -113,13 +113,12 @@ def compute_statistics(df, ignore_vars='logp'):
 data = pd.read_csv('../../data/flow_master.csv', comment='#')
 
 # Slice out the O2 RBS1027 data.
-leak_data = data[(data['IPTG_uM'] == 0) & (data['operator']=='O2') &
-                 (data['repressors'] == 130)]
+leak_data = data[(data['IPTG_uM'] == 0) & (data['operator']=='O2')]    
 
 # Fit parameter "a" just from the leakiness.
 model = pm.Model()
 with model:
-    a = pm.Uniform('a', lower=0, upper=10, testval=0.1)
+    a = pm.Uniform('a', lower=0, upper=1, testval=0.1)
     R = 2 * leak_data['repressors'].values
     ep_r = leak_data['binding_energy'].unique()
     sigma = pm.DensityDist('sigma', jeffreys, testval=1)
@@ -139,8 +138,8 @@ with model:
     trace = pm.sample(draws=50000, step=step, start=burn[-1], njobs=None)
 
     # Convert the trace to a dataframe and compute the statistics.
-    df = trace_to_df(trace, model=model)
-    stats = compute_statistics(df)
+    a_df = trace_to_df(trace, model=model)
+    stats = compute_statistics(a_df)
 
 
 
@@ -150,7 +149,7 @@ model = pm.Model()
 with model:
     # Define the priors
     # a = pm.Uniform('a', lower=0, upper=1, testval=0.1)
-    a = 1.0
+    a =  pm.Normal('a', mu=stats['a'][0], sd=stats['a'][0] - stats['a'][1])
     b = pm.Uniform('b', lower=-1.0, upper=1.0, testval=0)
     ep = pm.Uniform('ep', lower=-7, upper=7, testval=4)
     n = pm.Uniform('n', lower=0, upper=10, testval=2)
