@@ -62,10 +62,7 @@ def trace_to_df(trace, model):
 def compute_statistics(df, ignore_vars='logp'):
     """
     Computes the mode and highest probability density (hpd)
-    of the parameters in a given dataframe.
-    """
-
-    # Set up the multi indexing.
+    of the parameters in a given dataframe.  """ # Set up the multi indexing.
     var_names = np.array(df.keys())
     if ignore_vars is not None:
         var_names = var_names[var_names != ignore_vars]
@@ -130,9 +127,9 @@ with model:
     # Sample the distribution.
     step = pm.Metropolis()
     start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
-    burn = pm.sample(draws=10000, njobs=None, step=step, start=start)
+    burn = pm.sample(draws=10000, njobs=1, step=step, start=start)
     step = pm.Metropolis()
-    trace = pm.sample(draws=50000, tune=100000, njobs=None, step=step,
+    trace = pm.sample(draws=50000, tune=100000, njobs=1, step=step,
                       start=burn[-1])
 
     # Convert the trace to a dataframe.
@@ -224,9 +221,9 @@ for g, d in tqdm(grouped):
         # Sample the distribution.
         step = pm.Metropolis()
         start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
-        burn = pm.sample(draws=10000, njobs=None, step=step, start=start)
+        burn = pm.sample(draws=10000, njobs=1, step=step, start=start)
         step = pm.Metropolis()
-        trace = pm.sample(draws=50000, tune=100000, njobs=None, step=step,
+        trace = pm.sample(draws=50000, tune=100000, njobs=1, step=step,
                           start=burn[-1])
 
         # Convert the trace to a dataframe.
@@ -242,5 +239,6 @@ for g, d in tqdm(grouped):
         _df = pd.DataFrame(kd_dict)
         kd_df.append(_df, ignore_index=True)
 
+kd_df.to_csv('data/hill_kd.csv', index=False)
 
 # %%
