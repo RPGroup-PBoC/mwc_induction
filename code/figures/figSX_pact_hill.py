@@ -174,9 +174,9 @@ with model:
     # Find the MAP and sample.
     start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
     step = pm.Metropolis()
-    burn = pm.sample(draws=100000, start=start, step=step, njobs=None)
+    burn = pm.sample(draws=10000, start=start, step=step, njobs=None)
     step = pm.Metropolis()
-    trace = pm.sample(draws=1000, njobs=None,
+    trace = pm.sample(draws=50000, njobs=None,
                       start=burn[-1], step=step)
 
     # Convert the trace to a dataframe and compute the statistics.
@@ -195,53 +195,20 @@ for g, d in grouped:
 
 # %% Define the figure axis.
 plt.close('all')
-fig, ax = plt.subplots(2, 2, figsize=(8,8))
+fig, ax = plt.subplots(2, 2, figsize=(8, 6))
 ax = ax.ravel()
 
 # Define the data and plotting information.
 data = pd.read_csv('data/flow_master.csv', comment='#')
 np.sort(data.repressors.unique())
 data = data[data['repressors'] > 0]
-axes = {'O1': ax[1], 'O2': ax[2], 'O3': ax[3]}
+axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
 binding_energy = {i: j for i, j in zip(data['operator'].unique(),
                                   data['binding_energy'].unique())}
 color_key = {i:j for i, j in zip([870, 610, 130, 62, 30, 11], colors)}
 
 
 
-# Plot the fit of a from the leakiness.
-rep_range = np.logspace(0, 4, 500)
-a_stats = compute_statistics(a_df)
-a_fit = fc_function(rep_range, binding_energy['O2'], (stats['a'][0], 0,
-                                                      0, 0, 0))
-
-
-leak_cred_region = np.zeros((2, len(rep_range)))
-for i, R in enumerate(rep_range):
-    a_chain_fit = fc_function(R, binding_energy['O2'], (df['a'], 0, 0, 0, 0))
-    leak_cred_region[:, i] = mwc.hpd(a_chain_fit, mass_frac=0.95)
-
-ax[0].loglog(rep_range, a_fit, color='r')
-ax[0].fill_between(rep_range, leak_cred_region[0, :], leak_cred_region[1, :],
-                   color='r', alpha=0.5)
-
-grouped = leak_data.groupby('repressors')
-for g, d in grouped:
-    mean_fc = d['fold_change_A'].mean()
-    sem_fc = d['fold_change_A'].std() / np.sqrt(len(d))
-    ax[0].errorbar(2 * g, mean_fc, yerr=sem_fc, linestyle='none', color='r')
-    ax[0].loglog(2 * g, mean_fc, marker='o', linestyle='none',
-                 markerfacecolor='w', markeredgecolor='r', markeredgewidth=1,
-                 markersize=5)
-ax[0].set_title('Operator O2, $c = 0$', fontsize=12, y=1.03,
-                backgroundcolor='#FFEDCE')
-ax[0].set_xlabel('repressors per cell', fontsize=11)
-ax[0].set_ylabel('fold-change', fontsize=11)
-ax[0].set_xlim([1E0, 1E4])
-ax[0].xaxis.set_tick_params(labelsize=10)
-ax[0].yaxis.set_tick_params(labelsize=10)
-
-# Set the concentrations overwhich to plot.
 c_range = np.logspace(-2, 4, 500)
 
 # plot the fits, data, and credible regions.
@@ -254,17 +221,17 @@ for g, d in grouped:
                                                        modes['n']))
 
     # Compute the credible regions.
-    # cred_region = np.zeros([2, len(c_range)])
-    # for i, c in enumerate(c_range):
-        # val = fc_function(2 * g[1], binding_energy[g[0]],
-                        #   (df['a'], df['b'], c, df['ep'], df['n']))
-        # cred_region[:, i] = mwc.hpd(val, mass_frac=0.95)
-    #
+    cred_region = np.zeros([2, len(c_range)])
+    for i, c in enumerate(c_range):
+        val = fc_function(2 * g[1], binding_energy[g[0]],
+                          (df['a'], df['b'], c, df['ep'], df['n']))
+        cred_region[:, i] = mwc.hpd(val, mass_frac=0.95)
+
     axes[g[0]].plot(c_range / 1E6, fit, color=color_key[g[1]], zorder=1,
                     label=str(2 * g[1]))
-    # axes[g[0]].fill_between(c_range / 1E6, fit, cred_region[0, :],
-                            # cred_region[1, :], color=color_key[g[1]],
-                            # alpha=0.5, zorder=0)
+    axes[g[0]].fill_between(c_range / 1E6, fit, cred_region[0, :],
+                            cred_region[1, :], color=color_key[g[1]],
+                            alpha=0.5, zorder=0)
 
     # Groupby the concentration and plot the mean/sem
     _grouped = d.groupby('IPTG_uM')
@@ -283,12 +250,12 @@ for g, d in grouped:
                             linestyle='none', color=color_key[g[1]])
 
         axes[g[0]].plot(_g / 1E6, mean_fc, 'o', markerfacecolor=face,
-                                markersize=5,
-                            markeredgecolor=color_key[g[1]],
-                            markeredgewidth=1)
+                        markersize=5, markeredgecolor=color_key[g[1]],
+                        markeredgewidth=1)
+                        
     axes[g[0]].set_title(r'Operator %s, $\Delta\varepsilon_{RA} = %s\, k_BT$'
                          %(g[0], binding_energy[g[0]]), backgroundcolor='#FFEDCE', y=1.03, fontsize=12)
-for a in ax[1:]:
+for a in ax:
     a.set_xscale('log')
     a.set_xlim([1E-8, 1E-2])
     a.xaxis.set_tick_params(labelsize=10)
@@ -298,23 +265,12 @@ for a in ax[1:]:
 
 ax[1].legend(title='rep. / cell', loc='upper left', fontsize=10)
 
-ax[0].text(-0.25, 1.05, '(A)', fontsize=15, transform=ax[0].transAxes)
+ax[0].text(-0.20, 1.05, '(A)', fontsize=15, transform=ax[0].transAxes)
 ax[1].text(-0.20, 1.05, '(B)', fontsize=15, transform=ax[1].transAxes)
-ax[2].text(-0.25, 1.05, '(C)', fontsize=15, transform=ax[2].transAxes)
-ax[3].text(-0.20, 1.05, '(D)', fontsize=15, transform=ax[3].transAxes)
-# ax[0].set_axis_off()
+ax[2].text(-0.20, 1.05, '(C)', fontsize=15, transform=ax[2].transAxes)
+# ax[3].text(-0.20, 1.05, '(D)', fontsize=15, transform=ax[3].transAxes)
+ax[-1].set_axis_off()
 plt.tight_layout()
-plt.savefig('/Users/gchure/Desktop/test.pdf')
+plt.savefig('figures/SI_figs/figS17_pact_hill.pdf')
 
-a_stats['a']
-
-# %%
-_ = corner.corner(a_df.drop('logp', axis=1))
-plt.savefig('/Users/gchure/Desktop/a_corner.pdf')
-_ = corner.corner(df.drop('logp', axis=1))
-plt.savefig('/Users/gchure/Desktop/corner.pdf')
-
-
-# %%
 stats
-# a_df.iloc[max_logp]

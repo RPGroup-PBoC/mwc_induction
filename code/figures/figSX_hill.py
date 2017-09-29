@@ -11,18 +11,14 @@ import theano.tensor as tt
 import pandas as pd
 
 mwc.set_plotting_style()
-colors = sns.color_palette('colorblind', n_colors=8)
+colors = sns.color_palette('colorblind')
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
+
 # Define the relevant functions.
-def generic_hill_fn(a, b, c, ep, n, log=True):
-    if log == True:
-        numer = (c * np.exp(-ep))**n
-    elif log == False:
-        numer = (c / ep)**n
+def generic_hill_fn(a, b, c, ep, n):
+    numer = (c * np.exp(-ep))**n
     denom = 1 + numer
     return a + b * numer / denom
-
-
 
 def jeffreys(val):
     return -tt.log(val)
@@ -62,9 +58,6 @@ def trace_to_df(trace, model):
 
     return df
 
-def cred_region(df, mass_frac=0.95):
-    cred_region = np.zeros([])
-
 
 def compute_statistics(df, ignore_vars='logp'):
     """
@@ -93,8 +86,8 @@ def compute_statistics(df, ignore_vars='logp'):
     hpd_min, hpd_max = [], []
     for i, var in enumerate(var_names):
         _min, _max = mwc.hpd(df[var], 0.95)
-        hpd_min.append(stat_vals[i] - _min)
-        hpd_max.append(_max - stat_vals[i])
+        hpd_min.append(_min)
+        hpd_max.append(_max)
     for _ in hpd_min:
         stat_vals.append(_)
     for _ in hpd_max:
@@ -107,8 +100,9 @@ def compute_statistics(df, ignore_vars='logp'):
     return var_stats
 
 
+
 # Load in the data files.
-data = pd.read_csv('../../data/flow_master.csv')
+data = pd.read_csv('data/flow_master.csv')
 
 # Separate only the O2 RBS 1027 files.
 data = data[(data['operator'] == 'O2') & (data['rbs'] == 'RBS1027')]
@@ -125,7 +119,6 @@ with model:
 
     # Define the concentration constant
     IPTG = data['IPTG_uM'].unique()
-
 
     # Compute the expected value.
     fc = generic_hill_fn(a, b, data['IPTG_uM'].values, ep, n)
@@ -145,12 +138,15 @@ with model:
     # Convert the trace to a dataframe.
     df = trace_to_df(trace, model)
     df['kd'] = np.exp(df['ep'])
-# Compute the statistics.
+
+    # Compute the statistics.
     stats = compute_statistics(df)
 
-
+# %%
+stats = compute_statistics(df)
+stats['kd']
 # Compute the credible region for the fold-change curve.
-c_range = np.logspace(-3, 4, 500)
+c_range = np.logspace(-2, 4, 500)
 cred_region = np.zeros([2, len(c_range)])
 for i, c in enumerate(c_range):
     params = (df['a'], df['b'], c, df['ep'], df['n'])
@@ -165,7 +161,8 @@ for g, d in grouped:
 
 fit = generic_hill_fn(modes['a'], modes['b'], c_range, modes['ep'], modes['n'])
 
-fig, ax = plt.subplots(1,1)
+
+fig, ax = plt.subplots(1,1, figsize=(5, 3))
 grouped = data.groupby('IPTG_uM')
 for g, d in grouped:
     sem = np.std(d['fold_change_A']) / np.sqrt(len(d))
@@ -176,7 +173,7 @@ for g, d in grouped:
         label='__nolegend__'
     ax.errorbar(g/1E6, mean, yerr=sem, linestyle='none', color='r', zorder=1,
                      label='__nolegend__')
-    ax.plot(g/1E6, mean, marker='o', markerfacecolor='w',
+    ax.plot(g/1E6, mean, marker='o', markerfacecolor='w', markersize=4,
             markeredgewidth=2, markeredgecolor='r', label=label, zorder=2,
             linestyle='none')
 
@@ -184,13 +181,66 @@ ax.fill_between(c_range / 1E6, cred_region[0, :], cred_region[1, :],
                 color='r', label='__nolegend__', alpha=0.5)
 ax.plot(c_range/1E6, fit, color='r', label='Hill function fit', zorder=1)
 ax.legend(loc='upper left')
-ax.set_xlabel('[IPTG] (M)')
-ax.set_ylabel('fold-change')
+ax.set_xlabel('[IPTG] (M)', fontsize=11)
+ax.set_ylabel('fold-change', fontsize=11)
+ax.xaxis.set_tick_params(labelsize=10)
+ax.yaxis.set_tick_params(labelsize=10)
 ax.set_xscale('log')
-ax.text
-
 ax.set_ylim([-0.01,1])
-ax.set_xlim([1E-9, 1E-2])
-ax.set_title('$R$ = 260, Operator O2', backgroundcolor='#FFEDCE', y=1.03)
+ax.set_xlim([1E-8, 1E-2])
+ax.set_title('$R$ = 260, Operator O2', backgroundcolor='#FFEDCE', y=1.03,
+             fontsize=11)
 
-plt.savefig('../../figures/SI_figs/figSX_generic_hill.pdf', bbox_inches='tight')
+plt.savefig('figures/SI_figs/figS16_generic_hill.pdf', bbox_inches='tight')
+
+
+# %% Computing the parameters for all eighteen strains.
+data = pd.read_csv('data/flow_master.csv')
+
+# Set up the inference using PyMC3.
+kd_df = pd.DataFrame([], columns=['operator', 'repressors', 'mode', 'hpd_min', 'hpd_max'])
+
+grouped = data.groupby(['operator', 'repressors'])
+for g, d in tqdm(grouped):
+    model = pm.Model()
+    with model:
+        # Set the pirors as uniform.
+        a = pm.Uniform('a', lower=-1.0, upper=1.0, testval=0.1)
+        b = pm.Uniform('b', lower=-7.0, upper=7.0, testval=0)
+        ep = pm.Uniform('ep', lower=-10, upper=10, testval=3)
+        sigma = pm.DensityDist('sigma', jeffreys, testval=1)
+        n = pm.Uniform('n', lower=0, upper=100,  testval=2)
+
+        # Define the concentration constant
+        IPTG = data['IPTG_uM'].unique()
+
+        # Compute the expected value.
+        fc = generic_hill_fn(a, b, data['IPTG_uM'].values, ep, n)
+
+        # Define the likelihood.
+        like = pm.Normal('like', mu=fc, sd=sigma,
+                         observed=data['fold_change_A'].values)
+
+        # Sample the distribution.
+        step = pm.Metropolis()
+        start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
+        burn = pm.sample(draws=10000, njobs=None, step=step, start=start)
+        step = pm.Metropolis()
+        trace = pm.sample(draws=50000, tune=100000, njobs=None, step=step,
+                          start=burn[-1])
+
+        # Convert the trace to a dataframe.
+        df = trace_to_df(trace, model)
+        df['kd'] = np.exp(df['ep'])
+
+        # Compute the statistics.
+        stats = compute_statistics(df)
+        kd_dict = dict(operator=g[0], repressors=2 * g[1],
+                       mode=stats['kd'][0], hpd_min=stats['kd'][0] -
+                       stats['kd'][1], hpd_max=stats['kd'][2] -
+                       stats['kd'][0])
+        _df = pd.DataFrame(kd_dict)
+        kd_df.append(_df, ignore_index=True)
+
+
+# %%

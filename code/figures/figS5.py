@@ -15,7 +15,6 @@ colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
 sns.set_palette(colors)
 
 # Define functions to be used in figure
-
 def pact(IPTG, K_A, K_I, e_AI):
     '''
     Computes the probability that a repressor is active
