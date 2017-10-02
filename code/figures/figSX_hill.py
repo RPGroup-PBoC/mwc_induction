@@ -127,9 +127,9 @@ with model:
     # Sample the distribution.
     step = pm.Metropolis()
     start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
-    burn = pm.sample(draws=10000, njobs=1, step=step, start=start)
+    burn = pm.sample(draws=10000, njobs=10, step=step, start=start)
     step = pm.Metropolis()
-    trace = pm.sample(draws=50000, tune=100000, njobs=1, step=step,
+    trace = pm.sample(draws=50000, tune=100000, njobs=10, step=step,
                       start=burn[-1])
 
     # Convert the trace to a dataframe.
@@ -195,9 +195,11 @@ plt.savefig('figures/SI_figs/figS16_generic_hill.pdf', bbox_inches='tight')
 data = pd.read_csv('data/flow_master.csv')
 
 # Set up the inference using PyMC3.
-kd_df = pd.DataFrame([], columns=['operator', 'repressors', 'mode', 'hpd_min', 'hpd_max'])
+kd_df = pd.DataFrame([], columns=['operator', 'repressors', 'param',
+				'mode', 'hpd_min', 'hpd_max'])
 
 grouped = data.groupby(['operator', 'repressors'])
+_stats = []
 for g, d in tqdm(grouped):
     model = pm.Model()
     with model:
@@ -221,9 +223,9 @@ for g, d in tqdm(grouped):
         # Sample the distribution.
         step = pm.Metropolis()
         start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
-        burn = pm.sample(draws=10000, njobs=1, step=step, start=start)
+        burn = pm.sample(draws=10000, njobs=10, step=step, start=start)
         step = pm.Metropolis()
-        trace = pm.sample(draws=50000, tune=100000, njobs=1, step=step,
+        trace = pm.sample(draws=50000, tune=100000, njobs=10, step=step,
                           start=burn[-1])
 
         # Convert the trace to a dataframe.
@@ -232,13 +234,14 @@ for g, d in tqdm(grouped):
 
         # Compute the statistics.
         stats = compute_statistics(df)
-        kd_dict = dict(operator=g[0], repressors=2 * g[1],
-                       mode=stats['kd'][0], hpd_min=stats['kd'][0] -
-                       stats['kd'][1], hpd_max=stats['kd'][2] -
-                       stats['kd'][0])
-        _df = pd.DataFrame(kd_dict)
-        kd_df.append(_df, ignore_index=True)
+	_stats.append(stats)
 
-kd_df.to_csv('data/hill_kd.csv', index=False)
+for stats in _stats:
+    for _, key in enumerate(param_keys):
+        param_dict = dict(operator=g[0], repressors=2*g[1], param=key, mode=stats[key][0], hpd_min=stats[key][1], hpd_max=stats[key][2])
+        _df = pd.Series(param_dict)
+        kd_df = kd_df.append(_df, ignore_index=True)
+
+kd_df.to_csv('data/hill_params.csv', index=False)
 
 # %%
