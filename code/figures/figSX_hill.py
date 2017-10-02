@@ -15,10 +15,13 @@ colors = sns.color_palette('colorblind')
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
 # Define the relevant functions.
+
+
 def generic_hill_fn(a, b, c, ep, n):
     numer = (c * np.exp(-ep))**n
     denom = 1 + numer
     return a + b * numer / denom
+
 
 def jeffreys(val):
     return -tt.log(val)
@@ -62,7 +65,7 @@ def trace_to_df(trace, model):
 def compute_statistics(df, ignore_vars='logp'):
     """
     Computes the mode and highest probability density (hpd)
-    of the parameters in a given dataframe.  """ # Set up the multi indexing.
+    of the parameters in a given dataframe.  """  # Set up the multi indexing.
     var_names = np.array(df.keys())
     if ignore_vars is not None:
         var_names = var_names[var_names != ignore_vars]
@@ -95,7 +98,6 @@ def compute_statistics(df, ignore_vars='logp'):
     var_stats = pd.Series(flat_vals, index=index)
 
     return var_stats
-
 
 
 # Load in the data files.
@@ -159,31 +161,31 @@ for g, d in grouped:
 fit = generic_hill_fn(modes['a'], modes['b'], c_range, modes['ep'], modes['n'])
 
 
-fig, ax = plt.subplots(1,1, figsize=(5, 3))
+fig, ax = plt.subplots(1, 1, figsize=(5, 3))
 grouped = data.groupby('IPTG_uM')
 for g, d in grouped:
     sem = np.std(d['fold_change_A']) / np.sqrt(len(d))
     mean = d['fold_change_A'].mean()
     if g == 5000.0:
-        label='data'
+        label = 'data'
     else:
-        label='__nolegend__'
-    ax.errorbar(g/1E6, mean, yerr=sem, linestyle='none', color='r', zorder=1,
-                     label='__nolegend__')
-    ax.plot(g/1E6, mean, marker='o', markerfacecolor='w', markersize=4,
+        label = '__nolegend__'
+    ax.errorbar(g / 1E6, mean, yerr=sem, linestyle='none', color='r', zorder=1,
+                label='__nolegend__')
+    ax.plot(g / 1E6, mean, marker='o', markerfacecolor='w', markersize=4,
             markeredgewidth=2, markeredgecolor='r', label=label, zorder=2,
             linestyle='none')
 
 ax.fill_between(c_range / 1E6, cred_region[0, :], cred_region[1, :],
                 color='r', label='__nolegend__', alpha=0.5)
-ax.plot(c_range/1E6, fit, color='r', label='Hill function fit', zorder=1)
+ax.plot(c_range / 1E6, fit, color='r', label='Hill function fit', zorder=1)
 ax.legend(loc='upper left')
 ax.set_xlabel('[IPTG] (M)', fontsize=11)
 ax.set_ylabel('fold-change', fontsize=11)
 ax.xaxis.set_tick_params(labelsize=10)
 ax.yaxis.set_tick_params(labelsize=10)
 ax.set_xscale('log')
-ax.set_ylim([-0.01,1])
+ax.set_ylim([-0.01, 1])
 ax.set_xlim([1E-8, 1E-2])
 ax.set_title('$R$ = 260, Operator O2', backgroundcolor='#FFEDCE', y=1.03,
              fontsize=11)
@@ -196,7 +198,7 @@ data = pd.read_csv('data/flow_master.csv')
 
 # Set up the inference using PyMC3.
 kd_df = pd.DataFrame([], columns=['operator', 'repressors', 'param',
-				'mode', 'hpd_min', 'hpd_max'])
+                                  'mode', 'hpd_min', 'hpd_max'])
 
 grouped = data.groupby(['operator', 'repressors'])
 _stats = []
@@ -234,13 +236,13 @@ for g, d in tqdm(grouped):
 
         # Compute the statistics.
         stats = compute_statistics(df)
-	_stats.append(stats)
 
-for stats in _stats:
-    for _, key in enumerate(param_keys):
-        param_dict = dict(operator=g[0], repressors=2*g[1], param=key, mode=stats[key][0], hpd_min=stats[key][1], hpd_max=stats[key][2])
-        _df = pd.Series(param_dict)
-        kd_df = kd_df.append(_df, ignore_index=True)
+        for _, key in enumerate(param_keys):
+            param_dict = dict(operator=g[0], repressors=2 * g[1], param=key,
+                              mode=stats[key][0], hpd_min=stats[key][1],
+                              hpd_max=stats[key][2])
+            _df = pd.Series(param_dict)
+            kd_df = kd_df.append(_df, ignore_index=True)
 
 kd_df.to_csv('data/hill_params.csv', index=False)
 
