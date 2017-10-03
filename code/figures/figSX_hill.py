@@ -216,18 +216,18 @@ for g, d in tqdm(grouped):
         IPTG = data['IPTG_uM'].unique()
 
         # Compute the expected value.
-        fc = generic_hill_fn(a, b, data['IPTG_uM'].values, ep, n)
+        fc = generic_hill_fn(a, b, d['IPTG_uM'].values, ep, n)
 
         # Define the likelihood.
         like = pm.Normal('like', mu=fc, sd=sigma,
-                         observed=data['fold_change_A'].values)
+                         observed=d['fold_change_A'].values)
 
         # Sample the distribution.
         step = pm.Metropolis()
         start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
         burn = pm.sample(draws=10000, njobs=10, step=step, start=start)
         step = pm.Metropolis()
-        trace = pm.sample(draws=50000, tune=100000, njobs=10, step=step,
+        trace = pm.sample(draws=50000, tune=100000, njobs=1, step=step,
                           start=burn[-1])
 
         # Convert the trace to a dataframe.
@@ -236,7 +236,7 @@ for g, d in tqdm(grouped):
 
         # Compute the statistics.
         stats = compute_statistics(df)
-
+        param_keys = ['kd', 'a', 'b', 'n']
         for _, key in enumerate(param_keys):
             param_dict = dict(operator=g[0], repressors=2 * g[1], param=key,
                               mode=stats[key][0], hpd_min=stats[key][1],
@@ -247,3 +247,32 @@ for g, d in tqdm(grouped):
 kd_df.to_csv('data/hill_params.csv', index=False)
 
 # %%
+# load the cv file of all of the parameters.
+params = pd.read_csv('data/hill_params.csv')
+
+# Keep only those with repressors greater than zero
+params = params[params['repressors'] > 0]
+
+
+# Plot.
+fig, ax = plt.subplots(2, 2, figsize=(9, 5))
+ax = ax.ravel()
+
+# Group by operator and repressor count.
+grouped = params.groupby(['operator', 'repressors'])
+axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
+colors = {i: j for i, j in zip(params['repressors'].unique(), colors)}
+c_range = np.logspace(-2, 4)
+for g, d in grouped:
+    a = d[d['param'] == 'a']['mode'].unique()
+    b = d[d['param'] == 'b']['mode'].unique()
+    kd = -np.log(d[d['param'] == 'kd']['mode'].unique())
+    n = d[d['param'] == 'n']['mode'].unique()
+    fit = generic_hill_fn(a, b, c_range, kd, n)
+
+    axes[g[0]].plot(c_range, fit)
+
+for a in ax:
+    a.set_xscale('log')
+plt.tight_layout()
+plt.savefig('/Users/gchure/Desktop/test.pdf', bbox_inches='tight')
