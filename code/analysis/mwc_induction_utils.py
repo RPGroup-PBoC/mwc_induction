@@ -157,7 +157,7 @@ import joblib as jlb
 import pandas as pd
 import scipy.stats as sc
 import scipy
-import statsmodels.tools.numdiff as smnd # to comput the Hessian matrix
+import statsmodels.tools.numdiff as smnd  # to comput the Hessian matrix
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -693,13 +693,15 @@ def non_lin_reg_mwc(df, p0,
         # respective error bars
         Ka = np.exp(-ea)
         Ki = np.exp(-ei)
-        deltaKa = np.sqrt(cov[0,0]) * Ka
-        deltaKi = np.sqrt(cov[1,1]) * Ki
+        deltaKa = np.sqrt(cov[0, 0]) * Ka
+        deltaKi = np.sqrt(cov[1, 1]) * Ki
         return Ka, deltaKa, Ki, deltaKi
     else:
-        return ea, cov[0,0], ei, cov[1,1]
+        return ea, cov[0, 0], ei, cov[1, 1]
 
 # #################
+
+
 def hpd(trace, mass_frac):
     """
     Returns highest probability density region given by
@@ -883,6 +885,80 @@ def mcmc_cred_reg_error_prop(iptg, flatchain, mass_frac=.95, epsilon=4.5):
         cred_region[:, i] = hpd(fc, mass_frac)
 
     return cred_region
+
+
+def trace_to_df(trace, model):
+    """
+    Converts the trace from a pymc3 sampling trace to a
+    Pandas DataFrame.
+    """
+
+    def compute_logp(chain):
+        """
+        Computes the log probability of the provided trace
+        at a given chain.
+        """
+        names = trace.varnames
+        var_dict = {}
+        for n in names:
+            var_dict[n] = trace.get_values(n, chains=chain)
+        sample_df = pd.DataFrame(var_dict)
+
+        logp = [model.logp(sample_df.iloc[step]
+                           ) for step in range(len(sample_df))]
+        return logp
+
+    chains = trace.chains
+    for c in tqdm(chains, desc='Processing chains'):
+        logp = compute_logp(c)
+        if c == 0:
+            df = pm.trace_to_dataframe(trace, chains=c)
+            df.insert(np.shape(df)[1], 'logp', logp)
+        else:
+            _df = pm.trace_to_dataframe(trace, chains=c)
+            _df.insert(np.shape(_df)[1], 'logp', logp)
+            df.append(_df, ignore_index=True)
+
+    return df
+
+
+def compute_statistics(df, ignore_vars='logp'):
+    """
+    Computes the mode and highest probability density (hpd)
+    of the parameters in a given dataframe.  """
+    # Set up the multi indexing.
+    var_names = np.array(df.keys())
+    if ignore_vars is not None:
+        var_names = var_names[var_names != ignore_vars]
+
+    # Generate arrays for indexing and zip as tuples.
+    names = [var for var in var_names] * 3
+    stats = ['mode', 'hpd_min', 'hpd_max']
+    stats = np.array([[s] * len(var_names) for s in stats]).flatten()
+    tuples = list(zip(*[names, stats]))
+
+    # Define the index.
+    index = pd.MultiIndex.from_tuples(tuples, names=['var', 'stat'])
+
+    # Determine the mode for each
+    mode_ind = np.argmax(df['logp'])
+    stat_vals = [df.iloc[mode_ind][var] for var in var_names]
+    # Compute the min and max vals of the HPD.
+    hpd_min, hpd_max = [], []
+    for i, var in enumerate(var_names):
+        _min, _max = mwc.hpd(df[var], 0.95)
+        hpd_min.append(_min)
+        hpd_max.append(_max)
+    for _ in hpd_min:
+        stat_vals.append(_)
+    for _ in hpd_max:
+        stat_vals.append(_)
+
+    # Add them to the array for the multiindex
+    flat_vals = np.array([stat_vals]).flatten()
+    var_stats = pd.Series(flat_vals, index=index)
+
+    return var_stats
 
 # #################
 # Flow Cytometry Data Processing
@@ -1377,7 +1453,7 @@ def ecdf(data):
         The sorted data (x) and the ECDF (y) of the data.
     """
 
-    return np.sort(data), np.arange(len(data))/len(data)
+    return np.sort(data), np.arange(len(data)) / len(data)
 
 
 # #################
@@ -1391,7 +1467,7 @@ def set_plotting_style():
           'axes.labelsize': 18,
           'axes.titlesize': 20,
           'axes.facecolor': '#E3DCD0',
-          'xtick.major' : 13,
+          'xtick.major': 13,
           'xtick.labelsize': 'large',
           'ytick.labelsize': 13,
           'font.family': 'Lucida Sans Unicode',

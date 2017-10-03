@@ -260,13 +260,14 @@ ax = ax.ravel()
 
 # Group by operator and repressor count.
 grouped = params.groupby(['operator', 'repressors'])
+params
 axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
 colors = {i: j for i, j in zip(params['repressors'].unique(), colors)}
 c_range = np.logspace(-2, 4)
 for g, d in grouped:
     a = d[d['param'] == 'a']['mode'].unique()
     b = d[d['param'] == 'b']['mode'].unique()
-    kd = -np.log(d[d['param'] == 'kd']['mode'].unique())
+    kd = np.log(d[d['param'] == 'kd']['mode'].unique())
     n = d[d['param'] == 'n']['mode'].unique()
     fit = generic_hill_fn(a, b, c_range, kd, n)
 
