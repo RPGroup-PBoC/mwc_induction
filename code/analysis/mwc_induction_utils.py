@@ -161,6 +161,9 @@ import statsmodels.tools.numdiff as smnd  # to comput the Hessian matrix
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
+import theano.tensor as tt
+import pymc3 as pm
+from tqdm import tqdm
 from fit_bivariate_gaussian_astroML import *
 
 
@@ -946,7 +949,7 @@ def compute_statistics(df, ignore_vars='logp'):
     # Compute the min and max vals of the HPD.
     hpd_min, hpd_max = [], []
     for i, var in enumerate(var_names):
-        _min, _max = mwc.hpd(df[var], 0.95)
+        _min, _max = hpd(df[var], 0.95)
         hpd_min.append(_min)
         hpd_max.append(_max)
     for _ in hpd_min:
