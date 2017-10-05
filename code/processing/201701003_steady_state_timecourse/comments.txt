@@ -1,0 +1,10 @@
+# Date : 2017-10-03
+# Equipment : Björkman MACSQuant
+# User : gchure
+# Description :
+# Timecourse measurement of expression to determine if we are in steady-state.
+# Auto (HG104), O2 Delta (O2 HG105), and O2 RBS1027 cells were diluted 1:1000
+# into M9 + 0.5% glucose + 50µM IPTG in a large 2mL 96 well plate and allowed t
+# to grow for several hours with measurement on the MACSQuant. The dilution was
+# performed at 08h30m and the first measurement was made at 14h38m, followed
+# by a measurement each hour afterward. 
