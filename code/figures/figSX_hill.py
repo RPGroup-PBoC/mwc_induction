@@ -245,7 +245,7 @@ kd_df.to_csv('data/hill_params.csv', index=False)
 
 # %%
 # load the cv file of all of the parameters.
-params = pd.read_csv('data/hill_params.csv')
+params = pd.read_csv('../../data/hill_params.csv')
 
 # Keep only those with repressors greater than zero
 params = params[params['repressors'] > 0]
@@ -255,9 +255,9 @@ params = params[params['repressors'] > 0]
 plt.close('all')
 fig, ax = plt.subplots(2, 2, figsize=(6, 4))
 # Add figure text labels
-fig.text(-0.03, 0.99, '(A)', fontsize=12)
-fig.text(0.48, 0.99, '(B)', fontsize=12)
-fig.text(-0.03, 0.5, '(C)', fontsize=12)
+fig.text(0.0, 0.99, '(A)', fontsize=12)
+fig.text(0.5, 0.99, '(B)', fontsize=12)
+fig.text(0.0, 0.5, '(C)', fontsize=12)
 fig.text(0.5, 0.5, '(D)', fontsize=12)
 
 ax = ax.ravel()
@@ -279,9 +279,9 @@ c_range = np.logspace(-2, 4)
 
 for d in glyphs.keys():
     ax[0].plot([], [], marker=glyphs[d], markerfacecolor='w',
-               markeredgecolor='k', markersize=5, markeredgewidth=1.5, label=d,
+               markeredgecolor='k', markersize=3, markeredgewidth=1.5, label=d,
                linestyle='none')
-ax[0].legend(ncol=3, bbox_to_anchor=(0.9, 1.3), fontsize=11)
+ax[0].legend(ncol=3, bbox_to_anchor=(1.0, 1.3), fontsize=10)
 
 ax_dict = {'a': 0, 'b': 1, 'kd': 2, 'n': 3}
 for a in ax:
@@ -337,4 +337,4 @@ for a in [ax[2],  ax[3]]:
     a.set_yscale('log')
 
 plt.tight_layout()
-plt.savefig('figures/SI_figs/figSX_hill_params.pdf', bbox_inches='tight')
+plt.savefig('../../figures/SI_figs/figSX_hill_params.pdf', bbox_inches='tight')
