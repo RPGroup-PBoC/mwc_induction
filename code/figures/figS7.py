@@ -10,8 +10,8 @@ sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
-# Define functions to be used for figures
 
+# Define functions to be used for figures
 def fugacity_leakiness(R, Ns, e_s, e_AI=4.5, Nc=0, e_c=0):
     '''
     Solves for the leakiness of a simple repression construct with
@@ -28,7 +28,8 @@ def fugacity_leakiness(R, Ns, e_s, e_AI=4.5, Nc=0, e_c=0):
     Nc : float
         Number of competitor operators available for repressor binding
     e_s : float
-        Binding energy between specific operator and repressor as inferred in Garcia 2011
+        Binding energy between specific operator and repressor as inferred in
+        Garcia 2011
     e_c : float
         Binding energy between competitor operator and repressor
     e_AI : float
@@ -50,7 +51,9 @@ def fugacity_leakiness(R, Ns, e_s, e_AI=4.5, Nc=0, e_c=0):
         leakiness.append(1/(1 + lam * np.exp(-(e_s))))
     return np.array(leakiness)
 
-def fugacity_saturation(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c=0):
+
+def fugacity_saturation(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0,
+                        e_c=0):
     '''
     Solves for the saturation of a simple repression construct with
     multiple promoter copies (Ns, with energy e_s) or competitor sites
@@ -66,7 +69,8 @@ def fugacity_saturation(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c
     Nc : float
         Number of competitor operators available for repressor binding
     e_s : float
-        Binding energy between specific operator and repressor as inferred in Garcia 2011
+        Binding energy between specific operator and repressor as inferred in
+        Garcia 2011
     e_c : float
         Binding energy between competitor operator and repressor
     K_A : float
@@ -91,7 +95,9 @@ def fugacity_saturation(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c
         saturation.append(1/(1 + lam * np.exp(-(e_s))))
     return np.array(saturation)
 
-def fugacity_dynamic_range(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c=0):
+
+def fugacity_dynamic_range(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0,
+                           e_c=0):
     '''
     Solves for the dynamic range of a simple repression construct with
     multiple promoter copies (Ns, with energy e_s) or competitor sites
@@ -107,7 +113,8 @@ def fugacity_dynamic_range(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, 
     Nc : float
         Number of competitor operators available for repressor binding
     e_s : float
-        Binding energy between specific operator and repressor as inferred in Garcia 2011
+        Binding energy between specific operator and repressor as inferred in
+        Garcia 2011
     e_c : float
         Binding energy between competitor operator and repressor
     K_A : float
@@ -123,10 +130,11 @@ def fugacity_dynamic_range(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, 
     return fugacity_saturation(R, Ns, e_s, K_A, K_I, e_AI, Nc, e_c) -\
            fugacity_leakiness(R, Ns, e_s, e_AI, Nc, e_c)
 
+
 # Define parameters
 ops = [-15.3, -13.9, -9.7]
 op_names = ['O1', 'O2', 'O3']
-fig_labels = [['A', 'B', 'C'], ['D', 'E', 'F']]
+fig_labels = [['(A)', '(B)', '(C)'], ['(D)', '(E)', '(F)']]
 y_labels = ['leakiness', 'saturation', 'dynamic range']
 reps = np.logspace(0, 3, 100)
 Nc = [10, 100]
@@ -141,11 +149,14 @@ for i, a in enumerate(ax):
     for j, op in enumerate(ops):
         # Produce plots
         a[j].axvline(Nc[i], ls='--', color='gray')
-        a[0].plot(reps, fugacity_leakiness(reps, 1, op, Nc=Nc[i], e_c=e_c), color=op_colors[j], label=ops[j])
+        a[0].plot(reps, fugacity_leakiness(reps, 1, op, Nc=Nc[i], e_c=e_c),
+                                           color=op_colors[j], label=ops[j])
 
-        a[1].plot(reps, fugacity_saturation(reps, 1, op, Nc=Nc[i], e_c=e_c), color=op_colors[j])
+        a[1].plot(reps, fugacity_saturation(reps, 1, op, Nc=Nc[i], e_c=e_c),
+                                            color=op_colors[j])
 
-        a[2].plot(reps, fugacity_dynamic_range(reps, 1, op, Nc=Nc[i], e_c=e_c), color=op_colors[j])
+        a[2].plot(reps, fugacity_dynamic_range(reps, 1, op, Nc=Nc[i], e_c=e_c),
+                                               color=op_colors[j])
 
         # Format axes
         a[0].set_yscale('log')
@@ -165,7 +176,7 @@ for i, a in enumerate(ax):
                ha='center', va='center', fontsize=14)
         a[2].text(2.8E2, 0.06, r'$N_C$= %s' % str(Nc[i]),\
            ha='center', va='center', fontsize=14)
-        a[j].text(3E-1, 1.1, fig_labels[i][j], ha='center', va='center', fontsize=24)
+        a[j].text(2.8E-1, 1.1, fig_labels[i][j], ha='center', va='center', fontsize=24)
 
 # Add legend
 leg = ax[0][0].legend(title='binding energy \n' + r'$\Delta \varepsilon_{AI}\ (k_BT)$',\

@@ -10,11 +10,12 @@ sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
-colors=sns.color_palette('colorblind').as_hex()
+colors = sns.color_palette('colorblind').as_hex()
 colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
 sns.set_palette(colors)
 
 # Define functions to be used in figure
+
 
 def pact(IPTG, K_A, K_I, e_AI):
     '''
@@ -37,6 +38,7 @@ def pact(IPTG, K_A, K_I, e_AI):
     (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
     return pact
 
+
 def fugacity(IPTG, R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c=0):
     '''
     Solves for the fugacity of simple repression with
@@ -53,7 +55,8 @@ def fugacity(IPTG, R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c=0):
     Nc : float
         Number of competitor operators available for repressor binding
     e_s : float
-        Binding energy between specific operator and repressor as inferred in Garcia 2011
+        Binding energy between specific operator and repressor as inferred in
+        Garcia 2011
     e_c : float
         Binding energy between competitor operator and repressor
     K_A : float
@@ -76,6 +79,7 @@ def fugacity(IPTG, R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c=0):
         lam.append(fsolve(func, 0))
     return np.array(lam)
 
+
 def occupancy(lam, e_s):
     '''
     Computes fold-change for simple repression using the fugacity (lam).
@@ -91,10 +95,11 @@ def occupancy(lam, e_s):
     '''
     return 1/(1 + lam * np.exp(-(e_s)))
 
+
 # Define parameter values
 ops = [-15.3, -13.9, -9.7]
 op_names = ['O1', 'O2', 'O3']
-fig_labels = [['A', 'B', 'C'], ['D', 'E', 'F']]
+fig_labels = [['(A)', '(B)', '(C)'], ['(D)', '(E)', '(F)']]
 reps = [1740, 1220, 260, 124, 60, 22]
 Ns = [10, 100]
 IPTG = np.logspace(-8, -2, 100)

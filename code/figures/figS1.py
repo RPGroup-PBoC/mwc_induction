@@ -1,8 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import mwc_induction_utils as mwc
 import pandas as pd
+
+# Import the project utils
+import sys
+sys.path.insert(0, '../analysis/')
+import mwc_induction_utils as mwc
+
 mwc.set_plotting_style()
 # Load in the datasets
 data_a = pd.read_csv('../../data/figs1_part_A.csv')
@@ -43,7 +48,7 @@ for i in range(len(data_b)):
     ax[1].plot(IPTG_range, fc, label=ep_ai, color=colors[i])
 
 # plot the data.
-grouped = pd.groupby(data_O2, ['IPTG_uM']).fold_change_A
+grouped = data_O2.groupby(['IPTG_uM']).fold_change_A
 for group, data in grouped:
     mean_fc = np.mean(data)
     mean_sem = np.std(data) / np.sqrt(len(data))
@@ -56,8 +61,8 @@ ax[1].set_ylabel('fold-change')
 leg = ax[1].legend(loc='upper left', title=r"""allosteric parameter
        $\Delta\varepsilon_{AI}$ $(k_BT)$""")
 leg.get_title().set_fontsize(12)
-fig.text(-0.01, 0.92, 'A', fontsize=22)
-fig.text(0.5, 0.92, 'B', fontsize=22)
+fig.text(-0.025, 0.92, '(A)', fontsize=22)
+fig.text(0.5, 0.92, '(B)', fontsize=22)
 plt.tight_layout()
 
 plt.savefig('../../figures/SI_figs/figS1.pdf', bbox_inches='tight')
