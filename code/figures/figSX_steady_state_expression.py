@@ -18,6 +18,7 @@ fig, ax = plt.subplots(1, 3, figsize=(6, 2.5),gridspec_kw = {'width_ratios':[2, 
 strain_colors = {'auto': 'b', 'delta': 'g', 'RBS1027': 'r'}
 grouped = data.groupby(['strain', 'delta_t'])
 
+print(data[data.strain=='auto']['FITC-A'])
 for g, d in grouped:
     ax[0].plot(d['delta_t'], d['FITC-A'], 'o', color=strain_colors[g[0]],
                alpha=0.5, markersize=5, label=g[0])
@@ -32,6 +33,8 @@ ax[0].set_ylabel('mean YFP fluorescence (a.u.)', fontsize=11)
 ax[2].set_ylim([0, 1])
 ax[2].set_ylabel('fold-change', fontsize=11)
 ax[0].set_yticks([1E3, 3E3, 1E4, 3E4, 1E5])
+ax[0].set_xticks([6, 8, 10, 12])
+ax[2].set_xticks([6, 8, 10, 12])
 
 # Set (A) and (B) labels.
 fig.text(0.05, 0.96, '(A)', fontsize=15)
