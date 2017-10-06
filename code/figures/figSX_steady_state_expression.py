@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import mwc_induction_utils as mwc
 import pandas as pd
+import glob
 from tqdm import tqdm
 mwc.set_plotting_style()
 
@@ -40,3 +41,32 @@ for a in ax:
     a.grid(linewidth=1)
 plt.tight_layout()
 plt.savefig('figures/SI_figs/figSX_steady_state.pdf')
+
+
+# %% Make a figure showing the ECDFs of all of the experiemental runs.
+
+fig, ax = plt.subplots(4, 6, figsize=(5, 9))
+
+# Set up the axes dictionary.
+axes = {'auto': ax[0], 'delta': ax[1], 'RBS1027': ax[2]}
+
+# Go through all of the files.
+files = glob.glob('data/flow/csv/20171003*.csv')
+alpha = 0.4
+for i, f in enumerate(files):
+    # Split the file name to get the strain information.
+    strain = f.split('/')[-1].split('_')[2]
+
+    # Load the data  and gate.
+    flow_data = pd.read_csv(f)
+    gate = mwc.auto_gauss_gate(flow_data, alpha)
+
+    # Compute the ECDF and plot as thin black lines.
+    x, y = np.sort(gate['FITC-A']), np.arange(0, len(gate), 1) / len(gate)
+
+    axes[strain].plot(x, y, 'k-', lw=0.5, alpha=0.5, rasterized=True)
+
+for a in ax:
+    a.set_xscale('log')
+    a.set_yscale('log')
+plt.savefig('/Users/gchure/Desktop/test.pdf')
