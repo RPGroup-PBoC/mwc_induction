@@ -13,7 +13,7 @@ mwc.set_plotting_style()
 data = pd.read_csv('../../data/20171003_O2_timeseries_MACSQuant.csv',
                    comment='#')
 plt.close('all')
-fig, ax = plt.subplots(1, 3, figsize=(8, 3),gridspec_kw = {'width_ratios':[2, 1.2, 2]})
+fig, ax = plt.subplots(1, 3, figsize=(6, 2.5),gridspec_kw = {'width_ratios':[2, 1.2, 2]})
 # note that the second subplot (ax[1]) will remain blank for legend
 strain_colors = {'auto': 'b', 'delta': 'g', 'RBS1027': 'r'}
 grouped = data.groupby(['strain', 'delta_t'])
@@ -34,8 +34,8 @@ ax[2].set_ylabel('fold-change', fontsize=11)
 ax[0].set_yticks([1E3, 3E3, 1E4, 3E4, 1E5])
 
 # Set (A) and (B) labels.
-fig.text(0.05, 0.95, '(A)', fontsize=15)
-fig.text(0.6, 0.95, '(B)', fontsize=15)
+fig.text(0.05, 0.96, '(A)', fontsize=15)
+fig.text(0.6, 0.96, '(B)', fontsize=15)
 for a in ax:
     if a == 1:
         continue
@@ -49,23 +49,24 @@ handles = []
 labels = []
 for i, _ in enumerate(ax):
     if i != 0:
+        # remove if I want to collect labels for fold-change
         continue
     handles_temp, labels_temp = ax[i].get_legend_handles_labels()
     handles = np.append(handles, handles_temp)
     labels = np.append(labels, labels_temp)
 
 # convert labels into more descriptive label
-print(labels)
 strain_labels = {'auto': 'autofluorescence', 'delta': '$\Delta lacI$ strain',
                 'RBS1027': 'rep. / cell = 260','fold_change_A': 'fold change'}
 labels = np.array([strain_labels[key] for key in labels])
 
 # create legend with unique strain labels
 by_label = OrderedDict(zip(labels, handles))
-ax[0].legend(by_label.values(), by_label.keys(),bbox_to_anchor=(1.02, 1), loc=2,
-title=r"$\Delta\varepsilon_{RA} = -13.9$ $k_BT$"+"\n"+r"$c$ = $50$ $\mu$M",fontsize=10)
+lgd = ax[0].legend(by_label.values(), by_label.keys(),bbox_to_anchor=(1.02, 1), loc=2,
+title=r"$\Delta\varepsilon_{RA} = -13.9$ $k_BT$"+"\n"+r"$c$ = $50$ $\mu$M",fontsize=8)
+plt.setp(lgd.get_title(), fontsize=10)
 
-fig.subplots_adjust(wspace=.4)
+fig.subplots_adjust(wspace=.55)
 fig.savefig('SI_figs/figSX_steady_state.pdf', bbox_inches='tight')
 
 # # %% Make a figure showing the ECDFs of all of the experiemental runs.
