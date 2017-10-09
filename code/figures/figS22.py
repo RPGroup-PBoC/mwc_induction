@@ -22,15 +22,6 @@ import seaborn as sns
 mwc.set_plotting_style()
 
 #===============================================================================
-# Set output directory based on the graphicspath.tex file to print in dropbox
-#===============================================================================
-dropbox = open('../../doc/induction_paper/graphicspath.tex')
-output = dropbox.read()
-output = re.sub('\\graphicspath{{', '', output)
-output = output[1::]
-output = re.sub('}}\n', '', output)
-
-#===============================================================================
 # Read the data
 #===============================================================================
 # Define working directory
@@ -212,8 +203,8 @@ main_legend = ax[0].legend(loc='upper left', title='repressors / cell')
 
 
 
-plt.figtext(0.0, .95, 'A', fontsize=20)
-plt.figtext(0.50, .95, 'B', fontsize=20)
+plt.figtext(0.0, .95, '(A)', fontsize=20)
+plt.figtext(0.50, .95, '(B)', fontsize=20)
 
 plt.tight_layout()
-plt.savefig(output + '/figS14_Oid_titration.pdf', bbox_inches='tight')
+plt.savefig('../../figures/SI_figs/figS22.pdf', bbox_inches='tight')

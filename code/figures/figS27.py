@@ -50,7 +50,9 @@ def saturation(K_A, K_I, e_AI, R, Op):
     -------
     saturation
     '''
-    return 1 / (1 + 1 / (1 + np.exp(-e_AI) * (K_A / K_I)**2) * R / 5E6 * np.exp(-Op))
+    return 1 / (1 + 1 / (1 + np.exp(-e_AI) * (K_A / K_I)**2) * R / 5E6 *
+                np.exp(-Op))
+
 
 def dynamic_range(K_A, K_I, e_AI, R, Op):
     '''
@@ -73,6 +75,7 @@ def dynamic_range(K_A, K_I, e_AI, R, Op):
     '''
     return saturation(K_A, K_I, e_AI, R, Op) - leakiness(K_A, K_I, e_AI, R, Op)
 
+
 # Establish parameter values
 K_A = 139
 K_I = 0.53
@@ -91,21 +94,31 @@ colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
 # Make plots
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(nrows=2, ncols=2, figsize=(13, 9.5))
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(nrows=2, ncols=2,
+                                             figsize=(13, 9.5))
 labels = []
 for i in range(len(Reps)):
-    ax1.plot(op_array, leakiness(K_A, K_I, e_AI, Reps[i], op_array), color=colors[i], label=Reps[i])
-    ax2.plot(op_array, saturation(K_A, K_I, e_AI, Reps[i], op_array), color=colors[i])
-    ax3.plot(op_array, dynamic_range(K_A, K_I, e_AI, Reps[i], op_array), color=colors[i])
+    ax1.plot(op_array, leakiness(K_A, K_I, e_AI, Reps[i], op_array),
+    color=colors[i], label=Reps[i])
+    ax2.plot(op_array, saturation(K_A, K_I, e_AI, Reps[i], op_array),
+    color=colors[i])
+    ax3.plot(op_array, dynamic_range(K_A, K_I, e_AI, Reps[i], op_array),
+    color=colors[i])
     ax4.axis('off')
 
     for op in ops:
-        ax1.plot(op, leakiness(K_A, K_I, e_AI, Reps[i], op), marker=ops_dict[op],
-                 markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=2)
-        ax2.plot(op, saturation(K_A, K_I, e_AI, Reps[i], op), marker=ops_dict[op],
-                 markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=2)
-        ax3.plot(op, dynamic_range(K_A, K_I, e_AI, Reps[i], op), marker=ops_dict[op],
-                 markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=2)
+        ax1.plot(op, leakiness(K_A, K_I, e_AI, Reps[i], op),
+                 marker=ops_dict[op],
+                 markerfacecolor='white', markeredgecolor=colors[i],
+                 markeredgewidth=2)
+        ax2.plot(op, saturation(K_A, K_I, e_AI, Reps[i], op),
+                 marker=ops_dict[op],
+                 markerfacecolor='white', markeredgecolor=colors[i],
+                 markeredgewidth=2)
+        ax3.plot(op, dynamic_range(K_A, K_I, e_AI, Reps[i], op),
+                 marker=ops_dict[op],
+                 markerfacecolor='white', markeredgecolor=colors[i],
+                 markeredgewidth=2)
 
 
 # Create legends
@@ -127,12 +140,12 @@ leg = ax1.legend(loc='upper left', title='repressors/cell')
 leg.get_title().set_fontsize(15)
 
 # Label axes
-labels_dict = {ax1 : {'ylabel' : 'leakiness', 'plotlabel' : 'A'},
-               ax2 : {'ylabel' : 'saturation', 'plotlabel' : 'B'},
-               ax3 : {'ylabel' : 'dynamic range', 'plotlabel' : 'C'}}
+labels_dict = {ax1 : {'ylabel' : 'leakiness', 'plotlabel' : '(A)'},
+               ax2 : {'ylabel' : 'saturation', 'plotlabel' : '(B)'},
+               ax3 : {'ylabel' : 'dynamic range', 'plotlabel' : '(C)'}}
 for ax in (ax1, ax2, ax3):
     ax.set_xlabel(r'binding energy $\Delta \varepsilon_{RA}\ (k_BT)$')
     ax.set_ylabel(labels_dict[ax]['ylabel'])
-    ax.text(-19.8, 1.02, labels_dict[ax]['plotlabel'], fontsize=20)
+    ax.text(-20.5, 1.02, labels_dict[ax]['plotlabel'], fontsize=20)
 
-plt.show()
+plt.savefig('../../figures/SI_figs/figS27.pdf', bbox_inches='tight')

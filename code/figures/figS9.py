@@ -1,54 +1,90 @@
-# For numerical computing
-import numpy as np
-import scipy.stats
+"""
+Creation Date:
+    20161026
+Last Modified:
+    20170215
+Author(s):
+    Griffin Chure
+Purpose:
+    This script generates the plot from the supplementary figure S3 showing
+    that there is no effect of running the flow-cytometry samples in 'reverse
+    mode'. Please see SI Section B2 for more information.
 
-# For plotting
+"""
+# Import standard dependencies.
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
+import glob
+import re
 
-# Custom written utilities
+# Custom written modules.
 import mwc_induction_utils as mwc
+
+# Set the plotting environments.
 mwc.set_plotting_style()
 
-# For OS interaction and reading of data files.
-import glob
-import pandas as pd
+# Load in all data files.
+data_sets = glob.glob('../../data/2016*O2_*titration*')
+with open('../../data/datasets_ignore.csv') as f:
+    ignored_sets = f.readlines()
+    ignored_sets = ['../../data/' + z.rstrip() for z in ignored_sets]
+with open('../../data/reversed_plates_O2.csv') as f:
+    control_sets = f.readlines()
+    control_sets = ['../../data/' + z.rstrip() for z in control_sets]
+forward_sets, reversed_sets = [], []
+for entry in data_sets:
+    if entry not in ignored_sets:
+        samp = pd.read_csv(entry, comment='#')
+        if 'r2' in entry:
+            samp.insert(1, 'exp_run', 2)
+        else:
+            samp.insert(1, 'exp_run', 1)
 
-# Load example flow cytometry data
-flow_data = pd.read_csv('../../data/flow/csv/20160813/20160813_r2_wt_O2_auto_0.1uMIPTG.csv', comment='#')
+        if entry in control_sets:
+            reversed_sets.append(samp)
+        else:
+            forward_sets.append(samp)
 
-# Set the colors
-colors = sns.color_palette('colorblind', n_colors=7)
-colors[4] = sns.xkcd_palette(['dusty purple'])[0]
+# Add columns.
+fwd = pd.concat(forward_sets, axis=0)
+rev = pd.concat(reversed_sets, axis=0)
+fwd.insert(np.shape(fwd)[1], 'reversed', 0)
+rev.insert(np.shape(rev)[1], 'reversed', 1)
 
-# Set the range  of alpha.
-alpha_range = [0.8, 0.6, 0.4, 0.25, 0.05]
+# Make the final data frame.
+df = pd.concat([fwd, rev], axis=0)
+df = df[df['rbs'] == 'RBS1027']
 
-# Generate an understandable legend.
-plt.close('all')
-plt.plot([], [], 'ko', label=r'100$^\mathrm{th}$')
-for i, a in enumerate(alpha_range):
-    plt.plot([], [], 'o', color=colors[i], label=str(int(a * 100)) + r'$^\mathrm{th}$')
-leg = plt.legend(title=r'percentile', ncol=1, loc='upper left',
-                 fontsize=14, bbox_to_anchor=(1.0, 1.0))
-leg.get_title().set_fontsize('15')
+# Group the data frame by the important bits.
+grouped = df.groupby(['reversed', 'date', 'exp_run', 'rbs'])
 
-plt.plot(flow_data['FSC-A'], flow_data['SSC-A'], 'ko', markersize=2, rasterized=True)
-# plt.xscale('log')
-# plt.yscale('log')
-plt.xlabel('forward scatter (a.u.)')
-plt.ylabel('side scatter (a.u.)')
+# Plot the fold change as a function of IPTG coloring the reverse runs.
+plt.figure(figsize=(6, 6))
+for group, data in grouped:
+    if group[0] == 0:
+        fwd, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'ko',
+        markersize=8, alpha=0.75, label='forward')
 
-# Plot the selected cells for a range of alpha
-for i, a in enumerate(alpha_range):
-    gated_cells = mwc.auto_gauss_gate(np.log(flow_data), a)
-    plt.plot(np.exp(gated_cells['FSC-A']), np.exp(gated_cells['SSC-A']), 'o',
-    markersize=2, color=colors[i], rasterized=True)
-plt.tight_layout()
+    else:
+        rev, = plt.plot(data['IPTG_uM']/1E6, data['fold_change_A'], 'ro',
+        markersize=8, alpha=0.75, label='reverse')
+
+
+# Do some formatting.
+legend = plt.legend(handles=[fwd, rev], loc='upper left', fontsize=14,
+                    title=r"""rep. / cell = 260
+$\Delta\varepsilon_{RA} = -13.9$ $k_BT$""")
+plt.setp(legend.get_title(), fontsize=15)
+plt.xlabel('[IPTG] (M)', fontsize=20)
+plt.ylabel('fold-change', fontsize=20)
+plt.setp(legend.get_title(), fontsize=15)
+plt.tick_params(labelsize=16)
 plt.xscale('log')
-plt.yscale('log')
-plt.ylim([0.5 * np.min(flow_data['SSC-A']), 1.2 * np.max(flow_data['SSC-A'])])
-plt.xlim([0.5 * np.min(flow_data['FSC-A']), 1.2 * np.max(flow_data['FSC-A'])])
-# plt.margins(0.2)
-# Save the figure.
+plt.ylim([0, 1.1])
+plt.tight_layout()
+plt.xlim([1E-8, 1E-2])
+ax = plt.gca()
+plt.tight_layout()
 plt.savefig('../../figures/SI_figs/figS9.pdf', bbox_inches='tight')

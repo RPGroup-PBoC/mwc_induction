@@ -137,7 +137,7 @@ ax[1].set_xlabel(r'binding energy $\Delta \varepsilon_{AI}\ (k_BT)$')
 ax[0].set_ylabel(r'[$EC_{50}$]')
 ax[1].set_ylabel('effective Hill coefficient')
 
-plt.figtext(0.05, 0.95, 'A', fontsize=20)
-plt.figtext(0.48, 0.95, 'B', fontsize=20)
+plt.figtext(0.05, 0.95, '(A)', fontsize=20)
+plt.figtext(0.48, 0.95, '(B)', fontsize=20)
 
-plt.show()
+plt.savefig('../../figures/SI_figs/figS28.pdf', bbox_inches='tight')

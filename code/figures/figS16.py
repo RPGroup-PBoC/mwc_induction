@@ -1,166 +1,154 @@
-import os
-import glob
-import pickle
+
+# (c) 2017 the authors. This work is licensed under a [Creative Commons
+# Attribution License CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+# All code contained herein is licensed under an [MIT
+# license](https://opensource.org/licenses/MIT).
+
+# For operating system interaction
 import re
 
-# Our numerical workhorses
+# For loading .pkl files.
+import pickle
+
+# For scientific computing
 import numpy as np
 import pandas as pd
+import scipy.special
 
-# Import the project utils
-import sys
-sys.path.insert(0, '../analysis/')
+# Import custom utilities
 import mwc_induction_utils as mwc
 
-# Import matplotlib stuff for plotting
+# Useful plotting libraries
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-
-# Seaborn, useful for graphics
 import seaborn as sns
-
 mwc.set_plotting_style()
 
-#===============================================================================
-# Read the data
-#===============================================================================
-# Define working directory
-datadir = '../../data/'
-# List files to be read
-files = ['flow_master.csv', 'merged_Oid_data_foldchange.csv']
-# Read flow cytometry data
-df_Oid = pd.read_csv(datadir + files[1], comment='#')
-# make an extra column to have consistent labeling
-df_Oid['fold_change_A'] = df_Oid.fold_change
-# Remove manually the outlier with an unphysical fold-change
-df_Oid = df_Oid[df_Oid.fold_change_A <= 1]
-# Read the flow cytometry data
-df = pd.read_csv(datadir + files[0], comment='#')
-# Attach both data frames into a single one
-df = pd.concat([df, df_Oid])
-# Drop rows containing NA values
-df.dropna(axis=1, inplace=True)
 
-# Now we remove the autofluorescence and delta values
-df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
+# Variability  in fold-change as parameter change.
 
-#===============================================================================
-# Load MCMC flatchain
-#===============================================================================
-# Load the flat-chain
-with open('../../data/mcmc/SI_E_global.pkl', 'rb') as file:
-    unpickler = pickle.Unpickler(file)
-    gauss_flatchain = unpickler.load()
-    gauss_flatlnprobability = unpickler.load()
+def fold_change_oo(Ka, Ki, R, era, eai=4.5, Nns=4.6E6):
+    '''
+    computes the gene expression fold change for a simple repression architecture
+    in the limit where the inducer concentration goes to infinity
+    Parameters
+    ----------
+    Ka, Ki : float.
+        Dissociation constants of the ligand to the active and inactive state
+        of the repressor respectively.
+    R : float.
+        Mean repressor copy number per cell
+    era : float.
+        Repressor-DNA binding energy
+    eai : float.
+        Energy difference between active and inactive state of repressor
+    Nns : float.
+        Number of non-specific binding sites.
+    Returns
+    -------
+    fold-change
+    '''
+    return (1 + 1 / (1 + np.exp(-eai) * (Ka / Ki)**2) * R / Nns *
+            np.exp(-era))**-1
 
-# Generate a Pandas Data Frame with the mcmc chain
-columns = np.concatenate([['ea', 'ei', 'sigma'],\
-          [df[df.repressors==r].rbs.unique()[0] for r in \
-              np.sort(df.repressors.unique())],
-          [df[df.binding_energy==o].operator.unique()[0] for o in \
-              np.sort(df.binding_energy.unique())]])
 
-mcmc_df = pd.DataFrame(gauss_flatchain, columns=columns)
-# Generate data frame with mode values for each parameter
-max_idx = np.argmax(gauss_flatlnprobability, axis=0)
-param_fit = pd.DataFrame(gauss_flatchain[max_idx, :], index=columns,
-                         columns=['mode'])
-# map value of the parameters
-map_param = param_fit['mode'].to_dict()
+# Let us now define the numerical values for all the needed parameters
+era_num = np.array([-15.3, -13.9, -9.7])  # kBT
+Ka_num = 139.96  # µM
+Ki_num = 0.54  # µM
 
-#===============================================================================
-# Plot the theory vs data for all 4 operators with the credible region
-#===============================================================================
-# Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-7, -2, 100)
-IPTG_lin = np.array([0, 1E-7])
+
+# Let's now plot the change in fold-change as $K_A$ and $K_I$ vary for
+# different energies and repressor copy numbers.
+
+# Factor by which the Ka and Ki are varied
+factor = 2
+
+Ka_array = np.logspace(np.log10(Ka_num / factor),
+                       np.log10(Ka_num * factor), 100)
+Ki_array = np.logspace(np.log10(Ki_num / factor),
+                       np.log10(Ki_num * factor), 100)
+
+
+# Initialize plot
+fig, ax = plt.subplots(2, 2, figsize=(11, 8))
+
+ax = ax.ravel()
+
+# Fixed R, variable ∆e_RA
+
+# Loopt through binding energies
+colors = sns.color_palette('Oranges', n_colors=4)[::-1]
+rep = 260  # repressors per cell
+for i, eRA in enumerate(era_num):
+    # compute the ∆fold-change_Ka
+    delta_fc = fold_change_oo(Ka_num, Ki_num, rep, eRA) - \
+               fold_change_oo(Ka_array, Ki_num, rep, eRA)
+
+    ax[0].plot(np.log10(Ka_array / Ka_num), delta_fc,
+               label=r'{:.1f}'.format(eRA), color=colors[i])
+
+    # compute the ∆fold-change_KI
+    delta_fc = fold_change_oo(Ka_num, Ki_num, rep, eRA) - \
+        fold_change_oo(Ka_num, Ki_array, rep, eRA)
+
+    ax[1].plot(np.log10(Ki_array / Ki_num), delta_fc,
+               label=r'{:.1f}'.format(eRA), color=colors[i])
+
+# Format Ka plot
+ax[0].set_xlabel(r'$\log_{10} \frac{K_A}{K_A^{fit}}$')
+ax[0].set_ylabel(r'$\Delta$fold-change$_{K_A}$')
+ax[0].margins(0.01)
+
+# Format Ki plot
+ax[1].set_xlabel(r'$\log_{10} \frac{K_I}{K_I^{fit}}$')
+ax[1].set_ylabel(r'$\Delta$fold-change$_{K_I}$')
+ax[1].margins(0.01)
+ax[1].legend(loc='center left', title=r'$\Delta\varepsilon_{RA}$ ($k_BT$)',
+             ncol=1, fontsize=11, bbox_to_anchor=(1, 0.5))
+
+# Fixed R, variable ∆e_RA
 
 # Set the colors for the strains
 colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
-# Define the operators and their respective energies
-operators = ['O1', 'O2', 'O3', 'Oid']
-energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17.0}
+repressors = [22, 60, 124, 260, 1220, 1740][::-1]
+eRA = -15.3
+for i, rep in  enumerate(repressors):
+# compute the ∆fold-change_Ka
+    delta_fc = fold_change_oo(Ka_num, Ki_num, rep, eRA) - \
+        fold_change_oo(Ka_array, Ki_num, rep, eRA)
 
-# Initialize the plot to set the size
-fig, ax = plt.subplots(2, 2, figsize=(11, 8))
-ax = ax.ravel()
-# Define the GridSpec to center the lower plot
+    ax[2].plot(np.log10(Ka_array / Ka_num), delta_fc,
+               label=str(rep), color=colors[i])
+
+    # compute the ∆fold-change_KI
+    delta_fc = fold_change_oo(Ka_num, Ki_num, rep, eRA) - \
+        fold_change_oo(Ka_num, Ki_array, rep, eRA)
+
+    ax[3].plot(np.log10(Ki_array / Ki_num), delta_fc,
+               label=str(rep), color=colors[i])
+
+# Format Ka plot
+ax[2].set_xlabel(r'$\log_{10} \frac{K_A}{K_A^{fit}}$')
+ax[2].set_ylabel(r'$\Delta$fold-change$_{K_A}$')
+ax[2].margins(0.01)
+
+# # Format Ki plot
+ax[3].set_xlabel(r'$\log_{10} \frac{K_I}{K_I^{fit}}$')
+ax[3].set_ylabel(r'$\Delta$fold-change$_{K_I}$')
+ax[3].margins(0.01)
+ax[3].legend(loc='center left', title=r'repressors / cell', ncol=1,
+             fontsize=11, bbox_to_anchor=(1, 0.5))
 
 
-# Loop through operators
-for i, op in enumerate(operators):
-    print(op)
-    data = df[df.operator==op]
-    # loop through RBS mutants
-    for j, rbs in enumerate(df.rbs.unique()):
-        # Check if the RBS was measured for this operator
-        if rbs in data.rbs.unique():
-        # plot the theory using the parameters from the fit.
-        # Log scale
-            ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
-                ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
-                R=map_param[rbs],
-                epsilon_r=map_param[op]),
-                color=colors[j])
-            # Linear scale
-            ax[i].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
-                ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
-                R=map_param[rbs],
-                epsilon_r=map_param[op]),
-                color=colors[j], linestyle='--')
-            # plot 95% HPD region using the variability in the parameters
-            # Log scale
-            flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
-            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1e6,
-                flatchain, epsilon=4.5)
-            ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                            alpha=0.3, color=colors[j])
-            # linear scale
-            flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
-            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG_lin * 1e6,
-                flatchain, epsilon=4.5)
-            ax[i].fill_between(IPTG_lin, cred_region[0,:], cred_region[1,:],
-                            alpha=0.3, color=colors[j])
+# Label plot
+plt.figtext(0.0, .95, '(A)', fontsize=20)
+plt.figtext(0.50, .95, '(B)', fontsize=20)
+plt.figtext(0.0, .46, '(C)', fontsize=20)
+plt.figtext(0.50, .46, '(D)', fontsize=20)
 
-        # Plot mean and standard error of the mean for the flow data
-        if op != 'Oid':
-            # compute the mean value for each concentration
-            fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
-            # compute the standard error of the mean
-            fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
-            np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
-
-            # plot the experimental data
-            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6, fc_mean,
-                yerr=fc_err, fmt='o',
-                label=df[df.rbs==rbs].repressors.unique()[0] * 2,
-                color=colors[j])
-        # Plot the raw data for Oid
-        else:
-            ax[i].plot(data[data.rbs==rbs].IPTG_uM / 1E6,
-                    data[data.rbs==rbs].fold_change_A, marker='o', lw=0,
-                    color=colors[j])
-
-    # Add operator and binding energy labels.
-    ax[i].text(0.8, 0.09, r'{0}'.format(op), transform=ax[i].transAxes,
-            fontsize=13)
-    ax[i].text(0.67, 0.02,
-            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %np.round(map_param[op], 1),
-            transform=ax[i].transAxes, fontsize=13)
-    ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
-    ax[i].set_xlabel('IPTG (M)', fontsize=15)
-    ax[i].set_ylabel('fold-change', fontsize=16)
-    ax[i].set_ylim([-0.01, 1.1])
-    ax[i].set_xlim(left=-5E-9)
-    ax[i].tick_params(labelsize=14)
-
-ax[0].legend(loc='upper left', title='repressors / cell')
-# add plot letter labels
-plt.figtext(0.0, .95, 'A', fontsize=20)
-plt.figtext(0.50, .95, 'B', fontsize=20)
-plt.figtext(0.0, .46, 'C', fontsize=20)
-plt.figtext(0.50, .46, 'D', fontsize=20)
 plt.tight_layout()
 plt.savefig('../../figures/SI_figs/figS16.pdf', bbox_inches='tight')
