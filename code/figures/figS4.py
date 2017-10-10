@@ -35,7 +35,7 @@ def pact(IPTG, K_A, K_I, e_AI):
     probability that repressor is active
     '''
     pact = (1 + IPTG * 1 / K_A)**2 / \
-    (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
+        (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
     return pact
 
 
@@ -71,9 +71,10 @@ def fugacity(IPTG, R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c=0):
     '''
     NNS = 4.6E6
     lam = []
-    func = lambda x: -Reff + Ns*(x * np.exp(-e_s))/(1 + x * np.exp(-e_s)) +\
-                         NNS * (x)/(1 + x) + \
-                         Nc*(x * np.exp(-e_c))/(1 + x * np.exp(-e_c))
+
+    def func(x): return -Reff + Ns * (x * np.exp(-e_s)) / (1 + x * np.exp(-e_s)) +\
+        NNS * (x) / (1 + x) + \
+        Nc * (x * np.exp(-e_c)) / (1 + x * np.exp(-e_c))
     for c in IPTG:
         Reff = R * pact(c, K_A, K_I, e_AI)
         lam.append(fsolve(func, 0))
@@ -93,7 +94,7 @@ def occupancy(lam, e_s):
     -------
     fold-change (occupancy)
     '''
-    return 1/(1 + lam * np.exp(-(e_s)))
+    return 1 / (1 + lam * np.exp(-(e_s)))
 
 
 # Establish parameter values
@@ -106,7 +107,7 @@ R = 260
 
 # Make plot
 
-fig, ax = plt.subplots(ncols=3,  sharey=False, figsize=(16, 4))
+fig, ax = plt.subplots(ncols=3,  sharey=False, figsize=(7, 2))
 
 for i, a in enumerate(ax):
     for N in Ns:
@@ -114,21 +115,21 @@ for i, a in enumerate(ax):
         fc = occupancy(lam_array, ops[i])
         a.plot(IPTG, fc, label=N)
     a.set_xscale('log')
-    a.set_ylabel('fold-change')
-    a.set_ylim(-0.01,1.1)
+    a.set_ylabel('fold-change', fontsize=8)
+    a.set_ylim(-0.01, 1.1)
     a.set_xlim(1E-8, 1E-2)
-    a.set_xlabel('[IPTG] (M)')
-    a.tick_params(labelsize=14)
+    a.set_xlabel('[IPTG] (M)', fontsize=8)
+    a.tick_params(labelsize=6)
 
     # Plot labels
-    a.text(2E-7, 0.9, '%s \n' % op_names[i] + r'$\Delta \varepsilon_{RA}= %0.1f\ k_BT$' % ops[i],\
-           ha='center', va='center', fontsize=14)
-    a.text(1E-9, 1.1, fig_labels[i], ha='center', va='center', fontsize=24)
+    a.set_title(r'%s $\Delta \varepsilon_{RA}= %0.1f\ k_BT$' % (
+        op_names[i], ops[i]), backgroundcolor='#FFEDCE', y=1.01,
+        fontsize=7)
+    a.text(-0.3, 1.08, fig_labels[i], transform=a.transAxes, fontsize=12)
 
 # Add legend
-leg1 = ax[0].legend(title=r'$N_S$', fontsize=12, loc='lower right')
-leg1.get_title().set_fontsize(14)
+leg1 = ax[2].legend(title=r'$N_S$', loc='lower right', fontsize=6)
+leg1.get_title().set_fontsize(6)
 
-
-plt.tight_layout()
+plt.subplots_adjust(wspace=0.35)
 plt.savefig('../../figures/SI_figs/figS4.pdf', bbox_inches='tight')

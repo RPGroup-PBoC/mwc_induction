@@ -9,14 +9,12 @@ import sys
 sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
-
 colors = sns.color_palette('colorblind').as_hex()
 colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
 sns.set_palette(colors)
 
+
 # Define functions to be used in figure
-
-
 def pact(IPTG, K_A, K_I, e_AI):
     '''
     Computes the probability that a repressor is active
@@ -35,7 +33,7 @@ def pact(IPTG, K_A, K_I, e_AI):
     probability that repressor is active
     '''
     pact = (1 + IPTG * 1 / K_A)**2 / \
-    (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
+        (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
     return pact
 
 
@@ -71,9 +69,10 @@ def fugacity(IPTG, R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0, e_c=0):
     '''
     NNS = 4.6E6
     lam = []
-    func = lambda x: -Reff + Ns*(x * np.exp(-e_s))/(1 + x * np.exp(-e_s)) +\
-                         NNS * (x)/(1 + x) + \
-                         Nc*(x * np.exp(-e_c))/(1 + x * np.exp(-e_c))
+
+    def func(x): return -Reff + Ns * (x * np.exp(-e_s)) / (1 + x * np.exp(-e_s)) +\
+        NNS * (x) / (1 + x) + \
+        Nc * (x * np.exp(-e_c)) / (1 + x * np.exp(-e_c))
     for c in IPTG:
         Reff = R * pact(c, K_A, K_I, e_AI)
         lam.append(fsolve(func, 0))
@@ -93,7 +92,7 @@ def occupancy(lam, e_s):
     -------
     fold-change (occupancy)
     '''
-    return 1/(1 + lam * np.exp(-(e_s)))
+    return 1 / (1 + lam * np.exp(-(e_s)))
 
 
 # Define parameter values
@@ -105,45 +104,48 @@ Ns = [10, 100]
 IPTG = np.logspace(-8, -2, 100)
 
 # Plot figure
-fig, ax = plt.subplots(ncols=3, nrows=2, sharey=False, figsize=(16, 8))
+fig, ax = plt.subplots(2, 3, sharey=False, figsize=(7, 4))
 
 for i, a in enumerate(ax[0]):
     for rep in reps:
         lam_array = fugacity(IPTG, rep, Ns=Ns[0], e_s=ops[i])
         fc = occupancy(lam_array, ops[i])
-        a.plot(IPTG, fc, label=rep)
+        _ = a.plot(IPTG, fc, label=rep)
     a.set_xscale('log')
-    a.set_ylabel('fold-change')
-    a.set_xlabel('[IPTG] (M)')
-    a.set_ylim(-0.01,1.1)
+    a.set_ylabel('fold-change', fontsize=8)
+    a.set_xlabel('[IPTG] (M)', fontsize=8)
+    a.set_ylim(-0.01, 1.1)
     a.set_xlim(1E-8, 1E-2)
-    a.tick_params(labelsize=14)
+    a.tick_params(labelsize=6)
 
     # Define figure text
-    a.text(7E-4, 0.1, '%s \n' % op_names[i] + r'$\Delta \varepsilon_{RA}= %0.1f\ k_BT$' % ops[i],\
-           ha='center', va='center', fontsize=14)
-    a.text(1E-9, 1.1, fig_labels[0][i], ha='center', va='center', fontsize=24)
+    a.set_title(r'%s $\Delta \varepsilon_{RA}= %0.1f\ k_BT$' % (op_names[i], ops[i]), backgroundcolor='#FFEDCE', y=1.01,
+                fontsize=7)
+
+    a.text(-0.22, 1.1, fig_labels[0][i], ha='center', va='center', fontsize=12,
+           transform=a.transAxes)
 
 for i, a in enumerate(ax[1]):
     for rep in reps:
         lam_array = fugacity(IPTG, rep, Ns=Ns[1], e_s=ops[i])
         fc = occupancy(lam_array, ops[i])
-        a.plot(IPTG, fc, label=rep)
+        _ = a.plot(IPTG, fc, label=rep)
     a.set_xscale('log')
-    a.set_ylabel('fold-change')
-    a.set_xlabel('[IPTG] (M)')
-    a.set_ylim(-0.01,1.1)
+    a.set_ylabel('fold-change', fontsize=8)
+    a.set_xlabel('[IPTG] (M)', fontsize=8)
+    a.set_ylim(-0.01, 1.1)
     a.set_xlim(1E-8, 1E-2)
-    a.tick_params(labelsize=14)
+    a.tick_params(labelsize=6)
 
     # Define figure text
-    a.text(7E-4, 0.1, '%s \n' % op_names[i] + r'$\Delta \varepsilon_{RA}= %0.1f\ k_BT$' % ops[i],\
-           ha='center', va='center', fontsize=14)
-    a.text(1E-9, 1.1, fig_labels[1][i], ha='center', va='center', fontsize=24)
+    a.set_title(r'%s $\Delta \varepsilon_{RA}= %0.1f\ k_BT$' % (op_names[i], ops[i]), backgroundcolor='#FFEDCE', y=1.01,
+                fontsize=7)
+    a.text(-0.22, 1.1, fig_labels[1][i], ha='center', va='center', fontsize=12,
+           transform=a.transAxes)
 
 # Add legend
-leg1 = ax[0][0].legend(title='repressors/cell', fontsize=12, loc='upper left')
-leg1.get_title().set_fontsize(14)
-
-plt.tight_layout()
+leg1 = ax[0][0].legend(title='repressors/cell', loc='upper left', fontsize=6)
+leg1.get_title().set_fontsize(5.5)
+plt.subplots_adjust(wspace=0.35, hspace=0.5)
+# plt.tight_layout()
 plt.savefig('../../figures/SI_figs/figS3.pdf', bbox_inches='tight')

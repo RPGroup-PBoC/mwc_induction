@@ -39,16 +39,17 @@ def fugacity_leakiness(R, Ns, e_s, e_AI=4.5, Nc=0, e_c=0):
     leakiness
     '''
     NNS = 4.6E6
-    p_A = 1/(1 + np.exp(-e_AI))
+    p_A = 1 / (1 + np.exp(-e_AI))
     Reff = R * p_A
     leakiness = []
     for R in R:
         Reff = R * p_A
-        func = lambda x: -Reff + Ns*(x * np.exp(-e_s))/(1 + x * np.exp(-e_s)) +\
-                             NNS * (x)/(1 + x) + \
-                             Nc*(x * np.exp(-e_c))/(1 + x * np.exp(-e_c))
+
+        def func(x): return -Reff + Ns * (x * np.exp(-e_s)) / (1 + x * np.exp(-e_s)) +\
+            NNS * (x) / (1 + x) + \
+            Nc * (x * np.exp(-e_c)) / (1 + x * np.exp(-e_c))
         lam = fsolve(func, 0)
-        leakiness.append(1/(1 + lam * np.exp(-(e_s))))
+        leakiness.append(1 / (1 + lam * np.exp(-(e_s))))
     return np.array(leakiness)
 
 
@@ -84,15 +85,16 @@ def fugacity_saturation(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0,
     saturation
     '''
     NNS = 4.6E6
-    p_A = 1/(1 + np.exp(-e_AI) * (K_A/K_I)**2)
+    p_A = 1 / (1 + np.exp(-e_AI) * (K_A / K_I)**2)
     saturation = []
     for R in R:
         Reff = R * p_A
-        func = lambda x: -Reff + Ns*(x * np.exp(-e_s))/(1 + x * np.exp(-e_s)) +\
-                             NNS * (x)/(1 + x) + \
-                             Nc*(x * np.exp(-e_c))/(1 + x * np.exp(-e_c))
+
+        def func(x): return -Reff + Ns * (x * np.exp(-e_s)) / (1 + x * np.exp(-e_s)) +\
+            NNS * (x) / (1 + x) + \
+            Nc * (x * np.exp(-e_c)) / (1 + x * np.exp(-e_c))
         lam = fsolve(func, 0)
-        saturation.append(1/(1 + lam * np.exp(-(e_s))))
+        saturation.append(1 / (1 + lam * np.exp(-(e_s))))
     return np.array(saturation)
 
 
@@ -128,7 +130,7 @@ def fugacity_dynamic_range(R, Ns, e_s, K_A=139E-6, K_I=0.53E-6, e_AI=4.5, Nc=0,
     dynamic range
     '''
     return fugacity_saturation(R, Ns, e_s, K_A, K_I, e_AI, Nc, e_c) -\
-           fugacity_leakiness(R, Ns, e_s, e_AI, Nc, e_c)
+        fugacity_leakiness(R, Ns, e_s, e_AI, Nc, e_c)
 
 
 # Define parameters
@@ -150,13 +152,13 @@ for i, a in enumerate(ax):
         # Produce plots
         a[j].axvline(Nc[i], ls='--', color='gray')
         a[0].plot(reps, fugacity_leakiness(reps, 1, op, Nc=Nc[i], e_c=e_c),
-                                           color=op_colors[j], label=ops[j])
+                  color=op_colors[j], label=ops[j])
 
         a[1].plot(reps, fugacity_saturation(reps, 1, op, Nc=Nc[i], e_c=e_c),
-                                            color=op_colors[j])
+                  color=op_colors[j])
 
         a[2].plot(reps, fugacity_dynamic_range(reps, 1, op, Nc=Nc[i], e_c=e_c),
-                                               color=op_colors[j])
+                  color=op_colors[j])
 
         # Format axes
         a[0].set_yscale('log')
@@ -170,20 +172,18 @@ for i, a in enumerate(ax):
         a[2].set_ylim(-0.015, 1.1)
 
 # Add figure text
-        a[0].text(2.8E2, 1.5E-3, r'$N_C$= %s' % str(Nc[i]),\
-           ha='center', va='center', fontsize=14)
-        a[1].text(2.8E2, 0.06, r'$N_C$= %s' % str(Nc[i]),\
-               ha='center', va='center', fontsize=14)
-        a[2].text(2.8E2, 0.06, r'$N_C$= %s' % str(Nc[i]),\
-           ha='center', va='center', fontsize=14)
-        a[j].text(2.8E-1, 1.1, fig_labels[i][j], ha='center', va='center', fontsize=24)
+        a[0].set_title(r'$N_C$= %s' % str(Nc[i]), backgroundcolor='#FFEDCE')
+        a[1].set_title(r'$N_C$= %s' % str(Nc[i]), backgroundcolor='#FFEDCE')
+        a[2].set_title(r'$N_C$= %s' % str(Nc[i]), backgroundcolor='#FFEDCE')
+        a[j].text(-0.3, 1.05, fig_labels[i][j], transform=a[j].transAxes,
+                  fontsize=12)
+        #   ha='center', va='center', fontsize=12)
 
 # Add legend
-leg = ax[0][0].legend(title='binding energy \n' + r'$\Delta \varepsilon_{AI}\ (k_BT)$',\
+leg = ax[1][0].legend(title='binding energy \n' + r'$\Delta \varepsilon_{AI}\ (k_BT)$',
                       fontsize=12, loc='lower left')
 plt.setp(leg.get_title(), multialignment='center')
 leg.get_title().set_fontsize(14)
-
+mwc.scale_plot(fig, 'two_row')
 plt.tight_layout()
-
 plt.savefig('../../figures/SI_figs/figS7.pdf', bbox_inches='tight')

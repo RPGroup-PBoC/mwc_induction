@@ -1173,8 +1173,6 @@ def generate_flatfield(im, im_dark, im_field, median_filt=True):
     ----------
     im : 2d-array
         Image to be flattened.
-    im_dark : 2d-array
-        Average image of camera shot noise (no illumination).
     im_field: 2d-array
         Average image of fluorescence illumination.
     median_filt : bool
@@ -1197,12 +1195,8 @@ def generate_flatfield(im, im_dark, im_field, median_filt=True):
         will result in a division by zero.
     """
 
-    # Ensure that the same image is not being provided as the bright and dark.
-    if np.isclose(im_field, im_dark).all():
-        raise RuntimeError('im_bright and im_dark are approximately equal.')
-
-    # Compute the mean difference between the bright and dark image.
-    mean_diff = np.mean(im_field - im_dark)
+    # Compute the mean field image.
+    mean_diff = np.mean(im_field)
 
     if median_filt is True:
         selem = skimage.morphology.square(3)
@@ -1211,7 +1205,7 @@ def generate_flatfield(im, im_dark, im_field, median_filt=True):
         im_filt = im
 
     # Compute and return the flattened image.
-    im_flat = ((im_filt - im_dark) / (im_field - im_dark)) * mean_diff
+    im_flat = (im_filt - im_dark) / (im_field - im_dark) * mean_diff
     return im_flat
 
 
@@ -1463,26 +1457,54 @@ def ecdf(data):
 def set_plotting_style():
     """
     Formats plotting enviroment to that used in Physical Biology of the Cell,
-    2nd edition. To format all plots within a script, simply execute
-    `mwc_induction_utils.set_plotting_style() in the preamble.
+    2nd edition. To format all plots within a script, simply execute `mwc_induction_utils.set_plotting_style() in the import statements.
     """
-    rc = {'lines.linewidth': 2,
-          'axes.labelsize': 18,
-          'axes.titlesize': 20,
-          'axes.facecolor': '#E3DCD0',
-          'xtick.major': 13,
-          'xtick.labelsize': 'large',
-          'ytick.labelsize': 13,
+    # TODO: Still playing with getting the sizing just right.
+    rc = {'axes.facecolor': '#E3DCD0',
           'font.family': 'Lucida Sans Unicode',
           'grid.linestyle': ':',
-          'grid.linewidth': 1.5,
           'grid.color': '#ffffff',
           'mathtext.fontset': 'stixsans',
           'mathtext.sf': 'sans',
-          'legend.frameon': True,
-          'legend.fontsize': 13}
+          'legend.frameon': True}
     plt.rc('text.latex', preamble=r'\usepackage{sfmath}')
     plt.rc('mathtext', fontset='stixsans', sf='sans')
     sns.set_style('darkgrid', rc=rc)
     sns.set_palette("colorblind", color_codes=True)
-    sns.set_context('notebook', rc=rc)
+    sns.set_context('paper', rc=rc)
+
+
+def scale_plot(figure, layout):
+    """
+    Resizes a figure canvas to a specific layout.
+
+    Parameters
+    ----------
+    figure : matplotib Figure canvas
+        Figure to be resized.
+    layout: string
+        The layout of the plot. Choices are
+
+        'single_plot' :  1 single plot of size 6w3h
+        'one_row' : 1 row of plots with size of 6w2h
+        'two_row' : 2 rows of plots with size of 6w4h
+        'three_row': 3 rows of plots with size of 6w6h.
+    """
+    axes = figure.get_axes()
+    for a in axes:
+        a.tick_params(labelsize=6)
+        a.xaxis.label.set_size(8)
+        a.yaxis.label.set_size(8)
+        a.title.set_size(8)
+        if a.properties()['legend'] is not None:
+            leg = a.properties()['legend']
+            leg_props = leg.properties()
+            leg_props['title'].set_fontsize(7)
+            plt.setp(a.get_legend().get_texts(), fontsize=7)
+
+    # Define the figure sizes.
+    sizes = dict(single_row=(6, 3), one_row=(6, 2),
+                 two_row=(6, 4), three_row=(6, 6))
+    figure.set_size_inches(sizes[layout])
+    plt.subplots_adjust(wspace=0.35)
+    return figure
