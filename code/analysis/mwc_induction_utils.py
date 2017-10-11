@@ -1485,7 +1485,8 @@ def scale_plot(figure, layout):
     layout: string
         The layout of the plot. Choices are
 
-        'single_plot' :  1 single plot of size 6w3h
+        'single_plot_wide' :  1 single plot of size 5w4h
+        'single_plot_tall': 1 single plot of size 4w5h
         'one_row' : 1 row of plots with size of 6w2h
         'two_row' : 2 rows of plots with size of 6w4h
         'three_row': 3 rows of plots with size of 6w6h.
@@ -1503,7 +1504,7 @@ def scale_plot(figure, layout):
             plt.setp(a.get_legend().get_texts(), fontsize=7)
 
     # Define the figure sizes.
-    sizes = dict(single_row=(6, 3), one_row=(6, 2),
+    sizes = dict(single_plot_wide=(5, 4), single_plot_tall=(5, 6), single_row=(6, 3), one_row=(6, 2),
                  two_row=(6, 4), three_row=(6, 6))
     figure.set_size_inches(sizes[layout])
     plt.subplots_adjust(wspace=0.35)

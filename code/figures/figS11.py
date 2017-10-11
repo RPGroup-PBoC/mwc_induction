@@ -29,11 +29,11 @@ datadir = '../../data/'
 df = pd.read_csv(datadir + 'flow_master.csv', comment='#')
 
 # Now we remove the autofluorescence and delta values
-df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.IPTG_uM==0)]
+df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.IPTG_uM == 0)]
 
 # Let's import the data from HG 2011 and RB 2014
 df_old = pd.read_csv(datadir + 'tidy_lacI_titration_data.csv', comment='#')
-df_old = df_old[df_old.operator!='Oid']
+df_old = df_old[df_old.operator != 'Oid']
 #===============================================================================
 # O2 RBS1027
 #===============================================================================
@@ -73,14 +73,14 @@ df_group = df_old.groupby('operator')
 i = 0
 for group, data in df_group:
     # Extract HG data
-    garcia = data[data.author=='garcia']
+    garcia = data[data.author == 'garcia']
     ax.plot(garcia.repressor, garcia.fold_change, color=colors[i],
-                lw=0, marker='o', label='', alpha=0.75)
+            lw=0, marker='o', label='', alpha=0.75)
     # Extract RB data
-    brewster = data[data.author=='brewster']
+    brewster = data[data.author == 'brewster']
     ax.plot(brewster.repressor, brewster.fold_change, color=colors[i],
-                lw=0, marker='D', label='', alpha=0.75)
-    i+=1
+            lw=0, marker='D', label='', alpha=0.75)
+    i += 1
 
 # Group data by operator
 df_group = df.groupby('operator')
@@ -91,27 +91,27 @@ i = 0
 for group, data in df_group:
     # Compute the theoretical fold change for this operator
     fc = mwc.fold_change_log(np.array([0]), ea, ei, 4.5,
-                                r_array / 2, data.binding_energy.unique())
+                             r_array / 2, data.binding_energy.unique())
     ax.plot(r_array, fc, color=colors[i],
-            label=group + r' $\Delta\varepsilon_{RA} =$' + \
+            label=group + r' $\Delta\varepsilon_{RA} =$' +
             str(data.binding_energy.unique()[0]) + ' $k_BT$')
     # compute the mean value for each concentration
     fc_mean = data.groupby('repressors').fold_change_A.mean()
     # compute the standard error of the mean
     fc_err = data.groupby('repressors').fold_change_A.std() / \
-    np.sqrt(data.groupby('repressors').size())
-    log_fc_err = fc_mean - 10**(np.log10(fc_mean) - \
-                           fc_err / fc_mean / np.log(10))
+        np.sqrt(data.groupby('repressors').size())
+    log_fc_err = fc_mean - 10**(np.log10(fc_mean) -
+                                fc_err / fc_mean / np.log(10))
 
-    log_fc_err= np.vstack([log_fc_err, 10**(np.log10(fc_mean) + \
-                                       fc_err / fc_mean / np.log(10)) -\
-                                       fc_mean])
+    log_fc_err = np.vstack([log_fc_err, 10**(np.log10(fc_mean) +
+                                             fc_err / fc_mean / np.log(10)) -
+                            fc_mean])
     # plot the experimental data
     ax.errorbar(fc_mean.index * 2, fc_mean,
                 yerr=log_fc_err,
                 fmt='o', markeredgecolor=colors[i], label='',
                 markerfacecolor='white', markeredgewidth=2)
-    i+=1
+    i += 1
 
 ax.plot([], [], marker='o',
         markeredgecolor='k', markerfacecolor='w', markeredgewidth=2,
@@ -129,5 +129,6 @@ ax.set_ylim(top=2)
 leg = ax.legend(loc='lower left', fontsize=8)
 leg.set_zorder(1)
 
+mwc.scale_plot(fig, 'single_plot_tall')
 plt.tight_layout()
 plt.savefig('../../figures/SI_figs/figS11.pdf', bbox_inches='tight')

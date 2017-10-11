@@ -180,8 +180,8 @@ for i, a in enumerate(ax):
         #   ha='center', va='center', fontsize=12)
 
 # Add legend
-leg = ax[1][0].legend(title='binding energy \n' + r'$\Delta \varepsilon_{AI}\ (k_BT)$',
-                      fontsize=12, loc='lower left')
+leg = ax[1][0].legend(title='binding energy \n' + r'$\Delta \varepsilon_{AI}\ (k_BT)$', fontsize=12, loc='lower left',
+                      labelspacing=0.1, handlelength=1.5)
 plt.setp(leg.get_title(), multialignment='center')
 leg.get_title().set_fontsize(14)
 mwc.scale_plot(fig, 'two_row')
