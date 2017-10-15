@@ -55,8 +55,8 @@ with open('../../data/mcmc/main_text_KaKi.pkl', 'rb') as file:
 max_idx = np.argmax(gauss_flatlnprobability, axis=0)
 ea, ei, sigma = gauss_flatchain[max_idx]
 
-ka_fc = np.exp(-gauss_flatchain[:,0])
-ki_fc = np.exp(-gauss_flatchain[:,1])
+ka_fc = np.exp(-gauss_flatchain[:, 0])
+ki_fc = np.exp(-gauss_flatchain[:, 1])
 #===============================================================================
 # Plot the theory vs data for all 4 operators with the credible region
 #===============================================================================
@@ -88,48 +88,52 @@ for i, op in enumerate(operators):
     for j, rbs in enumerate(df.rbs.unique()):
         # plot the theory using the parameters from the fit.
         if (op == 'O2') & (rbs == 'RBS1027'):
-            label=None
+            label = None
         else:
-            label=df[df.rbs==rbs].repressors.unique()[0] * 2
+            label = df[df.rbs == rbs].repressors.unique()[0] * 2
         # Log scale
         ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
-            ea=ea, ei=ei, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op]),
-            color=colors[j], label=label)
+                                             ea=ea, ei=ei, epsilon=4.5,
+                                             R=df[(df.rbs == rbs)
+                                                  ].repressors.unique(),
+                                             epsilon_r=energies[op]),
+                   color=colors[j], label=label)
         # Linear scale
         ax[i].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
-            ea=ea, ei=ei, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op]),
-            color=colors[j], linestyle=':', label=None)
+                                                 ea=ea, ei=ei, epsilon=4.5,
+                                                 R=df[(df.rbs == rbs)
+                                                      ].repressors.unique(),
+                                                 epsilon_r=energies[op]),
+                   color=colors[j], linestyle=':', label=None)
 
         # plot 95% HPD region using the variability in the MWC parameters
         cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-            gauss_flatchain, epsilon=4.5,
-            R=df[(df.rbs == rbs)].repressors.unique(),
-            epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                        alpha=0.3, color=colors[j]) # compute the mean value for each concentration
-        fc_mean = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.mean()
+                                           gauss_flatchain, epsilon=4.5,
+                                           R=df[(df.rbs == rbs)
+                                                ].repressors.unique(),
+                                           epsilon_r=energies[op])
+        ax[i].fill_between(IPTG, cred_region[0, :], cred_region[1, :],
+                           alpha=0.3, color=colors[j])  # compute the mean value for each concentration
+        fc_mean = data[data.rbs == rbs].groupby('IPTG_uM').fold_change_A.mean()
         # # compute the standard error of the mean
-        fc_err = data[data.rbs==rbs].groupby('IPTG_uM').fold_change_A.std() / \
-        np.sqrt(data[data.rbs==rbs].groupby('IPTG_uM').size())
+        fc_err = data[data.rbs == rbs].groupby('IPTG_uM').fold_change_A.std() / \
+            np.sqrt(data[data.rbs == rbs].groupby('IPTG_uM').size())
 
         # plot the experimental data
         # Distinguish between the fit data and the predictions
         if (op == 'O2') & (rbs == 'RBS1027'):
-            ax[i].errorbar(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
-                    fc_mean, yerr=fc_err, linestyle='none', color=colors[j],
-                    label=None)
-            ax[i].plot(np.sort(data[data.rbs==rbs].IPTG_uM.unique()) / 1E6,
+            ax[i].errorbar(np.sort(data[data.rbs == rbs].IPTG_uM.unique()) / 1E6,
+                           fc_mean, yerr=fc_err, linestyle='none', color=colors[j],
+                           label=None)
+            ax[i].plot(np.sort(data[data.rbs == rbs].IPTG_uM.unique()) / 1E6,
                        fc_mean, marker='o', markersize=6, linestyle='none',
                        markeredgewidth=1, markeredgecolor=colors[j],
                        markerfacecolor='w',
-                       label=df[df.rbs=='RBS1027'].repressors.unique()[0] * 2)
+                       label=df[df.rbs == 'RBS1027'].repressors.unique()[0] * 2)
 
     # Add operator and binding energy labels.
-    ax[i].set_title(r'%s  $\Delta\varepsilon_{RA} = %s\, k_BT$' %(op, energies[op]), backgroundcolor='#ffedce', fontsize=14, y=1.03)
+    ax[i].set_title(r'%s  $\Delta\varepsilon_{RA} = %s\, k_BT$' % (
+        op, energies[op]), backgroundcolor='#ffedce', fontsize=14, y=1.03)
     ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
     ax[i].set_xlabel('IPTG (M)', fontsize=15)
     ax[i].set_ylabel('fold-change', fontsize=16)
@@ -144,9 +148,11 @@ def leakiness(num_rep, ep_r, ep_ai, n_ns=4.6E6):
     pact = 1 / (1 + np.exp(-ep_ai))
     return (1 + pact * (num_rep / n_ns) * np.exp(-ep_r))**-1
 
+
 def saturation(num_rep, ep_r, ep_ai, ka_ki, n_sites=2, n_ns=4.6E6):
     pact = 1 / (1 + np.exp(-ep_ai) * ka_ki**n_sites)
-    return (1 + pact * (num_rep/n_ns)*np.exp(-ep_r))**-1
+    return (1 + pact * (num_rep / n_ns) * np.exp(-ep_r))**-1
+
 
 def saturation_cred_region(num_rep, ep_r, ep_ai, ka_flatchain, ki_flatchain,
                            n_sites=2, n_ns=4.6E6, mass_frac=0.95):
@@ -157,6 +163,7 @@ def saturation_cred_region(num_rep, ep_r, ep_ai, ka_flatchain, ki_flatchain,
         cred_region[:, i] = mwc.hpd(fc, mass_frac)
     return cred_region
 
+
 def dyn_range(num_rep, ep_r, ka_ki, ep_ai=4.5, n_sites=2, n_ns=4.6E6):
     pact_leak = 1 / (1 + np.exp(-ep_ai))
     pact_sat = 1 / (1 + np.exp(-ep_ai) * (ka_ki)**n_sites)
@@ -165,8 +172,7 @@ def dyn_range(num_rep, ep_r, ka_ki, ep_ai=4.5, n_sites=2, n_ns=4.6E6):
     return sat - leak
 
 
-
-#The following equations are borrowed from Stephanie Barnes.
+# The following equations are borrowed from Stephanie Barnes.
 
 def pact(IPTG, K_A, K_I, e_AI):
     '''
@@ -186,7 +192,7 @@ def pact(IPTG, K_A, K_I, e_AI):
     probability that repressor is active
     '''
     pact = (1 + IPTG * 1 / K_A)**2 / \
-    (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
+        (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
     return pact
 
 
@@ -213,6 +219,7 @@ def fold_change(IPTG, K_A, K_I, e_AI, R, Op):
     '''
     return 1 / (1 + R / 5E6 * pact(IPTG, K_A, K_I, e_AI) * np.exp(-Op))
 
+
 def dyn_cred_region(num_rep, ka_flatchain, ki_flatchain, ep_r, mass_frac=0.95, epsilon=4.5):
     cred_region = np.zeros([2, len(num_rep)])
     ka_ki = ka_flatchain / ki_flatchain
@@ -220,6 +227,7 @@ def dyn_cred_region(num_rep, ka_flatchain, ki_flatchain, ep_r, mass_frac=0.95, e
         drng = dyn_range(R, ep_r, ka_ki, ep_ai=epsilon)
         cred_region[:, i] = mwc.hpd(drng, mass_frac)
     return cred_region
+
 
 def EC50(K_A, K_I, e_AI, R, Op):
     '''
@@ -237,19 +245,25 @@ def EC50(K_A, K_I, e_AI, R, Op):
     -------
     Concentration at which half of repressors are active (EC50)
     '''
-    t = 1 + (R / 4.6E6) * np.exp(-Op) + (K_A / K_I)**2 * (2 * np.exp(-e_AI) + 1 + (R / 4.6E6) * np.exp(-Op))
-    b = 2 * (1 + (R / 4.6E6) * np.exp(-Op)) + np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
-    return K_A * ((K_A / K_I - 1)/(K_A / K_I - (t/b)**(1/2)) -1)
+    t = 1 + (R / 4.6E6) * np.exp(-Op) + (K_A / K_I)**2 * \
+        (2 * np.exp(-e_AI) + 1 + (R / 4.6E6) * np.exp(-Op))
+    b = 2 * (1 + (R / 4.6E6) * np.exp(-Op)) + \
+        np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
+    return K_A * ((K_A / K_I - 1) / (K_A / K_I - (t / b)**(1 / 2)) - 1)
+
 
 def ec50_cred_region(num_rep, Op, e_AI, K_A, K_I,
                      mass_frac=0.95):
     cred_region = np.zeros([2, len(num_rep)])
     for i, R in enumerate(num_rep):
-        t = 1 + (R / 4.6E6) * np.exp(-Op) + (K_A / K_I)**2 * (2 * np.exp(-e_AI) + 1 + (R / 4.6E6) * np.exp(-Op))
-        b = 2 * (1 + (R / 4.6E6) * np.exp(-Op)) + np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
-        ec50_rng = K_A * ((K_A / K_I - 1)/(K_A / K_I - (t/b)**(1/2)) -1)
+        t = 1 + (R / 4.6E6) * np.exp(-Op) + (K_A / K_I)**2 * \
+            (2 * np.exp(-e_AI) + 1 + (R / 4.6E6) * np.exp(-Op))
+        b = 2 * (1 + (R / 4.6E6) * np.exp(-Op)) + \
+            np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
+        ec50_rng = K_A * ((K_A / K_I - 1) / (K_A / K_I - (t / b)**(1 / 2)) - 1)
         cred_region[:, i] = mwc.hpd(ec50_rng, mass_frac)
     return cred_region
+
 
 def effective_Hill(K_A, K_I, e_AI, R, Op):
     '''
@@ -267,10 +281,11 @@ def effective_Hill(K_A, K_I, e_AI, R, Op):
     effective Hill coefficient
     '''
     c = EC50(K_A, K_I, e_AI, R, Op)
-    return 2/(fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op))*\
-           (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) * \
-            2 * c * np.exp(-e_AI) * (1/K_A * (1 + c/K_A) * (1 + c/K_I)**2 - 1/K_I *\
-           (1 + c/K_A)**2 * (1 + c/K_I)) / ((1 + c/K_A)**2 + np.exp(-e_AI) * (1 + c/K_I)**2)**2)
+    return 2 / (fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op)) *\
+        (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) *
+         2 * c * np.exp(-e_AI) * (1 / K_A * (1 + c / K_A) * (1 + c / K_I)**2 - 1 / K_I *
+                                  (1 + c / K_A)**2 * (1 + c / K_I)) / ((1 + c / K_A)**2 + np.exp(-e_AI) * (1 + c / K_I)**2)**2)
+
 
 def effective_hill_cred(num_rep, Op, e_AI, K_A, K_I,
                         mass_frac=0.95):
@@ -279,52 +294,57 @@ def effective_hill_cred(num_rep, Op, e_AI, K_A, K_I,
         # Compute the EC50
         c = EC50(K_A, K_I, e_AI, R, Op)
         # Compute the hill
-        e_hill = 2/(fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op))*\
-           (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) * \
-            2 * c * np.exp(-e_AI) * (1/K_A * (1 + c/K_A) * (1 + c/K_I)**2 - 1/K_I *\
-           (1 + c/K_A)**2 * (1 + c/K_I)) / ((1 + c/K_A)**2 + np.exp(-e_AI) * (1 + c/K_I)**2)**2)
+        e_hill = 2 / (fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op)) *\
+            (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) *
+             2 * c * np.exp(-e_AI) * (1 / K_A * (1 + c / K_A) * (1 + c / K_I)**2 - 1 / K_I *
+                                      (1 + c / K_A)**2 * (1 + c / K_I)) / ((1 + c / K_A)**2 + np.exp(-e_AI) * (1 + c / K_I)**2)**2)
         cred_region[:, i] = mwc.hpd(e_hill, mass_frac)
 
     return cred_region
 
+
 rep_range = np.logspace(0, 4, 200)
 ka_ki = np.exp(-ea) / np.exp(-ei)
 en_colors = sns.color_palette('viridis', n_colors=len(operators))
-titles = ['leakiness', 'saturation', 'dynamic range', 'EC50 ($\mu$M)', 'effective Hill coefficient']
+titles = ['leakiness', 'saturation', 'dynamic range',
+          'EC50 ($\mu$M)', 'effective Hill coefficient']
 for i, op in enumerate(operators):
     # Compute the properties
     leak = leakiness(rep_range, energies[op], ep_ai=4.5)
-    sat = saturation(rep_range, energies[op], 4.5, np.exp(-ea)/np.exp(-ei))
+    sat = saturation(rep_range, energies[op], 4.5, np.exp(-ea) / np.exp(-ei))
     dyn_rng = dyn_range(rep_range, energies[op], ka_ki)
     ec50 = EC50(np.exp(-ea), np.exp(-ei), 4.5, rep_range, energies[op])
-    e_hill = effective_Hill(np.exp(-ea), np.exp(-ei), 4.5, rep_range, energies[op])
+    e_hill = effective_Hill(np.exp(-ea), np.exp(-ei),
+                            4.5, rep_range, energies[op])
 
     ax[3].plot(rep_range, leak, color=en_colors[i], label=energies[op])
     ax[4].plot(rep_range, sat, color=en_colors[i], label=energies[op])
     ax[5].plot(rep_range, dyn_rng, color=en_colors[i], label=energies[op])
     ax[6].plot(rep_range, ec50 / 1E6, color=en_colors[i])
     ax[7].plot(rep_range, e_hill, color=en_colors[i])
-    ax[i+3].set_xlabel('repressors per cell', fontsize=14)
-    ax[i+3].set_ylabel(titles[i], fontsize=14)
+    ax[i + 3].set_xlabel('repressors per cell', fontsize=14)
+    ax[i + 3].set_ylabel(titles[i], fontsize=14)
 
     # Plot the credible regions
-    sat_cred = saturation_cred_region(rep_range, energies[op], 4.5, ka_fc, ki_fc)
+    sat_cred = saturation_cred_region(
+        rep_range, energies[op], 4.5, ka_fc, ki_fc)
     dyn_cred = dyn_cred_region(rep_range,
-         ka_fc, ki_fc, epsilon=4.5,
-         ep_r=energies[op])
+                               ka_fc, ki_fc, epsilon=4.5,
+                               ep_r=energies[op])
     ec50_cred = ec50_cred_region(rep_range, energies[op], 4.5, ka_fc,
                                  ki_fc, mass_frac=0.95)
-    hill_cred = effective_hill_cred(rep_range, energies[op], 4.5, ka_fc, ki_fc, mass_frac=0.95)
-    ax[5].fill_between(rep_range, dyn_cred[0,:], dyn_cred[1,:],
-                        alpha=0.3, color=en_colors[i])
-    ax[4].fill_between(rep_range, sat_cred[0,:], sat_cred[1,:],
-                    alpha=0.3, color=en_colors[i])
-    ax[6].fill_between(rep_range, ec50_cred[0, :]/1E6, ec50_cred[1, :]/1E6,
+    hill_cred = effective_hill_cred(
+        rep_range, energies[op], 4.5, ka_fc, ki_fc, mass_frac=0.95)
+    ax[5].fill_between(rep_range, dyn_cred[0, :], dyn_cred[1, :],
+                       alpha=0.3, color=en_colors[i])
+    ax[4].fill_between(rep_range, sat_cred[0, :], sat_cred[1, :],
+                       alpha=0.3, color=en_colors[i])
+    ax[6].fill_between(rep_range, ec50_cred[0, :] / 1E6, ec50_cred[1, :] / 1E6,
                        alpha=0.3, color=en_colors[i])
     ax[7].fill_between(rep_range, hill_cred[0, :], hill_cred[1, :],
                        alpha=0.3, color=en_colors[i])
 
-    ax[i+3].set_xlim([1, 1E4])
+    ax[i + 3].set_xlim([1, 1E4])
     #
 
 ax[6].set_xlim([1, 1E4])

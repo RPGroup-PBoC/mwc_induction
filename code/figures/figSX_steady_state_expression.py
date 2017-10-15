@@ -10,15 +10,16 @@ mwc.set_plotting_style()
 
 
 # Load the data file.
-data = pd.read_csv('../../data/20171003_O2_timeseries_MACSQuant.csv',
+data = pd.read_csv('../../data/20171013_O2_timeseries_MACSQuant.csv',
                    comment='#')
 plt.close('all')
-fig, ax = plt.subplots(1, 3, figsize=(6, 2.5),gridspec_kw = {'width_ratios':[2, 1.2, 2]})
+fig, ax = plt.subplots(1, 3, figsize=(6, 2.5), gridspec_kw={
+                       'width_ratios': [2, 1.2, 2]})
 # note that the second subplot (ax[1]) will remain blank for legend
 strain_colors = {'auto': 'b', 'delta': 'g', 'RBS1027': 'r'}
 grouped = data.groupby(['strain', 'delta_t'])
 
-print(data[data.strain=='auto']['FITC-A'])
+print(data[data.strain == 'auto']['FITC-A'])
 for g, d in grouped:
     ax[0].plot(d['delta_t'], d['FITC-A'], 'o', color=strain_colors[g[0]],
                alpha=0.5, markersize=5, label=g[0])
@@ -60,17 +61,18 @@ for i, _ in enumerate(ax):
 
 # convert labels into more descriptive label
 strain_labels = {'auto': 'autofluorescence', 'delta': '$\Delta lacI$ strain',
-                'RBS1027': 'rep. / cell = 260','fold_change_A': 'fold change'}
+                 'RBS1027': 'rep. / cell = 260', 'fold_change_A': 'fold change'}
 labels = np.array([strain_labels[key] for key in labels])
 
 # create legend with unique strain labels
 by_label = OrderedDict(zip(labels, handles))
-lgd = ax[0].legend(by_label.values(), by_label.keys(),bbox_to_anchor=(1.02, 1), loc=2,
-title=r"$\Delta\varepsilon_{RA} = -13.9$ $k_BT$"+"\n"+r"$c$ = $50$ $\mu$M",fontsize=8)
+lgd = ax[0].legend(by_label.values(), by_label.keys(), bbox_to_anchor=(1.02, 1), loc=2,
+                   title=r"$\Delta\varepsilon_{RA} = -13.9$ $k_BT$" + "\n" + r"$c$ = $50$ $\mu$M", fontsize=8)
 plt.setp(lgd.get_title(), fontsize=10)
 
 fig.subplots_adjust(wspace=.55)
-fig.savefig('SI_figs/figSX_steady_state.pdf', bbox_inches='tight')
+fig.savefig('../../figures/SI_figs/figSX_steady_state_round_two.pdf',
+            bbox_inches='tight')
 
 # # %% Make a figure showing the ECDFs of all of the experiemental runs.
 #
