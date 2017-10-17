@@ -3,18 +3,42 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import matplotlib.lines as mlines
-from matplotlib.patches import Rectangle
 
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
-# Functions for calculating leakiness, saturation, and dynamic range
+# Functions for calculating fold change, EC50, and effective Hill coefficient
 
-def leakiness(K_A, K_I, e_AI, R, Op):
+
+def pact(IPTG, K_A, K_I, e_AI):
     '''
-    Computes the leakiness of a simple repression construct
+    Computes the probability that a repressor is active
     Parameters
     ----------
+    IPTG : array-like
+        Array of IPTG concentrations in uM
+    K_A : float
+        Dissociation constant for active repressor
+    K_I : float
+        Dissociation constant for inactive repressor
+    e_AI : float
+        Energetic difference between the active and inactive state
+    Returns
+    -------
+    probability that repressor is active
+    '''
+    pact = (1 + IPTG * 1 / K_A)**2 / \
+        (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
+    return pact
+
+
+def fold_change(IPTG, K_A, K_I, e_AI, R, Op):
+    '''
+    Computes fold-change for simple repression
+    Parameters
+    ----------
+    IPTG : array-like
+        Array of IPTG concentrations in uM
     K_A : float
         Dissociation constant for active repressor
     K_I : float
@@ -27,13 +51,14 @@ def leakiness(K_A, K_I, e_AI, R, Op):
         Operator binding energy
     Returns
     -------
-    leakiness
+    probability that repressor is active
     '''
-    return 1 / (1 + 1 / (1 + np.exp(-e_AI)) * R / 5E6 * np.exp(-Op))
+    return 1 / (1 + R / 5E6 * pact(IPTG, K_A, K_I, e_AI) * np.exp(-Op))
 
-def saturation(K_A, K_I, e_AI, R, Op):
+
+def EC50(K_A, K_I, e_AI, R, Op):
     '''
-    Computes the saturation of a simple repression construct
+    Computes the concentration at which half of the repressors are in the active state
     Parameters
     ----------
     K_A : float
@@ -42,21 +67,20 @@ def saturation(K_A, K_I, e_AI, R, Op):
         Dissociation constant for inactive repressor
     e_AI : float
         Energetic difference between the active and inactive state
-    R : float
-        Number of repressors per cell
-    Op : float
-        Operator binding energy
     Returns
     -------
-    saturation
+    Concentration at which half of repressors are active (EC50)
     '''
-    return 1 / (1 + 1 / (1 + np.exp(-e_AI) * (K_A / K_I)**2) * R / 5E6 *
-                np.exp(-Op))
+    t = 1 + (R / 5E6) * np.exp(-Op) + (K_A / K_I)**2 * \
+        (2 * np.exp(-e_AI) + 1 + (R / 5E6) * np.exp(-Op))
+    b = 2 * (1 + (R / 5E6) * np.exp(-Op)) + \
+        np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
+    return K_A * ((K_A / K_I - 1) / (K_A / K_I - (t / b)**(1 / 2)) - 1)
 
 
-def dynamic_range(K_A, K_I, e_AI, R, Op):
+def effective_Hill(K_A, K_I, e_AI, R, Op):
     '''
-    Computes the dynamic range of a simple repression construct
+    Computes the effective Hill coefficient
     Parameters
     ----------
     K_A : float
@@ -65,87 +89,67 @@ def dynamic_range(K_A, K_I, e_AI, R, Op):
         Dissociation constant for inactive repressor
     e_AI : float
         Energetic difference between the active and inactive state
-    R : float
-        Number of repressors per cell
-    Op : float
-        Operator binding energy
     Returns
     -------
-    dynamic range
+    effective Hill coefficient
     '''
-    return saturation(K_A, K_I, e_AI, R, Op) - leakiness(K_A, K_I, e_AI, R, Op)
+    c = EC50(K_A, K_I, e_AI, R, Op)
+    return 2 / (fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op)) *\
+        (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) *
+         2 * c * np.exp(-e_AI) * (1 / K_A * (1 + c / K_A) * (1 + c / K_I)**2 - 1 / K_I *
+                                  (1 + c / K_A)**2 * (1 + c / K_I)) / ((1 + c / K_A)**2 + np.exp(-e_AI) * (1 + c / K_I)**2)**2)
 
 
-# Establish parameter values
+# Define parameters
 K_A = 139
 K_I = 0.53
 e_AI = 4.5
+ops_range = np.linspace(-18, -8, 50)
 Reps = np.array([1740, 1220, 260, 124, 60, 22])
-op_array = np.linspace(-18, -8, 100)
 O1 = -15.3
 O2 = -13.9
 O3 = -9.7
 ops = [O1, O2, O3]
 markers = ['o', 'D', 's']
-ops_dict = dict(zip(ops, markers))
+names = ['O1', 'O2', 'O3']
+op_dict = dict(zip(ops, markers))
 
 # Set color palette
 colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
-# Make plots
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(nrows=2, ncols=2,
-                                             figsize=(13, 9.5))
-labels = []
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 4))
+
 for i in range(len(Reps)):
-    ax1.plot(op_array, leakiness(K_A, K_I, e_AI, Reps[i], op_array),
-    color=colors[i], label=Reps[i])
-    ax2.plot(op_array, saturation(K_A, K_I, e_AI, Reps[i], op_array),
-    color=colors[i])
-    ax3.plot(op_array, dynamic_range(K_A, K_I, e_AI, Reps[i], op_array),
-    color=colors[i])
-    ax4.axis('off')
-
+    ax[0].semilogy(ops_range, EC50(K_A, K_I, e_AI, Reps[i],
+                                   ops_range) * 1E-6, color=colors[i], label=Reps[i])
+    ax[1].plot(ops_range, effective_Hill(
+        K_A, K_I, e_AI, Reps[i], ops_range), color=colors[i])
     for op in ops:
-        ax1.plot(op, leakiness(K_A, K_I, e_AI, Reps[i], op),
-                 marker=ops_dict[op],
-                 markerfacecolor='white', markeredgecolor=colors[i],
-                 markeredgewidth=2)
-        ax2.plot(op, saturation(K_A, K_I, e_AI, Reps[i], op),
-                 marker=ops_dict[op],
-                 markerfacecolor='white', markeredgecolor=colors[i],
-                 markeredgewidth=2)
-        ax3.plot(op, dynamic_range(K_A, K_I, e_AI, Reps[i], op),
-                 marker=ops_dict[op],
-                 markerfacecolor='white', markeredgecolor=colors[i],
-                 markeredgewidth=2)
+        ax[0].semilogy(op, EC50(K_A, K_I, e_AI, Reps[i], op) * 1E-6, op_dict[op],
+                       markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=1, markersize=5)
+        ax[1].plot(op, effective_Hill(K_A, K_I, e_AI, Reps[i], op), op_dict[op],
+                   markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=1, markersize=5)
 
-
-# Create legends
-empty = [Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0)] # List containing one empty rectangle
+# Plot legend
 ims = []
-for m in markers:
-    for i in range(len(Reps)):
-        ims.append(mlines.Line2D([], [], marker=m, markerfacecolor='white',
-                   markeredgecolor=colors[i], markeredgewidth=2, linestyle='None'))
-legend_handles = empty * 8 + ims[:6] + empty + ims[6:12] + empty + ims[12:]
-
-rep_labels = ['rep./cell', '1740', '1220', '260', '124', '60', '22']
-op_labels = [['O1'], ['O2'], ['O3']]
-empty_label = ['']
-legend_labels = rep_labels + op_labels[0] + empty_label * 6 + op_labels[1] + empty_label * 6 + op_labels[2] + empty_label * 6
-ax3.legend(legend_handles, legend_labels, ncol=4, bbox_to_anchor=(2.1, 0.85), handletextpad=-1.65, fontsize=15)
-
-leg = ax1.legend(loc='upper left', title='repressors/cell')
+for i in range(3):
+    ims.append(mlines.Line2D([], [], color='gray',
+                             marker=markers[i], label=names[i], linestyle='None'))
+ax[0].add_artist(ax[0].legend(handles=ims, ncol=3, loc='upper left',
+                              handletextpad=0, columnspacing=0.5, fontsize=8))
+leg = ax[0].legend(title='rep./cell')
 leg.get_title().set_fontsize(15)
 
-# Label axes
-labels_dict = {ax1 : {'ylabel' : 'leakiness', 'plotlabel' : '(A)'},
-               ax2 : {'ylabel' : 'saturation', 'plotlabel' : '(B)'},
-               ax3 : {'ylabel' : 'dynamic range', 'plotlabel' : '(C)'}}
-for ax in (ax1, ax2, ax3):
-    ax.set_xlabel(r'binding energy $\Delta \varepsilon_{RA}\ (k_BT)$')
-    ax.set_ylabel(labels_dict[ax]['ylabel'])
-    ax.text(-20.5, 1.02, labels_dict[ax]['plotlabel'], fontsize=20)
+# Set axes properties
+ax[0].set_ylim(3.5E-6, 1E-3)
+ax[0].set_xlabel(r'binding energy $\Delta \varepsilon_{AI}\ (k_BT)$')
+ax[1].set_xlabel(r'binding energy $\Delta \varepsilon_{AI}\ (k_BT)$')
+ax[0].set_ylabel(r'[$EC_{50}$]')
+ax[1].set_ylabel('effective Hill coefficient')
 
+plt.figtext(0.0, 0.95, '(A)', fontsize=12)
+plt.figtext(0.5, 0.95, '(B)', fontsize=12)
+mwc.scale_plot(fig, 'one_row')
+plt.tight_layout()
 plt.savefig('../../figures/SI_figs/figS27.pdf', bbox_inches='tight')

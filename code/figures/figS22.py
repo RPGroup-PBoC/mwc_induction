@@ -21,7 +21,7 @@ import seaborn as sns
 
 mwc.set_plotting_style()
 
-#===============================================================================
+# ===============================================================================
 # Read the data
 #===============================================================================
 # Define working directory
@@ -40,25 +40,14 @@ df = pd.read_csv(datadir + files[0], comment='#')
 df = pd.concat([df, df_Oid])
 # Drop rows containing NA values
 df.dropna(axis=1, inplace=True)
+# Now we remove the autofluorescence, delta, and higher IPTG values
+df = df[(df.rbs != 'auto') & (df.rbs != 'delta') & (df.IPTG_uM == 0)]
 
-# Now we remove the autofluorescence and delta values
-df = df[(df.rbs != 'auto') & (df.rbs != 'delta')]
-
+# Let's import the data from HG 2011 and RB 2014
+df_old = pd.read_csv(datadir + 'tidy_lacI_titration_data.csv', comment='#')
 #===============================================================================
-# Load MCMC flatchain
-#===============================================================================
-# O2 - RBS1027 fit
-# Load the flat-chain
-with open('../../data/mcmc/main_text_KaKi.pkl', 'rb') as file:
-    unpickler = pickle.Unpickler(file)
-    gauss_flatchain_O2 = unpickler.load()
-    gauss_flatlnprobability_O2 = unpickler.load()
-
-# map value of the parameters
-max_idx = np.argmax(gauss_flatlnprobability_O2, axis=0)
-ea, ei, sigma = gauss_flatchain_O2[max_idx]
-
 # Global fit
+#===============================================================================
 # Load the flat-chain
 with open('../../data/mcmc/SI_E_global.pkl', 'rb') as file:
     unpickler = pickle.Unpickler(file)
@@ -66,11 +55,11 @@ with open('../../data/mcmc/SI_E_global.pkl', 'rb') as file:
     gauss_flatlnprobability = unpickler.load()
 
 # Generate a Pandas Data Frame with the mcmc chain
-columns = np.concatenate([['ea', 'ei', 'sigma'],\
-          [df[df.repressors==r].rbs.unique()[0] for r in \
-              np.sort(df.repressors.unique())],
-          [df[df.binding_energy==o].operator.unique()[0] for o in \
-              np.sort(df.binding_energy.unique())]])
+columns = np.concatenate([['ea', 'ei', 'sigma'],
+                          [df[df.repressors == r].rbs.unique()[0] for r in
+                           np.sort(df.repressors.unique())],
+                          [df[df.binding_energy == o].operator.unique()[0] for o in
+                           np.sort(df.binding_energy.unique())]])
 
 mcmc_df = pd.DataFrame(gauss_flatchain, columns=columns)
 # Generate data frame with mode values for each parameter
@@ -81,130 +70,114 @@ param_fit = pd.DataFrame(gauss_flatchain[max_idx, :], index=columns,
 map_param = param_fit['mode'].to_dict()
 
 #===============================================================================
-# Plot the theory vs data for all 4 operators with the credible region
+# Plot the theory vs data for all 3 operators
 #===============================================================================
-# Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-7, -2, 100)
-IPTG_lin = np.array([0, 1E-7])
-
+## Flow Data ##
+# Define the number of repressors for the theoretical predictions
+r_array = np.logspace(0, 3.5, 100)
 # Set the colors for the strains
-colors = sns.color_palette('colorblind', n_colors=7)
-colors[4] = sns.xkcd_palette(['dusty purple'])[0]
+colors = sns.color_palette('colorblind', n_colors=4)
 
 # Define the operators and their respective energies
-operators = ['Oid']
-energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17.0}
+operators = ['O1', 'O2', 'O3', 'Oid']
+energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
 # Initialize the plot to set the size
+#fig = plt.figure(figsize=(4.5, 4.5))
 sns.set_context('paper')
-fig, ax = plt.subplots(1, 2, figsize=(11, 4))
-#fig = plt.figure()
-#ax1 = plt.subplot(121, aspect=2/3)
-#ax2 = plt.subplot(122, aspect=2/3)
-#ax = [ax1, ax2]
+fig = plt.figure()
+ax = plt.subplot(111, aspect=2 / 3)
+# plt.axis('scaled')
 
-# Loop through operators
-for i, op in enumerate(operators):
-    print(op)
-    data = df[df.operator==op]
-    # loop through RBS mutants
-    for j, rbs in enumerate(df.rbs.unique()):
-        # Check if the RBS was measured for this operator
-        if rbs in data.rbs.unique():
-        # plot the theory using the parameters from the fit.
-        ## O2 - 1027 fit ##
-        # Log-scale
-            ax[0].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
-                ea=ea, ei=ei, epsilon=4.5,
-                R=np.array(df[(df.rbs == rbs)].repressors.unique()),
-                epsilon_r=energies[op]),
-                color=colors[j], label=None, zorder=1)
-            # Linear scale
-            ax[0].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
-                ea=ea, ei=ei, epsilon=4.5,
-                R=np.array(df[(df.rbs == rbs)].repressors.unique()),
-                epsilon_r=energies[op]),
-                color=colors[j], label=None, zorder=1, linestyle='--')
+## HG and RB data ##
+df_group = df_old.groupby('operator')
+i = 0
+for group, data in df_group:
+    # Extract HG data
+    garcia = data[data.author == 'garcia']
+    ax.plot(garcia.repressor, garcia.fold_change, color=colors[i],
+            lw=0, marker='o', label='', alpha=0.75)
+    # Extract RB data
+    brewster = data[data.author == 'brewster']
+    ax.plot(brewster.repressor, brewster.fold_change, color=colors[i],
+            lw=0, marker='D', label='', alpha=0.75)
+    i += 1
 
-        ## Global fit ##
-        # Log scale
-            ax[1].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
-                ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
-                R=map_param[rbs],
-                epsilon_r=map_param[op]),
-                color=colors[j])
-            # Linear scale
-            ax[1].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
-                ea=map_param['ea'], ei=map_param['ei'], epsilon=4.5,
-                R=map_param[rbs],
-                epsilon_r=map_param[op]),
-                color=colors[j], linestyle='--')
+# Group data by operator
+df_group = df.groupby('operator')
 
-            # plot 95% HPD region using the variability in the MWC parameters
-            ## O2 - 1027 fit ##
-            # Log scale
-            cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-                gauss_flatchain_O2, epsilon=4.5,
-                R=df[(df.rbs == rbs)].repressors.unique(),
-                epsilon_r=energies[op])
-            ax[0].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                            alpha=0.3, color=colors[j])
-            ## Global fit ##
-            # Log scale
-            flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
-            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG * 1E6,
-                flatchain, epsilon=4.5)
-            ax[1].fill_between(IPTG, cred_region[0,:], cred_region[1,:],
-                            alpha=0.3, color=colors[j])
-            # Linear scale
-            flatchain = np.array(mcmc_df[['ea', 'ei', rbs, op]])
-            cred_region = mwc.mcmc_cred_reg_error_prop(IPTG_lin * 1E6,
-                flatchain, epsilon=4.5)
-            ax[1].fill_between(IPTG_lin, cred_region[0,:], cred_region[1,:],
-                            alpha=0.3, color=colors[j])
+# initialize counter (because of df_group)
+i = 0
 
-        # Plot the raw data for Oid
-        if rbs in data.rbs.unique():
-            label=df[df.rbs==rbs].repressors.unique()[0] * 2
-        else:
-            label=''
-        ax[0].plot(data[data.rbs==rbs].IPTG_uM / 1E6,
-                data[data.rbs==rbs].fold_change_A, marker='o', lw=0,
-                color=colors[j], label=label)
-        ax[1].plot(data[data.rbs==rbs].IPTG_uM / 1E6,
-                data[data.rbs==rbs].fold_change_A, marker='o', lw=0,
-                color=colors[j], label=label)
+for group, data in df_group:
+    # Compute the theoretical fold change for this operator
+    #### Hernan energies ####
+    fc = mwc.fold_change_log(np.array([0]), map_param['ea'],
+                             map_param['ei'], 4.5,
+                             r_array / 2, data.binding_energy.unique())
+    ax.plot(r_array, fc, color=colors[i],
+            label=group)
 
+    #### Global fit energies ####
+    fc = mwc.fold_change_log(np.array([0]), map_param['ea'],
+                             map_param['ei'], 4.5,
+                             r_array / 2, map_param[group])
+    ax.plot(r_array, fc, color=colors[i], linestyle='--',
+            label='')  # str(np.round(map_param[group], 1))
 
-    # Add operator and binding energy labels.
-    ax[0].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
-    ax[0].set_xlabel('IPTG (M)', fontsize=15)
-    ax[0].set_ylabel('fold-change', fontsize=16)
-    ax[0].set_ylim([-0.01, 1.1])
-    ax[0].set_xlim(left=-5E-9)
-    ax[0].tick_params(labelsize=14)
+    # compute the mean value for each concentration
+    fc_mean = data.groupby('repressors').fold_change_A.mean()
+    # compute the standard error of the mean
+    fc_err = data.groupby('repressors').fold_change_A.std() / \
+        np.sqrt(data.groupby('repressors').size())
+    log_fc_err = fc_mean - 10**(np.log10(fc_mean) -
+                                fc_err / fc_mean / np.log(10))
 
-    ax[1].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
-    ax[1].set_xlabel('IPTG (M)', fontsize=15)
-    ax[1].set_ylabel('fold-change', fontsize=16)
-    ax[1].set_ylim([-0.01, 1.1])
-    ax[1].set_xlim(left=-5E-9)
-    ax[1].tick_params(labelsize=14)
+    log_fc_err = np.vstack([log_fc_err, 10**(np.log10(fc_mean) +
+                                             fc_err / fc_mean / np.log(10)) -
+                            fc_mean])
+    # plot the experimental data
+    ax.errorbar(fc_mean.index * 2, fc_mean,
+                yerr=log_fc_err,
+                fmt='o', markeredgecolor=colors[i], label='',
+                markerfacecolor='white', markeredgewidth=2)
+    i += 1
 
-ax[0].text(0.67, 0.02,
-            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %energies[op],
-            transform=ax[0].transAxes, fontsize=13)
-ax[1].text(0.67, 0.02,
-            r'$\Delta\varepsilon_{RA} = %s\,k_BT$' %np.round(map_param[op], 1),
-            transform=ax[1].transAxes, fontsize=13)
+main_legend = ax.legend(loc='center left', title='operator')
 
+l1 = ax.plot([], [], marker='o',
+             markeredgecolor='k', markerfacecolor='w', markeredgewidth=2,
+             label='flow cytometry', lw=0)
+l2 = ax.plot([], [], marker='o', color='k', alpha=0.75,
+             label='HG & RP 2011,\nMiller assay', lw=0)
+l3 = ax.plot([], [], marker='D', color='k', alpha=0.75,
+             label='RB et al. 2014,\ntime lapse microscopy', lw=0)
+l4 = ax.plot([], [], color='k', alpha=0.75,
+             label='HG & RP 2011 fit')
+l5 = ax.plot([], [], color='k', alpha=0.75, linestyle='--',
+             label='global fit')
+extra_legend = [l1, l2, l3, l4, l5]
 
-main_legend = ax[0].legend(loc='upper left', title='repressors / cell')
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.set_xlabel('repressors / cell')
+ax.set_ylabel('fold-change')
+ax.set_xlim(right=10**3.5)
+ax.set_ylim(top=2)
 
+# Add the extra legend
+labels = ['this study',
+          'HG & RP 2011',
+          'RB et al. 2014',
+          'HG & RP 2011 fit',
+          'global fit']
+leg = ax.legend([l[0] for l in extra_legend], labels,
+                loc='lower left', fontsize=8)
+plt.gca().add_artist(main_legend)
 
-
-plt.figtext(0.0, .95, '(A)', fontsize=20)
-plt.figtext(0.50, .95, '(B)', fontsize=20)
+leg.set_zorder(1)
 
 plt.tight_layout()
-plt.savefig('../../figures/SI_figs/figS22.pdf', bbox_inches='tight')
+mwc.scale_plot(fig, 'single_plot_wide')
+plt.savefig('../../figures/SI_figs/figS22.pdf',
+            bbox_inches='tight')

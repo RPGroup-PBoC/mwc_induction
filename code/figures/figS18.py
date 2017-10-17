@@ -14,13 +14,15 @@ import pandas as pd
 # For rendering in Hydrogen.
 # %matplotlib inline
 mwc.set_plotting_style()
-colors=sns.color_palette('colorblind').as_hex()
+colors = sns.color_palette('colorblind').as_hex()
 colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
 sns.set_palette(colors)
 
 # colors.reverse()
 
 # Define the relevant functions.
+
+
 def generic_hill_fn(a, b, c, ep, n):
     """
     Computes a generic Hill function of the form
@@ -34,6 +36,7 @@ def generic_hill_fn(a, b, c, ep, n):
 def fc_function(R, ep_r, hill_args, n_ns=4.6E6):
     h_c = generic_hill_fn(*hill_args)
     return (1 + h_c * (R / n_ns) * np.exp(-ep_r))**-1
+
 
 def jeffreys(val):
     return -tt.log(val)
@@ -114,39 +117,9 @@ def compute_statistics(df, ignore_vars='logp'):
 
     return var_stats
 
-# %% Load the data set.
-data = pd.read_csv('data/flow_master.csv', comment='#')
-
-# Slice out the O2 RBS1027 data.
-leak_data = data[(data['IPTG_uM'] == 0) & (data['operator']=='O2')]
-
-# Fit parameter "a" just from the leakiness.
-model = pm.Model()
-with model:
-    a = pm.Uniform('a', lower=0, upper=2, testval=0.9)
-    R = 2 * leak_data['repressors'].values
-    ep_r = leak_data['binding_energy'].unique()
-    sigma = pm.DensityDist('sigma', jeffreys, testval=1)
-
-    # Compute the expected value.
-    fc_exp = fc_function(R, ep_r, (a, 0, 0, 0, 0))
-
-    # Compute the likelihood.
-    obs = leak_data['fold_change_A'].values
-    like = pm.Normal('likelihood', mu=fc_exp, sd=sigma,
-                     observed=obs)
-    # find the MAP as the starting position.
-    start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
-    step = pm.Metropolis()
-    burn = pm.sample(draws=10000, step=step, start=start, njobs=None)
-    step = pm.Metropolis()
-    trace = pm.sample(draws=50000, step=step, start=burn[-1], njobs=None)
-
-    # Convert the trace to a dataframe and compute the statistics.
-    a_df = trace_to_df(trace, model=model)
-    stats = compute_statistics(a_df)
 
 # %%
+data = pd.read_csv('../../data/flow_master.csv')
 O2_data = data[(data['operator'] == 'O2') & (data['rbs'] == 'RBS1027')]
 # Set up the MCMC.
 model = pm.Model()
@@ -172,12 +145,7 @@ with model:
                      observed=O2_data['fold_change_A'].values)
 
     # Find the MAP and sample.
-    start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
-    step = pm.Metropolis()
-    burn = pm.sample(draws=10000, start=start, step=step, njobs=None)
-    step = pm.Metropolis()
-    trace = pm.sample(draws=50000, njobs=None,
-                      start=burn[-1], step=step)
+    trace = pm.sample(draws=5000, tune=10000, njobs=4)
 
     # Convert the trace to a dataframe and compute the statistics.
     df = trace_to_df(trace,  model)
@@ -185,8 +153,7 @@ with model:
     stats = compute_statistics(df)
 
 
-
-# Extract the modes.
+#%% Extract the modes.
 modes = {}
 grouped = stats.groupby('var')
 for g, d in grouped:
@@ -204,9 +171,8 @@ np.sort(data.repressors.unique())
 data = data[data['repressors'] > 0]
 axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
 binding_energy = {i: j for i, j in zip(data['operator'].unique(),
-                                  data['binding_energy'].unique())}
-color_key = {i:j for i, j in zip([870, 610, 130, 62, 30, 11], colors)}
-
+                                       data['binding_energy'].unique())}
+color_key = {i: j for i, j in zip([870, 610, 130, 62, 30, 11], colors)}
 
 
 c_range = np.logspace(-2, 4, 500)
@@ -252,9 +218,9 @@ for g, d in grouped:
         axes[g[0]].plot(_g / 1E6, mean_fc, 'o', markerfacecolor=face,
                         markersize=5, markeredgecolor=color_key[g[1]],
                         markeredgewidth=1)
-                        
+
     axes[g[0]].set_title(r'Operator %s, $\Delta\varepsilon_{RA} = %s\, k_BT$'
-                         %(g[0], binding_energy[g[0]]), backgroundcolor='#FFEDCE', y=1.03, fontsize=12)
+                         % (g[0], binding_energy[g[0]]), backgroundcolor='#FFEDCE', y=1.03, fontsize=12)
 for a in ax:
     a.set_xscale('log')
     a.set_xlim([1E-8, 1E-2])
@@ -265,12 +231,13 @@ for a in ax:
 
 ax[1].legend(title='rep. / cell', loc='upper left', fontsize=10)
 
-ax[0].text(-0.20, 1.05, '(A)', fontsize=15, transform=ax[0].transAxes)
-ax[1].text(-0.20, 1.05, '(B)', fontsize=15, transform=ax[1].transAxes)
-ax[2].text(-0.20, 1.05, '(C)', fontsize=15, transform=ax[2].transAxes)
+ax[0].text(-0.20, 1.05, '(A)', fontsize=12, transform=ax[0].transAxes)
+ax[1].text(-0.20, 1.05, '(B)', fontsize=12, transform=ax[1].transAxes)
+ax[2].text(-0.20, 1.05, '(C)', fontsize=12, transform=ax[2].transAxes)
 # ax[3].text(-0.20, 1.05, '(D)', fontsize=15, transform=ax[3].transAxes)
 ax[-1].set_axis_off()
+mwc.scale_plot(fig, 'three_row')
 plt.tight_layout()
-plt.savefig('figures/SI_figs/figS17_pact_hill.pdf')
+plt.savefig('figures/SI_figs/figS18.pdf')
 
 stats

@@ -84,7 +84,7 @@ rep = 260  # repressors per cell
 for i, eRA in enumerate(era_num):
     # compute the ∆fold-change_Ka
     delta_fc = fold_change_oo(Ka_num, Ki_num, rep, eRA) - \
-               fold_change_oo(Ka_array, Ki_num, rep, eRA)
+        fold_change_oo(Ka_array, Ki_num, rep, eRA)
 
     ax[0].plot(np.log10(Ka_array / Ka_num), delta_fc,
                label=r'{:.1f}'.format(eRA), color=colors[i])
@@ -116,8 +116,8 @@ colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
 repressors = [22, 60, 124, 260, 1220, 1740][::-1]
 eRA = -15.3
-for i, rep in  enumerate(repressors):
-# compute the ∆fold-change_Ka
+for i, rep in enumerate(repressors):
+    # compute the ∆fold-change_Ka
     delta_fc = fold_change_oo(Ka_num, Ki_num, rep, eRA) - \
         fold_change_oo(Ka_array, Ki_num, rep, eRA)
 
@@ -145,10 +145,12 @@ ax[3].legend(loc='center left', title=r'repressors / cell', ncol=1,
 
 
 # Label plot
-plt.figtext(0.0, .95, '(A)', fontsize=20)
-plt.figtext(0.50, .95, '(B)', fontsize=20)
-plt.figtext(0.0, .46, '(C)', fontsize=20)
-plt.figtext(0.50, .46, '(D)', fontsize=20)
+plt.figtext(0.0, .95, '(A)', fontsize=12)
+plt.figtext(0.50, .95, '(B)', fontsize=12)
+plt.figtext(0.0, .46, '(C)', fontsize=12)
+plt.figtext(0.50, .46, '(D)', fontsize=12)
 
+
+mwc.scale_plot(fig, 'two_row')
 plt.tight_layout()
-plt.savefig('../../figures/SI_figs/figS16.pdf', bbox_inches='tight')
+plt.savefig('../../figures/SI_figs/figS15.pdf', bbox_inches='tight')

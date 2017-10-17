@@ -101,7 +101,7 @@ def compute_statistics(df, ignore_vars='logp'):
 
 
 # Load in the data files.
-data = pd.read_csv('data/flow_master.csv')
+data = pd.read_csv('../../data/flow_master.csv')
 
 # Separate only the O2 RBS 1027 files.
 data = data[(data['operator'] == 'O2') & (data['rbs'] == 'RBS1027')]
@@ -110,7 +110,7 @@ data = data[(data['operator'] == 'O2') & (data['rbs'] == 'RBS1027')]
 model = pm.Model()
 with model:
     # Set the pirors as uniform.
-    a = pm.Uniform('a', lower=-1.0, upper=1.0, testval=0.1)
+    a = pm.Uniform('a', lower=0, upper=1.0, testval=0.1)
     b = pm.Uniform('b', lower=-7.0, upper=7.0, testval=0)
     ep = pm.Uniform('ep', lower=-10, upper=10, testval=3)
     sigma = pm.DensityDist('sigma', jeffreys, testval=1)
@@ -127,71 +127,11 @@ with model:
                      observed=data['fold_change_A'].values)
 
     # Sample the distribution.
-    step = pm.Metropolis()
-    start = pm.find_MAP(model=model, fmin=scipy.optimize.fmin_powell)
-    burn = pm.sample(draws=10000, njobs=10, step=step, start=start)
-    step = pm.Metropolis()
-    trace = pm.sample(draws=50000, tune=100000, njobs=10, step=step,
-                      start=burn[-1])
+    generic_trace = pm.sample(draws=50000, tune=10000, njobs=4)
 
     # Convert the trace to a dataframe.
-    df = trace_to_df(trace, model)
-    df['kd'] = np.exp(df['ep'])
-
-    # Compute the statistics.
-    stats = compute_statistics(df)
-
-# %%
-stats = compute_statistics(df)
-stats['kd']
-# Compute the credible region for the fold-change curve.
-c_range = np.logspace(-2, 4, 500)
-cred_region = np.zeros([2, len(c_range)])
-for i, c in enumerate(c_range):
-    params = (df['a'], df['b'], c, df['ep'], df['n'])
-    fc_val = generic_hill_fn(*params)
-    cred_region[:, i] = mwc.hpd(fc_val, 0.95)
-
-# Extract the modes and plot the fit + credible regions.
-modes = {}
-grouped = stats.groupby('var')
-for g, d in grouped:
-    modes[g] = d[0]
-
-fit = generic_hill_fn(modes['a'], modes['b'], c_range, modes['ep'], modes['n'])
-
-
-fig, ax = plt.subplots(1, 1, figsize=(5, 3))
-grouped = data.groupby('IPTG_uM')
-for g, d in grouped:
-    sem = np.std(d['fold_change_A']) / np.sqrt(len(d))
-    mean = d['fold_change_A'].mean()
-    if g == 5000.0:
-        label = 'data'
-    else:
-        label = '__nolegend__'
-    ax.errorbar(g / 1E6, mean, yerr=sem, linestyle='none', color='r', zorder=1,
-                label='__nolegend__')
-    ax.plot(g / 1E6, mean, marker='o', markerfacecolor='w', markersize=4,
-            markeredgewidth=2, markeredgecolor='r', label=label, zorder=2,
-            linestyle='none')
-
-ax.fill_between(c_range / 1E6, cred_region[0, :], cred_region[1, :],
-                color='r', label='__nolegend__', alpha=0.5)
-ax.plot(c_range / 1E6, fit, color='r', label='Hill function fit', zorder=1)
-ax.legend(loc='upper left')
-ax.set_xlabel('[IPTG] (M)', fontsize=11)
-ax.set_ylabel('fold-change', fontsize=11)
-ax.xaxis.set_tick_params(labelsize=10)
-ax.yaxis.set_tick_params(labelsize=10)
-ax.set_xscale('log')
-ax.set_ylim([-0.01, 1])
-ax.set_xlim([1E-8, 1E-2])
-ax.set_title('$R$ = 260, Operator O2', backgroundcolor='#FFEDCE', y=1.03,
-             fontsize=11)
-
-plt.savefig('figures/SI_figs/figS16_generic_hill.pdf', bbox_inches='tight')
-
+    generic_df = trace_to_df(generic_trace, model)
+    generic_df['kd'] = np.exp(generic_df['ep'])
 
 # %% Computing the parameters for all eighteen strains.
 data = pd.read_csv('data/flow_master.csv')
@@ -241,7 +181,69 @@ for g, d in tqdm(grouped):
             _df = pd.Series(param_dict)
             kd_df = kd_df.append(_df, ignore_index=True)
 
-kd_df.to_csv('data/hill_params.csv', index=False)
+kd_df.to_csv('../../data/hill_params.csv', index=False)
+
+
+# %%
+%matplotlib inline
+_ = pm.traceplot(generic_trace)
+df = pm.trace_to_dataframe(generic_trace)
+
+
+# Load the data.
+kd_df = pd.read_csv('../../data/hill_params.csv')
+O2_R260 = kd_df[(kd_df['operator'] == 'O2') & (kd_df['repressors'] == 260)]
+
+# Compute the credible region for the fold-change curve.
+c_range = np.logspace(-2, 4, 500)
+cred_region = np.zeros([2, len(c_range)])
+for i, c in enumerate(c_range):
+    params = (df['a'], df['b'], c, df['ep'], df['n'])
+    fc_val = generic_hill_fn(*params)
+    cred_region[:, i] = mwc.hpd(fc_val, 0.95)
+df
+# Extract the modes and plot the fit + credible regions.
+modes = {}
+grouped = O2_R260.groupby('param')
+for g, d in grouped:
+    modes[g] = d['mode'].values[0]
+fit = modes['a'] + modes['b'] * \
+    (c_range / modes['kd'])**modes['n'] / \
+    (1 + (c_range / modes['kd'])**modes['n'])
+
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 3))
+grouped = data.groupby('IPTG_uM')
+for g, d in grouped:
+    sem = np.std(d['fold_change_A']) / np.sqrt(len(d))
+    mean = d['fold_change_A'].mean()
+    if g == 5000.0:
+        label = 'data'
+    else:
+        label = '__nolegend__'
+    ax.errorbar(g / 1E6, mean, yerr=sem, linestyle='none', color='r', zorder=1,
+                label='__nolegend__')
+    ax.plot(g / 1E6, mean, marker='o', markerfacecolor='w', markersize=4,
+            markeredgewidth=1.5, markeredgecolor='r', label=label, zorder=2,
+            linestyle='none')
+
+ax.fill_between(c_range / 1E6, cred_region[0, :], cred_region[1, :],
+                color='r', label='__nolegend__', alpha=0.5)
+ax.plot(c_range / 1E6, fit, color='r', label='Hill function fit', zorder=1)
+ax.legend(loc='upper left')
+ax.set_xlabel('[IPTG] (M)', fontsize=11)
+ax.set_ylabel('fold-change', fontsize=11)
+ax.xaxis.set_tick_params(labelsize=10)
+ax.yaxis.set_tick_params(labelsize=10)
+ax.set_xscale('log')
+ax.set_ylim([-0.01, 1])
+ax.set_xlim([1E-8, 1E-2])
+ax.set_title('$R$ = 260, Operator O2', backgroundcolor='#FFEDCE', y=1.03,
+             fontsize=11)
+mwc.scale_plot(fig, 'single_plot_wide')
+plt.tight_layout()
+plt.savefig('../../figures/SI_figs/figS16.pdf', bbox_inches='tight')
+
 
 # %%
 # load the cv file of all of the parameters.
@@ -249,7 +251,6 @@ params = pd.read_csv('../../data/hill_params.csv')
 
 # Keep only those with repressors greater than zero
 params = params[params['repressors'] > 0]
-
 
 # %%Plot the parameter values.
 plt.close('all')
@@ -281,7 +282,7 @@ for d in glyphs.keys():
     ax[0].plot([], [], marker=glyphs[d], markerfacecolor='w',
                markeredgecolor='k', markersize=3, markeredgewidth=1.5, label=d,
                linestyle='none')
-ax[0].legend(ncol=3, bbox_to_anchor=(1.0, 1.3), fontsize=10)
+ax[0].legend(ncol=3, bbox_to_anchor=(0.95, 1.2), fontsize=10)
 
 ax_dict = {'a': 0, 'b': 1, 'kd': 2, 'n': 3}
 for a in ax:
@@ -336,5 +337,6 @@ for a in ax:
 for a in [ax[2],  ax[3]]:
     a.set_yscale('log')
 
+mwc.scale_plot(fig, 'two_row')
 plt.tight_layout()
-plt.savefig('../../figures/SI_figs/figSX_hill_params.pdf', bbox_inches='tight')
+plt.savefig('../../figures/SI_figs/figS17.pdf', bbox_inches='tight')

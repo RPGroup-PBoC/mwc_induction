@@ -1,143 +1,232 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-import matplotlib.lines as mlines
-
 import mwc_induction_utils as mwc
-mwc.set_plotting_style()
 
-# Functions for calculating fold change, EC50, and effective Hill coefficient
+# Define the fold-change functions and the p_act.
 
-def pact(IPTG, K_A, K_I, e_AI):
-    '''
-    Computes the probability that a repressor is active
+
+def p_act(c_range, k_a, k_i, ep_ai=5, n_sites=int(2)):
+    """
+    Computes the probability of finding an active transcription factor
+    at a given range of ligand concentrations.
+
     Parameters
     ----------
-    IPTG : array-like
-        Array of IPTG concentrations in uM
-    K_A : float
-        Dissociation constant for active repressor
-    K_I : float
-        Dissociation constant for inactive repressor
-    e_AI : float
-        Energetic difference between the active and inactive state
+    c_range : 1d-array
+        Range of ligand concentrations over which to compute the probability
+        of finding an active transcription factor. This should be in the same
+        units as k_a and k_i.
+    k_a, k_i : floats
+        Ligand dissociation constants for the active and inactive transcription
+        factors respectively. These should be in the same units as c_range.
+    ep_ai : float
+        Difference in energy between the active and inactive states of the
+        transcription factor. The default value is -4.5 kBT.
+    n_sites : int
+        Number of cooperative ligand binding sites on the transcription
+        factor. The default value is 2.
+
     Returns
     -------
-    probability that repressor is active
-    '''
-    pact = (1 + IPTG * 1 / K_A)**2 / \
-    (((1 + IPTG * 1 / K_A))**2 + np.exp(-e_AI) * (1 + IPTG * 1 / K_I)**2)
-    return pact
+    p_act : 1d-array
+        The probability of finding an active transcription factor at each
+        ligand concentration specified in c_range.
 
-def fold_change(IPTG, K_A, K_I, e_AI, R, Op):
-    '''
-    Computes fold-change for simple repression
+    Raises
+    ------
+    TypeError:
+        This exception is thrown if the provided number of cooperative ligand
+        binding sites, n_sites, is not an integer.
+    """
+    if type(n_sites) is not int:
+        raise TypeError('n_sites must be an integer.')
+
+    numer = (1 + c_range / k_a)**n_sites
+    denom = numer + np.exp(-ep_ai) * (1 + c_range / k_i)**n_sites
+    return numer / denom
+
+
+def fc_repression(c_range, num_rep,  k_a, k_i, ep_r, ep_ai=5,
+                  n_sites=int(2), n_ns=4.6E6):
+    """
+    Computes the fold-change for a simple repression motif over a range of
+    ligand concentrations.
+
     Parameters
     ----------
-    IPTG : array-like
-        Array of IPTG concentrations in uM
-    K_A : float
-        Dissociation constant for active repressor
-    K_I : float
-        Dissociation constant for inactive repressor
-    e_AI : float
-        Energetic difference between the active and inactive state
-    R : float
-        Number of repressors per cell
-    Op : float
-        Operator binding energy
+    c_range : 1d-array
+        Range of ligand concentrations over which to compute the fold-change.
+    num_rep : int
+        Number of repressors in the cell.
+    k_a, k_i : floats
+        Ligand dissociation constants for the active and inactive transcription
+        factor respectively. These should be in the same units as c_range.
+    ep_r : float
+        Binding energy of the  transcription factor to the DNA. This should be
+        in units of kBT.
+    ep_ai : float
+        Difference in energy between the active an inactive state of the
+        transcription factor. Default value is 4.5 kBT.
+    n_sites : int
+        Number of cooperative ligand binding sites on the transcription factors
+    n_ns : int
+        Number of nonspecific binding sites available to teh transcription factor. Default value is 4.6E6, the length of the E. coli genome in
+        basepairs.
+
     Returns
     -------
-    probability that repressor is active
-    '''
-    return 1 / (1 + R / 5E6 * pact(IPTG, K_A, K_I, e_AI) * np.exp(-Op))
+    fold_change : 1d-array
+        The fold-change in gene expression for the simple repression motif
+        at each concentration of ligand given in c_range.
 
-def EC50(K_A, K_I, e_AI, R, Op):
-    '''
-    Computes the concentration at which half of the repressors are in the active state
+    Raises
+    ------
+    TypeError:
+        This is thrown when the provided n_sites variable is not an integer.
+        Thrown by the function p_act.
+    """
+    # Compute the MWC probability.
+    mwc_term = p_act(c_range, k_a, k_i, n_sites=n_sites, ep_ai=ep_ai)
+
+    # Compute and return the foldchange.
+    repression = 1 + mwc_term * (num_rep / n_ns) * np.exp(-ep_r)
+    return 1 / repression
+
+
+def fc_activation(c_range, num_act, k_a, k_i, ep_a, ep_ap, ep_ai=4.5,
+                  n_ns=4.6E6, n_sites=int(2)):
+    """
+    Computes the fold-change for a simple repression motif over a range of
+    ligand concentrations.
+
     Parameters
     ----------
-    K_A : float
-        Dissociation constant for active repressor
-    K_I : float
-        Dissociation constant for inactive repressor
-    e_AI : float
-        Energetic difference between the active and inactive state
+    c_range : 1d-array
+        Range of ligand concentrations over which to compute the fold-change.
+    num_act : int
+        Number of activators in the cell.
+    k_a, k_i : floats
+        Ligand dissociation constants for the active and inactive transcription
+        factor respectively. These should be in the same units as c_range.
+    ep_a : float
+        Binding energy of the  transcription factor to the DNA. This should be
+        in units of kBT.
+    ep_ap : float
+        Interaction energy between the active transcription factor and the
+        polymerase when both are bound to the promoter..
+    ep_ai : float
+        Difference in energy between the active an inactive state of the
+        transcription factor. Default value is 4.5 kBT.
+    n_sites : int
+        Number of cooperative ligand binding sites on the transcription factors
+    n_ns : int
+        Number of nonspecific binding sites available to teh transcription factor. Default value is 4.6E6, the length of the E. coli genome in
+        basepairs.
+
     Returns
     -------
-    Concentration at which half of repressors are active (EC50)
-    '''
-    t = 1 + (R / 5E6) * np.exp(-Op) + (K_A / K_I)**2 * (2 * np.exp(-e_AI) + 1 + (R / 5E6) * np.exp(-Op))
-    b = 2 * (1 + (R / 5E6) * np.exp(-Op)) + np.exp(-e_AI) + (K_A / K_I)**2 * np.exp(-e_AI)
-    return K_A * ((K_A / K_I - 1)/(K_A / K_I - (t/b)**(1/2)) -1)
+    fold_change : 1d-array
+        The fold-change in gene expression for the simple repression motif
+        at each concentration of ligand given in c_range.
 
-def effective_Hill(K_A, K_I, e_AI, R, Op):
-    '''
-    Computes the effective Hill coefficient
-    Parameters
-    ----------
-    K_A : float
-        Dissociation constant for active repressor
-    K_I : float
-        Dissociation constant for inactive repressor
-    e_AI : float
-        Energetic difference between the active and inactive state
-    Returns
-    -------
-    effective Hill coefficient
-    '''
-    c = EC50(K_A, K_I, e_AI, R, Op)
-    return 2/(fold_change(c, K_A, K_I, e_AI, R, Op) - fold_change(0, K_A, K_I, e_AI, R, Op))*\
-           (-(fold_change(c, K_A, K_I, e_AI, R, Op))**2 * R / 5E6 * np.exp(-Op) * \
-            2 * c * np.exp(-e_AI) * (1/K_A * (1 + c/K_A) * (1 + c/K_I)**2 - 1/K_I *\
-           (1 + c/K_A)**2 * (1 + c/K_I)) / ((1 + c/K_A)**2 + np.exp(-e_AI) * (1 + c/K_I)**2)**2)
+    Raises
+    ------
+    TypeError:
+        This is thrown when the provided n_sites variable is not an integer.
+        Thrown by the function p_act.
+    """
+    # Compute the MWC probability.
+    mwc_term = p_act(c_range, k_a, k_i, n_sites=n_sites, ep_ai=ep_ai)
 
-# Define parameters
-K_A = 139
-K_I = 0.53
-e_AI = 4.5
-ops_range = np.linspace(-18, -8, 50)
-Reps = np.array([1740, 1220, 260, 124, 60, 22])
-O1 = -15.3
-O2 = -13.9
-O3 = -9.7
-ops = [O1, O2, O3]
-markers = ['o', 'D', 's']
-names = ['O1', 'O2', 'O3']
-op_dict = dict(zip(ops, markers))
+    # Compute and return the fold-change
+    numer = 1 + mwc_term * (num_act / n_ns) * np.exp(-(ep_a + ep_ap))
+    denom = 1 + mwc_term * (num_act / n_ns) * np.exp(-ep_a)
+    return numer / denom
 
-# Set color palette
-colors = sns.color_palette('colorblind', n_colors=7)
-colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 
-fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 4))
 
-for i in range(len(Reps)):
-    ax[0].semilogy(ops_range, EC50(K_A, K_I, e_AI, Reps[i], ops_range)*1E-6, color=colors[i], label=Reps[i])
-    ax[1].plot(ops_range, effective_Hill(K_A, K_I, e_AI, Reps[i], ops_range), color=colors[i])
-    for op in ops:
-        ax[0].semilogy(op, EC50(K_A, K_I, e_AI, Reps[i], op)*1E-6, op_dict[op],
-                       markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=2)
-        ax[1].plot(op, effective_Hill(K_A, K_I, e_AI, Reps[i], op), op_dict[op],
-                   markerfacecolor='white', markeredgecolor=colors[i], markeredgewidth=2)
+# Set the parameters of interest.
+num_tf = [1, 10, 100, 200, 500, 1000]
+ep_tf = [-8, -10, -12, -14, -16, -18]
+ep_ap = [0, -1, -2, -2.5, -3, -4]
+c_range = np.logspace(-9, -2, 500)
+ep_ai = 5
+k1 = 200E-6
+k2 = 0.5E-6
 
-# Plot legend
-ims = []
-for i in range(3):
-    ims.append(mlines.Line2D([], [], color='gray', marker=markers[i], label=names[i], linestyle='None'))
-ax[0].add_artist(ax[0].legend(handles=ims, ncol=3, loc='upper left', handletextpad=0, columnspacing=0.5, fontsize=15))
-leg = ax[0].legend(title='rep./cell')
-leg.get_title().set_fontsize(15)
+# Define the colors.
+tf_colors = sns.color_palette('viridis', n_colors=len(num_tf))
+ep_colors = sns.color_palette('plasma', n_colors=len(ep_tf))
+act_colors = sns.color_palette('Blues', n_colors=8)
 
-# Set axes properties
-ax[0].set_ylim(3.5E-6, 1E-3)
-ax[0].set_xlabel(r'binding energy $\Delta \varepsilon_{AI}\ (k_BT)$')
-ax[1].set_xlabel(r'binding energy $\Delta \varepsilon_{AI}\ (k_BT)$')
-ax[0].set_ylabel(r'[$EC_{50}$]')
-ax[1].set_ylabel('effective Hill coefficient')
+# Set up the figure axis. and add labels.
+plt.close('all')
+fig, ax = plt.subplots(2, 3)
 
-plt.figtext(0.05, 0.95, '(A)', fontsize=20)
-plt.figtext(0.48, 0.95, '(B)', fontsize=20)
+# Format the axes.
+axes = ax.ravel()
+axes[2].set_axis_off()
+for a in axes:
+    a.set_xscale('log')
+    a.set_xlabel('$c / K_A$')
+    a.set_ylabel('fold-change')
+    # Set titles.
+axes[0].set_title('varying TF copy number', backgroundcolor='#FFEDCE', y=1.01)
+axes[1].set_title('varying TF binding energy',
+                  backgroundcolor='#FFEDCE', y=1.01)
+axes[-1].set_title('varying interaction energy',
+                   backgroundcolor='#FFEDCE', y=1.01)
 
+# Add the legend.
+for i, _ in enumerate(num_tf):
+    axes[0].plot([], [], '-', color=tf_colors[i], label=num_tf[i])
+    axes[1].plot([], [], '-', color=ep_colors[i], label=ep_tf[i])
+    axes[2].plot([], [], '-', color=act_colors[i], label=ep_ap[i])
+
+axes[0].legend(title='transcription factors per cell',
+               ncol=3, bbox_to_anchor=(4, 1.2))
+axes[1].legend(title='binding energy ($k_BT$)',
+               ncol=3, bbox_to_anchor=(1.15, 0.8))
+axes[2].legend(title='interaction energy ($k_BT$)',
+               ncol=3, bbox_to_anchor=(1.25, 0.4))
+# Plot Varying TF copy number first.
+for i, T in enumerate(num_tf):
+    # Compute the fold-change curve.
+    corepression_fc = fc_repression(c_range, T, k2, k1, ep_tf[2], -ep_ai)
+    activation_fc = fc_activation(c_range, T, k2, k1, ep_tf[2], ep_ap[2],
+                                  -ep_ai)
+    # Plot the result.
+    _ = ax[0, 0].plot(c_range / k2, corepression_fc, '-', color=tf_colors[i])
+    _ = ax[1, 0].plot(c_range / k2, activation_fc, '-', color=tf_colors[i])
+
+# Plot varying TF binding energy
+for i, ep in enumerate(ep_tf):
+    # Compute the fold-change curve.
+    corepression_fc = fc_repression(c_range, num_tf[3], k2, k1, ep, -ep_ai)
+    activation_fc = fc_activation(c_range, num_tf[3], k2, k1, ep, ep_ap[2],
+                                  -ep_ai)
+    # Plot the result.
+    _ = ax[0, 1].plot(c_range / k2, corepression_fc, '-', color=ep_colors[i])
+    _ = ax[1, 1].plot(c_range / k2, activation_fc, '-', color=ep_colors[i])
+
+# Plot varying activation energy.
+for i, ep in enumerate(ep_ap):
+    # Compute the fold-change curve.
+    activation_fc = fc_activation(c_range, num_tf[3], k2, k1, ep_tf[2], ep,
+                                  -ep_ai)
+    # Plot the result.
+    _ = ax[1, 2].plot(c_range / k2, activation_fc, '-', color=act_colors[i])
+
+# Add various textual labels.
+fig.text(0.02, 0.8, 'corepression', backgroundcolor='#FFEDCE',
+         rotation='vertical')
+
+fig.text(0.02, 0.41, 'inducible activation', backgroundcolor='#FFEDCE',
+         rotation='vertical')
+
+fig.text(0, 0.93, '(A)', fontsize=12)
+fig.text(0, 0.5, '(B)', fontsize=12)
+
+mwc.scale_plot(fig, 'two_row')
+plt.subplots_adjust(hspace=0.3)
 plt.savefig('../../figures/SI_figs/figS28.pdf', bbox_inches='tight')
