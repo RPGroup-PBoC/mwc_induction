@@ -147,8 +147,10 @@ with model:
     # Find the MAP and sample.
     trace = pm.sample(draws=5000, tune=10000, njobs=4)
 
-    # Convert the trace to a dataframe and compute the statistics.
-    df = trace_to_df(trace,  model)
+    # # Convert the trace to a dataframe and compute the statistics.
+    df = pm.trace_to_dataframe(trace)
+    logp = pm.stats._log_post_trace(trace, model).sum(axis=1)
+    df['logp'] = logp
     df['kd'] = np.exp(df['ep'])
     stats = compute_statistics(df)
 
@@ -166,7 +168,7 @@ fig, ax = plt.subplots(2, 2, figsize=(8, 6))
 ax = ax.ravel()
 
 # Define the data and plotting information.
-data = pd.read_csv('data/flow_master.csv', comment='#')
+data = pd.read_csv('../../data/flow_master.csv', comment='#')
 np.sort(data.repressors.unique())
 data = data[data['repressors'] > 0]
 axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
@@ -174,7 +176,8 @@ binding_energy = {i: j for i, j in zip(data['operator'].unique(),
                                        data['binding_energy'].unique())}
 color_key = {i: j for i, j in zip([870, 610, 130, 62, 30, 11], colors)}
 
-
+for r in [870, 610, 130, 62, 30, 11]:
+    ax[0].plot([], [], 'o', color=color_key[r], label=2 * r)
 c_range = np.logspace(-2, 4, 500)
 
 # plot the fits, data, and credible regions.
@@ -192,9 +195,8 @@ for g, d in grouped:
         val = fc_function(2 * g[1], binding_energy[g[0]],
                           (df['a'], df['b'], c, df['ep'], df['n']))
         cred_region[:, i] = mwc.hpd(val, mass_frac=0.95)
-
-    axes[g[0]].plot(c_range / 1E6, fit, color=color_key[g[1]], zorder=1,
-                    label=str(2 * g[1]))
+    #
+    axes[g[0]].plot(c_range / 1E6, fit, color=color_key[g[1]], zorder=1)
     axes[g[0]].fill_between(c_range / 1E6, fit, cred_region[0, :],
                             cred_region[1, :], color=color_key[g[1]],
                             alpha=0.5, zorder=0)
@@ -229,15 +231,17 @@ for a in ax:
     a.set_xlabel('[IPTG] (M)', fontsize=10)
     a.set_ylabel('fold-change', fontsize=10)
 
-ax[1].legend(title='rep. / cell', loc='upper left', fontsize=10)
 
 ax[0].text(-0.20, 1.05, '(A)', fontsize=12, transform=ax[0].transAxes)
 ax[1].text(-0.20, 1.05, '(B)', fontsize=12, transform=ax[1].transAxes)
 ax[2].text(-0.20, 1.05, '(C)', fontsize=12, transform=ax[2].transAxes)
 # ax[3].text(-0.20, 1.05, '(D)', fontsize=15, transform=ax[3].transAxes)
 ax[-1].set_axis_off()
-mwc.scale_plot(fig, 'three_row')
-plt.tight_layout()
-plt.savefig('figures/SI_figs/figS18.pdf')
+mwc.scale_plot(fig, 'two_row')
 
-stats
+leg = ax[0].legend(title='repressors per cell', loc='upper left', fontsize=5,
+                   labelspacing=1)
+leg.get_title().set_fontsize(8)
+fig.set_size_inches(6, 4.5)
+plt.tight_layout()
+plt.savefig('../../figures/SI_figs/figS18.svg')
