@@ -1504,7 +1504,7 @@ def scale_plot(figure, layout):
             plt.setp(a.get_legend().get_texts(), fontsize=7)
 
     # Define the figure sizes.
-    sizes = dict(single_plot_wide=(5, 4), single_plot_tall=(5, 6), single_row=(6, 3), one_row=(6, 2),
+    sizes = dict(single_plot_wide=(5, 4), single_plot_tall=(5, 6), single_row=(6, 3), one_row=(6, 2.5),
                  two_row=(6, 4), three_row=(6, 6))
     figure.set_size_inches(sizes[layout])
     plt.subplots_adjust(wspace=0.35)

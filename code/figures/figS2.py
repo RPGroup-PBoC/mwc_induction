@@ -112,4 +112,5 @@ plt.figtext(0.5, 0.95, '(B)', fontsize=12)
 
 # Format and save
 plt.tight_layout()
+mwc.scale_plot(fig, 'one_row')
 plt.savefig('../../figures/SI_figs/figS2.pdf', bbox_inches='tight')

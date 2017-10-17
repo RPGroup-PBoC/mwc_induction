@@ -144,8 +144,9 @@ for i, a in enumerate(ax[1]):
            transform=a.transAxes)
 
 # Add legend
+mwc.scale_plot(fig, 'two_row')
 leg1 = ax[0][0].legend(title='repressors/cell', loc='upper left', fontsize=6)
 leg1.get_title().set_fontsize(5.5)
 plt.subplots_adjust(wspace=0.35, hspace=0.5)
-# plt.tight_layout()
+plt.tight_layout()
 plt.savefig('../../figures/SI_figs/figS3.pdf', bbox_inches='tight')

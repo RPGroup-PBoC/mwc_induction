@@ -130,6 +130,7 @@ for i, a in enumerate(ax):
 # Add legend
 leg1 = ax[2].legend(title=r'$N_S$', loc='lower right', fontsize=6)
 leg1.get_title().set_fontsize(6)
-
 plt.subplots_adjust(wspace=0.35)
+mwc.scale_plot(fig, 'one_row')
+plt.tight_layout()
 plt.savefig('../../figures/SI_figs/figS4.pdf', bbox_inches='tight')

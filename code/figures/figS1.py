@@ -8,9 +8,9 @@ import sys
 sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
-
-
 # Define the necessary functions:
+
+
 def foldchange(c, R, ep_ai, ep_r, ep_a, ep_i):
     mwc_term = (1 + c / ep_a)**2 * (1 + np.exp(-ep_ai)) / ((1 + c / ep_a)**2 +
                                                            np.exp(-ep_ai) * (1 + c / ep_i)**2)
@@ -76,4 +76,5 @@ fig.text(0.5, 0.92, '(B)', fontsize=15)
 
 # Format and save the figure.
 plt.tight_layout()
+mwc.scale_plot(fig, 'one_row')
 plt.savefig('../../figures/SI_figs/figS1.pdf', bbox_inches='tight')
