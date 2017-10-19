@@ -14,10 +14,8 @@ colors = sns.color_palette('colorblind', n_colors=6)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 colors.reverse()
 
-# %%
-# ######################
 
-
+# Define the necessary functions
 def jeffreys_prior(val):
     return -tt.log(val)
 
@@ -34,15 +32,14 @@ data = pd.read_csv('../../data/flow_master.csv')
 data = data[data['repressors'] > 0]
 
 # %% Group the data by operator and repressor.
-stat_df = []
 samples_df = {}
 grouped_data = data.groupby(['repressors', 'operator'])
 for g, d in grouped_data:
     with pm.Model() as model:
-        g
+
         # Define the priors.
-        a = pm.Normal('a', mu=1, sd=10, testval=0.1)
-        b = pm.Normal('b', mu=0, sd=10, testval=0)
+        a = pm.Uniform('a', lower=0, upper=1, testval=0.1)
+        b = pm.Uniform('b', lower=-1, upper=1, testval=0)
         ep = pm.Normal('ep', mu=0, sd=10, testval=3)
         sigma = pm.DensityDist('sigma', jeffreys_prior, testval=1)
         n = pm.Normal('n', mu=0, sd=100,  testval=2)
@@ -53,7 +50,7 @@ for g, d in grouped_data:
                          observed=d['fold_change_A'].values)
 
         # # Do the sampling.
-        trace = pm.sample(draws=5000, tune=10000)
+        trace = pm.sample(draws=500, tune=1000)
 
         # Convert it to a DataFrame.
 
@@ -62,8 +59,6 @@ for g, d in grouped_data:
             model=model, trace=trace).sum(axis=1)
 
         # Compute the statistics.
-        stats = mwc.compute_statistics(df)
-        stat_df.append(pd.DataFrame(stats))
         samples_df[g] = df
 
 # %%
@@ -76,7 +71,7 @@ params = params[params['repressors'] > 0]
 data = data[data['repressors'] > 0]
 
 # Define the concentration range over which to plot.
-c_range = np.logspace(-9, -2, 500)  # in M.
+c_range = np.logspace(-9, -2, 1000)  # in M.
 lin_ind = np.where(c_range > 1E-7)[0][0]
 # Group parameters by rbs and operator.
 grouped_params = params.groupby(['repressors', 'operator'])
@@ -88,28 +83,45 @@ ax = ax.ravel()
 ops = ['operator O1', 'operator O2', 'operator O3']
 panel_labels = ['(A)', '(B)', '(C)']
 for i, a in enumerate(ax[:-1]):
-    # a.set_xscale('log')
     a.set_xlabel('[IPTG] (M)')
     a.set_ylabel('fold-change')
     a.set_title(ops[i], backgroundcolor='#FFEDC0')
     a.set_xlim([1E-9, 1E-2])
     a.set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
     a.text(-0.24, 1.03, panel_labels[i], fontsize=12, transform=a.transAxes)
-ax[-1].set_axis_off()
+    ax[-1].set_axis_off()
 
 # Define the axes identifiers and the correct colors
 axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
 color_key = {i: j for i, j in zip(reps, colors)}
-
-# compute and plot the fits.
+stat_df = pd.DataFrame([], columns=['operator', 'repressors',
+                                    'param', 'mode', 'hpd_min',
+                                    'hpd_max'])
 for g, d in grouped_params:
     # Properly package the parameters for the function.
     slc = d.loc[:, ['param', 'mode']]
     fit_df = samples_df[(g[0] / 2, g[1])]
-    fit_stats = mwc.compute_statistics(fit_df)
-    modes = [fit_stats['ep'][0] - np.log(1E6),
-             fit_stats['a'][0], fit_stats['b'][0],
-             fit_stats['n'][0]]
+
+    fit_df['k'] = np.exp(df['ep'])
+    stats = mwc.compute_statistics(fit_df)
+    stats['k']
+
+    # Make the stats a DataFrame.
+    keys = ['k', 'ep', 'a', 'b', 'n']
+    for _, key in enumerate(keys):
+        param_dict = dict(operator=g[1], repressors=g[0],
+                          mode=stats[key][0], hpd_min=stats[key][1],
+                          hpd_max=stats[key][2], param=key)
+        _stats = pd.Series(param_dict)
+        stat_df = stat_df.append(_stats, ignore_index=True)
+
+    _df = pd.DataFrame(fit_stats)
+    _df.insert(0, 'repressors', 2 * g[0])
+    _df.insert(0, 'operator', g[1])
+    stat_df.append(_df)
+    modes = [stats['ep'][0] - np.log(1E6),
+             stats['a'][0], stats['b'][0],
+             stats['n'][0]]
 
     # Compute the fit value.
     fit = gen_hill(modes, c_range)
@@ -154,4 +166,7 @@ _ = ax[0].legend(title='rep. per cell', loc='upper left')
 mwc.scale_plot(fig, 'two_row')
 fig.set_size_inches(6, 4.5)
 plt.tight_layout()
-# plt.savefig('../../figures/SI_figs/figS16.svg')
+plt.savefig('../../figures/SI_figs/figS16.svg')
+
+# Save the general hill parameters.
+stat_df.to_csv('../../data/general_hill_params.csv', index=False)

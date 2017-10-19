@@ -32,33 +32,8 @@ def trace_to_df(trace, model):
     Converts the trace from a pymc3 sampling trace to a
     Pandas DataFrame.
     """
-
-    def compute_logp(chain):
-        """
-        Computes the log probability of the provided trace
-        at a given chain.
-        """
-        names = trace.varnames
-        var_dict = {}
-        for n in names:
-            var_dict[n] = trace.get_values(n, chains=chain)
-        sample_df = pd.DataFrame(var_dict)
-
-        logp = [model.logp(sample_df.iloc[step]
-                           ) for step in range(len(sample_df))]
-        return logp
-
-    chains = trace.chains
-    for c in tqdm(chains, desc='Processing chains'):
-        logp = compute_logp(c)
-        if c == 0:
-            df = pm.trace_to_dataframe(trace, chains=c)
-            df.insert(np.shape(df)[1], 'logp', logp)
-        else:
-            _df = pm.trace_to_dataframe(trace, chains=c)
-            _df.insert(np.shape(_df)[1], 'logp', logp)
-            df.append(_df, ignore_index=True)
-
+    df = pm.trace_to_dataframe(trace, model=model)
+    df['logp'] = pm.stats._log_post_trace(trace=trace, model=model).sum(axis=1)
     return df
 
 
@@ -247,7 +222,7 @@ plt.savefig('../../figures/SI_figs/figS16.pdf', bbox_inches='tight')
 
 # %%
 # load the cv file of all of the parameters.
-params = pd.read_csv('../../data/hill_params.csv')
+params = pd.read_csv('../../data/general_hill_params.csv')
 
 # Keep only those with repressors greater than zero
 params = params[params['repressors'] > 0]
@@ -273,7 +248,7 @@ pos = {i: j for i, j in zip(reps, positions)}
 offset = {'O1': -0.2, 'O2': 0, 'O3': 0.2}
 glyphs = {'O1': 'o', 'O2': 'D', 'O3': 's'}
 ylabels = {'a': 'leakiness', 'b': 'dynamic range',
-           'n': 'Hill coefficient', 'kd': r'$K$ ($\mu$M)'}
+           'n': 'Hill coefficient', 'ep': r'$K$ ($\mu$M)'}
 color_dict = {i: j for i, j in zip(params['repressors'].unique(), colors)}
 c_range = np.logspace(-2, 4)
 
@@ -284,22 +259,28 @@ for d in glyphs.keys():
                linestyle='none')
 ax[0].legend(ncol=3, bbox_to_anchor=(0.95, 1.2), fontsize=10)
 
-ax_dict = {'a': 0, 'b': 1, 'kd': 2, 'n': 3}
+param_keys = ['a', 'b', 'ep', 'n']
+ax_dict = {'a': 0, 'b': 1, 'ep': 2, 'n': 3}
 for a in ax:
     a.set_xlim([0.7, 6.3])
 for g, d in grouped:
-
-    for i, p in enumerate(d['param'].unique()):
+    for i, p in enumerate(param_keys):
         position = pos[g[1]] + offset[g[0]]
         param_id = d[d['param'] == p]
         mode = param_id['mode'].unique()
         min_val = param_id['hpd_min'].unique()
         max_val = param_id['hpd_max'].unique()
 
-        if min_val < 0:
-            min_val = 0
-        if max_val < 0:
-            max_val = 0
+        if p == 'ep':
+            mode = np.log(mode)
+            min_val = np.log(min_val)
+            max_val = np.log(max_val)
+        #
+        # if min_val < 0:
+        #     min_val = 0
+        # if max_val < 0:
+        #     max_val = 0
+
         ax[ax_dict[p]].vlines(position, min_val, max_val,
                               color=color_dict[g[1]],
                               linewidth=1)
@@ -309,20 +290,20 @@ for g, d in grouped:
                             markeredgewidth=1.5)
         ax[ax_dict[p]].set_ylabel(ylabels[p], fontsize=11)
 
-    # a.xaxis.set_ticklabels(params['repressors'].unique(), y=-0.06)
-
-    a = d[d['param'] == 'a']
-    b = d[d['param'] == 'b']
-    kd = d[d['param'] == 'kd']
-    n = d[d['param'] == 'n']
-    # fit = generic_hill_fn(a, b, c_range, kd, n)
-    position = pos[g[1]] + offset[g[0]]
-    # kd = d[d['param'] == 'n']
-    mode = kd['mode'].unique()
-    hpd_min = kd['hpd_min'].unique()
-    hpd_max = kd['hpd_max'].unique()
-
-
+    # # a.xaxis.set_ticklabels(params['repressors'].unique(), y=-0.06)
+    #
+    # a = d[d['param'] == 'a']
+    # b = d[d['param'] == 'b']
+    # kd = d[d['param'] == 'kd']
+    # n = d[d['param'] == 'n']
+    # # fit = generic_hill_fn(a, b, c_range, kd, n)
+    # position = pos[g[1]] + offset[g[0]]
+    # # kd = d[d['param'] == 'n']
+    # mode = kd['mode'].unique()
+    # hpd_min = kd['hpd_min'].unique()
+    # hpd_max = kd['hpd_max'].unique()
+    #
+    #
 ax[2].set_yscale('linear')
 
 for a in ax:
