@@ -27,6 +27,9 @@ import matplotlib.gridspec as gridspec
 import seaborn as sns
 import corner
 
+import pymc3 as pm
+import theano.tensor as tt
+
 # Set the plotting style.
 mwc.set_plotting_style()
 # %matplotlib inline
@@ -42,18 +45,65 @@ colors.reverse()
 # Generate a variable with the day that the script is run
 today = str(datetime.datetime.today().strftime('%Y%m%d'))
 
-#===============================================================================
-# Defining the problem
+#---------------------------------------------------------------------
+# for Hill
+#---------------------------------------------------------------------
 
-# In the SI_parameter_estimation.py we performed parameter estimations of
-# K_A and K_I for each strain in our data. Now we will load in the MCMC
-# flatchains to extract parameter estimates. We will summarize these in plots
-# and also plot the strain specific predictions within each operator strain set.
+# Define the necessary functions
+def jeffreys_prior(val):
+    return -tt.log(val)
 
-# For details of the Bayesian parameter estimation and the Bayesian approach
-# that is applied here, see the 'bayesian_parameter_estimation' notebook.
-#===============================================================================
 
+def gen_hill(params, c):
+    ep, a, b, n = params
+    numer = (c * np.exp(-ep))**n
+    denom = 1 + numer
+    return a + b * numer / denom
+
+
+# Load the data and ignore those with no repressors..
+data = pd.read_csv('../../data/flow_master.csv')
+data = data[data['repressors'] > 0]
+
+#-------------------------------------------------------------------------------
+# script to run MCMC for hill fits.
+#-------------------------------------------------------------------------------
+
+# # %% Group the data by operator and repressor.
+# samples_df = {}
+# grouped_data = data.groupby(['repressors', 'operator'])
+# for g, d in grouped_data:
+#     with pm.Model() as model:
+#
+#         # Define the priors.
+#         a = pm.Uniform('a', lower=0, upper=1, testval=0.1)
+#         b = pm.Uniform('b', lower=-1, upper=1, testval=0)
+#         ep = pm.Normal('ep', mu=0, sd=10, testval=3)
+#         sigma = pm.DensityDist('sigma', jeffreys_prior, testval=1)
+#         n = pm.Normal('n', mu=0, sd=100,  testval=2)
+#
+#         # Define the likelihood
+#         mu = gen_hill([ep, a, b, n], d['IPTG_uM'].values)
+#         like = pm.Normal('like', mu=mu, sd=sigma,
+#                          observed=d['fold_change_A'].values)
+#
+#         # # Do the sampling.
+#         trace = pm.sample(draws=500, tune=1000)
+#
+#         # Convert it to a DataFrame.
+#
+#         df = pm.trace_to_dataframe(trace)
+#         df['logp'] = pm.stats._log_post_trace(
+#             model=model, trace=trace).sum(axis=1)
+#
+#         # Compute the statistics.
+#         samples_df[g] = df
+
+#-------------------------------------------------------------------------------
+# load in MCMC traces from Hill fits
+#-------------------------------------------------------------------------------
+
+# samples_df = pd.read_csv('../../data/.csv')
 
 #===============================================================================
 # Load in the data from all strains
@@ -83,39 +133,6 @@ df.head()
 dict_R = {'HG104': '22', 'RBS1147': '60', 'RBS446' : '124', \
           'RBS1027': '260', 'RBS1': '1220', 'RBS1L': '1740'}
 
-# # generate DataFrame to save parameter estimates
-# param_summary = pd.DataFrame()
-#
-# # Loop through each strain in groups and calculate HPD
-# groups = df.groupby(['operator', 'rbs'])
-# for g, subdata in groups:
-#     with open('../../data/mcmc/' + \
-#               'SI_I_' + g[0] + '_R' + dict_R[g[1]] + '.pkl', 'rb') as file:
-#         unpickler = pickle.Unpickler(file)
-#         gauss_flatchain = unpickler.load()
-#         gauss_flatlnprobability = unpickler.load()
-#
-#     # map value of the parameters
-#     max_idx = np.argmax(gauss_flatlnprobability, axis=0)
-#     ea, ei = gauss_flatchain[max_idx, [0, 1]]
-#
-#     # ea range
-#     ea_hpd = mwc.hpd(gauss_flatchain[:, 0],0.95)
-#     ei_hpd = mwc.hpd(gauss_flatchain[:, 1],0.95)
-#
-#     # add values to dataframe
-#     param_summary_temp = pd.DataFrame({'rbs':g[1],
-#                                 'operator':g[0],
-#                                 'repressors':df[df['rbs']==g[1]].repressors.unique()[0],
-#                                 'ka_mode':[ea],
-#                                 'ka_hpd_max':[ea_hpd[0]],
-#                                 'ka_hpd_min':[ea_hpd[1]],
-#                                 'ki_mode':[ei],
-#                                 'ki_hpd_max':[ei_hpd[0]],
-#                                 'ki_hpd_min':[ei_hpd[1]]})
-#
-#     param_summary = param_summary.append(param_summary_temp, ignore_index=True)
-
 
 # Load the parameters and data
 params = pd.read_csv('../../data/hill_params.csv')
@@ -133,9 +150,11 @@ grouped_params = params.groupby(['repressors', 'operator'])
 reps = params.repressors.unique()
 
 # Instantiate the figure axis and set labels.
-fig, ax = plt.subplots(2, 2)
+fig, ax = plt.subplots(3, 2)
 ax = ax.ravel()
-ops = ['operator O1', 'operator O2', 'operator O3']
+ops = ['operator O1', 'operator O1',
+       'operator O2', 'operator O2',
+       'operator O3', 'operator O3']
 panel_labels = ['(A)', '(B)', '(C)']
 for i, a in enumerate(ax[:-1]):
     a.set_xlabel('[IPTG] (M)')
@@ -146,8 +165,86 @@ for i, a in enumerate(ax[:-1]):
     a.text(-0.24, 1.03, panel_labels[i], fontsize=12, transform=a.transAxes)
     ax[-1].set_axis_off()
 
+
+# ---------------- ---------------- ---------------- ----------------
+# for Hill function
+# ---------------- ---------------- ---------------- ----------------
+
+
 # Define the axes identifiers and the correct colors
-axes = {'O1': ax[0], 'O2': ax[1], 'O3': ax[2]}
+axes = {'O1': ax[0], 'O2': ax[2], 'O3': ax[4]}
+color_key = {i: j for i, j in zip(reps, colors)}
+stat_df = pd.DataFrame([], columns=['operator', 'repressors',
+                                    'param', 'mode', 'hpd_min',
+                                    'hpd_max'])
+for g, d in grouped_params:
+    # Properly package the parameters for the function.
+    slc = d.loc[:, ['param', 'mode']]
+    fit_df = samples_df[(g[0] / 2, g[1])]
+
+    fit_df['k'] = np.exp(df['ep'])
+    stats = mwc.compute_statistics(fit_df)
+    stats['k']
+
+    # Make the stats a DataFrame.
+    keys = ['k', 'ep', 'a', 'b', 'n']
+    for _, key in enumerate(keys):
+        param_dict = dict(operator=g[1], repressors=g[0],
+                          mode=stats[key][0], hpd_min=stats[key][1],
+                          hpd_max=stats[key][2], param=key)
+        _stats = pd.Series(param_dict)
+        stat_df = stat_df.append(_stats, ignore_index=True)
+
+    _df = pd.DataFrame(fit_stats)
+    _df.insert(0, 'repressors', 2 * g[0])
+    _df.insert(0, 'operator', g[1])
+    stat_df.append(_df)
+    modes = [stats['ep'][0] - np.log(1E6),
+             stats['a'][0], stats['b'][0],
+             stats['n'][0]]
+
+    # Compute the fit value.
+    fit = gen_hill(modes, c_range)
+
+    # Compute the credible region
+    cred_region = np.zeros((2, len(c_range)))
+    fit_df['k'] = fit_df['ep'] - np.log(1E6)
+    param_vals = fit_df.loc[:, ['k', 'a', 'b', 'n']].values
+    param_vals = param_vals.T
+    for i, c in enumerate(c_range):
+        fc = gen_hill(param_vals, c)
+        cred_region[:, i] = mwc.hpd(fc, mass_frac=0.95)
+
+    # Plot it
+    _ = axes[g[1]].plot(c_range[lin_ind:], fit[lin_ind:], '-',
+                        color=color_key[g[0]],
+                        lw=1, label='__nolegend__')
+    _ = axes[g[1]].plot(c_range[:lin_ind], fit[:lin_ind], '--',
+                        color=color_key[g[0]],
+                        lw=1, label='__nolegend__')
+    _ = axes[g[1]].fill_between(c_range, cred_region[0, :], cred_region[1, :],
+                                color=color_key[g[0]], alpha=0.4)
+# Plot the data.
+grouped_data = data.groupby(['repressors', 'operator'])
+for g, d in grouped_data:
+
+    # Arguments for calculation of mean and SEM
+    args = [np.mean, np.std, len]
+    _d = d.groupby('IPTG_uM')['IPTG_uM', 'fold_change_A'].agg(args)
+    sem = _d['fold_change_A']['std'] / np.sqrt(_d['fold_change_A']['len'])
+
+    # Plot the data.
+    _ = axes[g[1]].errorbar(_d['IPTG_uM']['mean'] / 1E6,
+                            _d['fold_change_A']['mean'], sem, fmt='o',
+                            color=color_key[2 * g[0]], markersize=3, lw=0.75,
+                            label=2 * g[0])
+
+# ---------------- ---------------- ---------------- ----------------
+# for MWC function
+# ---------------- ---------------- ---------------- ----------------
+
+# Define the axes identifiers and the correct colors
+axes = {'O1': ax[1], 'O2': ax[3], 'O3': ax[5]}
 color_key = {i: j for i, j in zip(reps, colors)}
 
 # Define array of IPTG concentrations
@@ -201,50 +298,14 @@ for g, d in grouped_data:
                             color=color_key[2 * g[0]], markersize=3, lw=0.75,
                             label=2 * g[0])
 
+
+
+
 # set the legend.
 _ = ax[0].legend(title='rep. per cell', loc='upper left')
 
 # Scale, add panel labels, and save.
-mwc.scale_plot(fig, 'two_row')
+mwc.scale_plot(fig, 'three_row_two_column')
 fig.set_size_inches(6, 4.5)
 plt.tight_layout()
-plt.savefig('../../figures/SI_figs/figS16_MWC.svg')
-
-
-########################################################################
-# if all fails, this code is useful for plotting
-########################################################################
-
-    # print(df[(df.repressors == g[0]/2)&(df.operator == g[1])].binding_energy.unique())
-#
-# # for i, rbs in enumerate(df_plot.rbs.unique()[::-1]):
-#     # plot the theory using the parameters from the fit.
-#
-# axes[g[1]].plot(IPTG , mwc.fold_change_log(IPTG * 1E6,
-#     ea=ea, ei=ei, epsilon=4.5,
-#     R=df[(df.repressors == g[0]/2)&(df.operator == g[1])].repressors.unique(),
-#     epsilon_r=df[(df.repressors == g[0]/2)&(df.operator == g[1])].binding_energy.unique()),
-#     lw=1, label='__nolegend__',
-#     color=color_key[g[0]])
-#
-# # plot 95% HPD region using the variability in the MWC parameters
-#
-# cred_region = mwc.mcmc_cred_region(IPTG * 1E6,
-#     gauss_pool_flatchain, epsilon=4.5,
-#     R=df[(df.repressors == g[0]/2)&(df.operator == g[1])].repressors.unique(),
-#     epsilon_r=df[(df.repressors == g[0]/2)&(df.operator == g[1])].binding_energy.unique())
-#
-# axes[g[1]].fill_between(IPTG , cred_region[0,:], cred_region[1,:],
-#                 alpha=1, color=color_key[g[0]],
-#                 lw=1, label='__nolegend__', alpha=0.4)
-#
-# # compute the mean value for each concentration
-#
-# fc_mean = df[(df.repressors == g[0])&(df.operator == g[1])].groupby('IPTG_uM').fold_change_A.mean()
-#
-# # compute the standard error of the mean
-#
-# fc_err = df[(df.repressors == g[0])&(df.operator == g[1])].groupby('IPTG_uM').fold_change_A.std() / \
-# np.sqrt(df[(df.repressors == g[0])&(df.operator == g[1])].groupby('IPTG_uM').size())
-
-#
+plt.savefig('../../figures/SI_figs/figS16_MWC_combined_good.svg')
