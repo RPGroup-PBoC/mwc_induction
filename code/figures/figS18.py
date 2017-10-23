@@ -47,33 +47,8 @@ def trace_to_df(trace, model):
     Converts the trace from a pymc3 sampling trace to a
     Pandas DataFrame.
     """
-
-    def compute_logp(chain):
-        """
-        Computes the log probability of the provided trace
-        at a given chain.
-        """
-        names = trace.varnames
-        var_dict = {}
-        for n in names:
-            var_dict[n] = trace.get_values(n, chains=chain)
-        sample_df = pd.DataFrame(var_dict)
-
-        logp = [model.logp(sample_df.iloc[step]
-                           ) for step in range(len(sample_df))]
-        return logp
-
-    chains = trace.chains
-    for c in tqdm(chains, desc='Processing chains'):
-        logp = compute_logp(c)
-        if c == 0:
-            df = pm.trace_to_dataframe(trace, chains=c)
-            df.insert(np.shape(df)[1], 'logp', logp)
-        else:
-            _df = pm.trace_to_dataframe(trace, chains=c)
-            _df.insert(np.shape(_df)[1], 'logp', logp)
-            df.append(_df, ignore_index=True)
-
+    df = pm.trace_to_dataframe(trace=trace, model=model)
+    df['logp'] = pm.stats._log_post_trace(trace=trace, model=model).sum(axis=1)
     return df
 
 
@@ -144,12 +119,12 @@ with model:
     like = pm.Normal('likelihood', mu=fc_exp, sd=sigma,
                      observed=O2_data['fold_change_A'].values)
 
-    # Find the MAP and sample.
+    # Sample it.
     trace = pm.sample(draws=5000, tune=10000, njobs=4)
 
     # # Convert the trace to a dataframe and compute the statistics.
     df = pm.trace_to_dataframe(trace)
-    logp = pm.stats._log_post_trace(trace, model).sum(axis=1)
+
     df['logp'] = logp
     df['kd'] = np.exp(df['ep'])
     stats = compute_statistics(df)
