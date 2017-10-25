@@ -10,9 +10,10 @@ sys.path.insert(0, '../analysis/')
 import mwc_induction_utils as mwc
 mwc.set_plotting_style()
 
-colors = sns.color_palette('colorblind').as_hex()
-colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
-sns.set_palette(colors)
+# colors = sns.color_palette('colorblind').as_hex()
+# colors[4] = sns.xkcd_palette(['dusty purple']).as_hex()[0]
+# sns.set_palette(colors)
+colors = sns.set_palette('magma')
 
 # Define functions to be used in figure
 
