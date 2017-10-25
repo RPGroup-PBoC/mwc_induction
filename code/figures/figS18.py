@@ -193,7 +193,7 @@ for g, d in grouped:
                             linestyle='none', color=color_key[g[1]])
 
         axes[g[0]].plot(_g / 1E6, mean_fc, 'o', markerfacecolor=face,
-                        markersize=5, markeredgecolor=color_key[g[1]],
+                        markersize=3, markeredgecolor=color_key[g[1]],
                         markeredgewidth=1)
 
     axes[g[0]].set_title(r'Operator %s, $\Delta\varepsilon_{RA} = %s\, k_BT$'

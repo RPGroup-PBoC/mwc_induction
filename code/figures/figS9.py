@@ -57,4 +57,5 @@ plt.xlim([0.5 * np.min(flow_data['FSC-A']), 1.2 * np.max(flow_data['FSC-A'])])
 # Save the figure.
 mwc.scale_plot(fig, 'single_plot_wide')
 plt.tight_layout()
+fig.set_size_inches(4, 3)
 plt.savefig('../../figures/SI_figs/figS9.pdf', bbox_inches='tight')
