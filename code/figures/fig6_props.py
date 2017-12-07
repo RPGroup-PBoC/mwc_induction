@@ -24,18 +24,6 @@ import seaborn as sns
 import scipy.stats
 mwc.set_plotting_style()
 
-#===============================================================================
-# Set output directory based on the graphicspath.tex file to print in dropbox
-#=============================================================================== # dropbox = open('../../doc/induction_paper/graphicspath.tex')
-# output = dropbox.read()
-# output = re.sub('\\graphicspath{{', '', output)
-# output = output[1::]
-# output = re.sub('}}\n', '', output)
-
-#===============================================================================
-# Read the data
-#===============================================================================
-
 datadir = '../../data/'
 df = pd.read_csv(datadir + 'flow_master.csv', comment='#')
 
@@ -61,11 +49,6 @@ ki_fc = np.exp(-gauss_flatchain[:, 1])
 # Plot the theory vs data for all 4 operators with the credible region
 #===============================================================================
 
-# Define the IPTG concentrations to evaluate
-IPTG = np.logspace(-7, -2, 100)
-IPTG_lin = np.array([0, 1E-7])
-
-
 # Set the colors for the strains
 colors = sns.color_palette('colorblind', n_colors=7)
 colors[4] = sns.xkcd_palette(['dusty purple'])[0]
@@ -75,75 +58,13 @@ colors[4] = sns.xkcd_palette(['dusty purple'])[0]
 operators = ['O1', 'O2', 'O3']
 energies = {'O1': -15.3, 'O2': -13.9, 'O3': -9.7, 'Oid': -17}
 
+
 # Initialize the figure.
-fig, ax = plt.subplots(3, 3, figsize=(8.5, 7.5))
+fig, ax = plt.subplots(2, 3, figsize=(8.5, 6))
 ax = ax.ravel()
 
 
 # Plot the predictions.
-for i, op in enumerate(operators):
-    print(op)
-    data = df[df.operator == op]
-    # loop through RBS mutants
-    for j, rbs in enumerate(df.rbs.unique()):
-        # plot the theory using the parameters from the fit.
-        if (op == 'O2') & (rbs == 'RBS1027'):
-            label = None
-        else:
-            label = df[df.rbs == rbs].repressors.unique()[0] * 2
-        # Log scale
-        ax[i].plot(IPTG, mwc.fold_change_log(IPTG * 1E6,
-                                             ea=ea, ei=ei, epsilon=4.5,
-                                             R=df[(df.rbs == rbs)
-                                                  ].repressors.unique(),
-                                             epsilon_r=energies[op]),
-                   color=colors[j], label=label)
-        # Linear scale
-        ax[i].plot(IPTG_lin, mwc.fold_change_log(IPTG_lin * 1E6,
-                                                 ea=ea, ei=ei, epsilon=4.5,
-                                                 R=df[(df.rbs == rbs)
-                                                      ].repressors.unique(),
-                                                 epsilon_r=energies[op]),
-                   color=colors[j], linestyle=':', label=None)
-
-        # plot 95% HPD region using the variability in the MWC parameters
-        cred_region = mwc.mcmc_cred_region(IPTG * 1e6,
-                                           gauss_flatchain, epsilon=4.5,
-                                           R=df[(df.rbs == rbs)
-                                                ].repressors.unique(),
-                                           epsilon_r=energies[op])
-        ax[i].fill_between(IPTG, cred_region[0, :], cred_region[1, :],
-                           alpha=0.3, color=colors[j])  # compute the mean value for each concentration
-        fc_mean = data[data.rbs == rbs].groupby('IPTG_uM').fold_change_A.mean()
-        # # compute the standard error of the mean
-        fc_err = data[data.rbs == rbs].groupby('IPTG_uM').fold_change_A.std() / \
-            np.sqrt(data[data.rbs == rbs].groupby('IPTG_uM').size())
-
-        # plot the experimental data
-        # Distinguish between the fit data and the predictions
-        if (op == 'O2') & (rbs == 'RBS1027'):
-            ax[i].errorbar(np.sort(data[data.rbs == rbs].IPTG_uM.unique()) / 1E6,
-                           fc_mean, yerr=fc_err, linestyle='none', color=colors[j],
-                           label=None)
-            ax[i].plot(np.sort(data[data.rbs == rbs].IPTG_uM.unique()) / 1E6,
-                       fc_mean, marker='o', markersize=6, linestyle='none',
-                       markeredgewidth=1, markeredgecolor=colors[j],
-                       markerfacecolor='w',
-                       label=df[df.rbs == 'RBS1027'].repressors.unique()[0] * 2)
-
-    # Add operator and binding energy labels.
-    ax[i].set_title(r'%s  $\Delta\varepsilon_{RA} = %s\, k_BT$' % (
-        op, energies[op]), backgroundcolor='#ffedce', fontsize=12, y=1.03)
-    ax[i].set_xscale('symlog', linthreshx=1E-7, linscalex=0.5)
-    ax[i].set_xlabel('IPTG (M)', fontsize=12)
-    ax[i].set_ylabel('fold-change', fontsize=12)
-    ax[i].set_ylim([-0.01, 1.1])
-    ax[i].set_xlim([-5E-9, 1E-2])
-    ax[i].set_xticks([0, 1E-6, 1E-4, 1E-2])
-    ax[i].tick_params(labelsize=10)
-
-
-# Plot the properties
 def leakiness(num_rep, ep_r, ep_ai, n_ns=4.6E6):
     pact = 1 / (1 + np.exp(-ep_ai))
     return (1 + pact * (num_rep / n_ns) * np.exp(-ep_r))**-1
@@ -317,13 +238,13 @@ for i, op in enumerate(operators):
     e_hill = effective_Hill(np.exp(-ea), np.exp(-ei),
                             4.5, rep_range, energies[op])
 
-    ax[3].plot(rep_range, leak, color=en_colors[i], label=energies[op])
-    ax[4].plot(rep_range, sat, color=en_colors[i], label=energies[op])
-    ax[5].plot(rep_range, dyn_rng, color=en_colors[i], label=energies[op])
-    ax[6].plot(rep_range, ec50 / 1E6, color=en_colors[i])
-    ax[7].plot(rep_range, e_hill, color=en_colors[i])
-    ax[i + 3].set_xlabel('repressors per cell', fontsize=12)
-    ax[i + 3].set_ylabel(titles[i], fontsize=12)
+    ax[0].plot(rep_range, leak, color=en_colors[i], label='__nolegend__')
+    ax[1].plot(rep_range, sat, color=en_colors[i], label='__nolegend__')
+    ax[2].plot(rep_range, dyn_rng, color=en_colors[i], label='__nolegend__')
+    ax[3].plot(rep_range, ec50 / 1E6, color=en_colors[i])
+    ax[4].plot(rep_range, e_hill, color=en_colors[i])
+    ax[i].set_xlabel('repressors per cell', fontsize=12)
+    ax[i].set_ylabel(titles[i], fontsize=12)
 
     # Plot the credible regions
     sat_cred = saturation_cred_region(
@@ -335,99 +256,175 @@ for i, op in enumerate(operators):
                                  ki_fc, mass_frac=0.95)
     hill_cred = effective_hill_cred(
         rep_range, energies[op], 4.5, ka_fc, ki_fc, mass_frac=0.95)
-    ax[5].fill_between(rep_range, dyn_cred[0, :], dyn_cred[1, :],
+    ax[1].fill_between(rep_range, dyn_cred[0, :], dyn_cred[1, :],
                        alpha=0.3, color=en_colors[i])
-    ax[4].fill_between(rep_range, sat_cred[0, :], sat_cred[1, :],
+    ax[2].fill_between(rep_range, sat_cred[0, :], sat_cred[1, :],
                        alpha=0.3, color=en_colors[i])
-    ax[6].fill_between(rep_range, ec50_cred[0, :] / 1E6, ec50_cred[1, :] / 1E6,
+    ax[3].fill_between(rep_range, ec50_cred[0, :] / 1E6, ec50_cred[1, :] / 1E6,
                        alpha=0.3, color=en_colors[i])
-    ax[7].fill_between(rep_range, hill_cred[0, :], hill_cred[1, :],
+    ax[4].fill_between(rep_range, hill_cred[0, :], hill_cred[1, :],
                        alpha=0.3, color=en_colors[i])
 
-    ax[i + 3].set_xlim([1, 1E4])
+    ax[i].set_xlim([1, 1E4])
     #
 
-ax[6].set_xlim([1, 1E4])
-ax[7].set_xlim([1, 1E4])
-ax[6].set_ylabel('$[EC_{50}]\,\,$(M)', fontsize=12)
-ax[7].set_ylabel('effective Hill coefficient', fontsize=12)
-leg_1 = ax[0].legend(loc='upper left', title='rep. / cell',
-                     fontsize=8, handlelength=1)
-leg_2 = ax[3].legend(title='   binding\n energy ($k_BT$)',
-                     loc='lower left', fontsize=8, handlelength=1)
-leg_1.get_title().set_fontsize(8)
-leg_2.get_title().set_fontsize(8)
-ax[3].set_yscale('log')
-ax[6].set_yscale('log')
-ax[6].set_yticks([1E-6, 1E-5, 1E-4])
-ax[7].set_yticks([1.2, 1.4, 1.6, 1.8])
-ax[8].set_axis_off()
 
-for i in range(3, len(ax)):
+# Plot the points.
+
+
+# Plot the leakiness and saturation data.
+grouped = pd.groupby(df, ['operator', 'repressors'])
+# Define the colors so I don't have to make another data frame.
+op_colors = {'O1': en_colors[0], 'O2': en_colors[1], 'O3': en_colors[2]}
+for g, d in grouped:
+    # Extract the unique IPTG values.
+    unique_IPTG = d['IPTG_uM'].unique()
+
+    # Slice the min and max IPTG values.
+    leak_vals = d[d['IPTG_uM'] == np.min(unique_IPTG)].fold_change_A
+    sat_vals = d[d['IPTG_uM'] == np.max(unique_IPTG)].fold_change_A
+
+    # Compute the mean and standard errors of reach.
+    mean_leak = np.mean(leak_vals)
+    sem_leak = np.std(leak_vals) / np.sqrt(len(leak_vals))
+    mean_sat = np.mean(sat_vals)
+    sem_sat = np.std(sat_vals) / np.sqrt(len(sat_vals))
+
+    # Plot the data with the appropriate legends..
+    if g[1] == 11:
+        legend = energies[g[0]]
+    else:
+        legend = '__nolegend__'
+    ax[0].plot(2 * g[1], mean_leak, 'o', color=op_colors[g[0]],
+               markersize=5, label='__nolegend__')
+    ax[1].plot(2 * g[1], mean_sat, 'o', color=op_colors[g[0]],
+               markersize=5, label='__nolegend__')
+    ax[0].errorbar(2 * g[1], mean_leak, sem_leak, linestyle='none',
+                   color=op_colors[g[0]], fmt='o', markersize=6, label=legend)
+    ax[1].errorbar(2 * g[1], mean_sat, sem_sat, linestyle='none',
+                   color=op_colors[g[0]], fmt='o', markersize=6, label=legend)
+
+# Compute the dynamic range.
+grouped = pd.groupby(df, 'operator')
+drs = []
+for g, d in grouped:
+    unique_IPTG = d.IPTG_uM.unique()
+    min_IPTG = np.min(unique_IPTG)
+    max_IPTG = np.max(unique_IPTG)
+    # Group the new data by repressors.
+    grouped_rep = pd.groupby(d, ['rbs', 'date', 'username'])
+    rbs_ind = {'HG104': 0, 'RBS1147': 1, 'RBS446': 2, 'RBS1027': 3,
+               'RBS1': 4, 'RBS1L': 5}
+    rep_dr = [[], [], [], [], [], []]
+    rep_std = []
+    for g_rep, d_rep in grouped_rep:
+        if g_rep[2] != 'sloosbarnes':
+            dr = d_rep[d_rep.IPTG_uM == max_IPTG].fold_change_A.values - \
+                d_rep[d_rep.IPTG_uM == min_IPTG].fold_change_A.values
+            rep_dr[rbs_ind[g_rep[0]]].append(dr[0])
+
+    # Compute the means.
+    for i, dr in enumerate(rep_dr):
+        rep_dr[i] = np.mean(dr)
+        rep_std.append(np.std(dr) / np.sqrt(len(dr)))
+
+    reps = np.sort(df.repressors.unique())
+    dr_df = pd.DataFrame([reps, rep_dr, rep_std]).T
+    dr_df.columns = ['repressors', 'dynamic_range', 'err']
+    dr_df.insert(0, 'operator', g)
+    drs.append(dr_df)
+drng = pd.concat(drs, axis=0)
+
+
+# Get the dynamic range data and plot.
+for i, op in enumerate(operators):
+    dyn_rng = drng[drng.operator == op]
+    ax[2].errorbar(2 * dyn_rng.repressors, dyn_rng.dynamic_range, yerr=dyn_rng.err, color=en_colors[i], fmt='o', linestyle='none',
+                   label=energies[op], markersize=5)
+
+
+# Load in the flatchains for the calculation of the effective hill and EC50
+repressors = ['R22', 'R60', 'R124', 'R260', 'R1220', 'R1740']
+flatchains = [[], [], []]
+kas = [[], [], []]
+kis = [[], [], []]
+for i, op in enumerate(operators):
+    for j, R in enumerate(repressors):
+        with open('../../data/mcmc/SI_I_' + op + '_' + R + '.pkl', 'rb') as file:
+            print(j)
+            unpickler = pickle.Unpickler(file)
+            gauss_flatchain = unpickler.load()
+            flatchains[i].append(gauss_flatchain)
+            gauss_flatlnprobability = unpickler.load()
+            ind = np.argmax(gauss_flatlnprobability)
+            kas[i].append(np.exp(-gauss_flatchain[ind, 0]))
+            kis[i].append(np.exp(-gauss_flatchain[ind, 1]))
+
+# Plot the EC50 and Effective hill
+repressor_numbers = [22, 60, 124, 260, 1220, 1740]
+for i, op in enumerate(operators):
+    for j, R in enumerate(repressor_numbers):
+        ec50_inf = EC50(kas[i][j], kis[i][j], 4.5, R, energies[op])
+        hill_inf = effective_Hill(kas[i][j], kis[i][j], 4.5, R,
+                                  energies[op])
+        # convert the flatchains to units of concentration
+        _ka_fc = np.exp(-flatchains[i][j][:, 0])
+        _ki_fc = np.exp(-flatchains[i][j][:, 1])
+        ec50_cred = EC50(_ka_fc, _ki_fc, 4.5, R, energies[op])
+        ec50_cred = mwc.hpd(ec50_cred, mass_frac=0.95)
+        hill_cred = effective_Hill(_ka_fc, _ki_fc, 4.5, R, energies[op])
+        hill_cred = mwc.hpd(hill_cred, 0.95)
+
+        if j == 0:
+            label = energies[op]
+        else:
+            label = '__nolegend__'
+
+        ax[3].vlines(R, ec50_cred[0] / 1E6, ec50_cred[1] / 1E6,
+                     color=en_colors[i], zorder=4 - i, label='__nolegend__')
+        ax[4].vlines(R, hill_cred[0], hill_cred[1],
+                     color=en_colors[i], zorder=4 - i, label='__nolegend__')
+        ax[3].plot(R, ec50_inf / 1E6, 's', markerfacecolor='w',
+                   markeredgecolor=en_colors[i], ms=6, markeredgewidth=1.5, zorder=4 - i)
+        ax[4].plot(R, hill_inf, 's', ms=6, markerfacecolor='w',
+                   markeredgecolor=en_colors[i], markeredgewidth=1.5, zorder=4 - i)
+
+ax[3].set_xlim([1, 1E4])
+ax[4].set_xlim([1, 1E4])
+ax[3].set_ylabel('$[EC_{50}]\,\,$(M)', fontsize=12)
+ax[4].set_ylabel('effective Hill coefficient', fontsize=12)
+leg_2 = ax[0].legend(title='   binding\n energy ($k_BT$)',
+                     loc='lower left', fontsize=8, handlelength=1)
+leg_2.get_title().set_fontsize(8)
+ax[0].set_yscale('log')
+ax[3].set_yscale('log')
+ax[3].set_yticks([1E-8, 1E-7, 1E-6, 1E-5, 1E-4])
+ax[4].set_yticks([1.2, 1.4, 1.6, 1.8])
+ax[5].set_axis_off()
+
+for i in range(len(ax)):
     ax[i].set_xscale('log')
     ax[i].set_xticks([1, 10, 100, 1000, 1E4])
     ax[i].set_xlabel('repressors per cell', fontsize=12)
 
-# Add plot letter label
-plt.figtext(0.01, 0.96, '(C)', fontsize=12)
-plt.figtext(0.33, 0.96, '(D)', fontsize=12)
-plt.figtext(0.64, 0.96, '(E)', fontsize=12)
-plt.figtext(0.01, 0.65, '(F)', fontsize=12)
-plt.figtext(0.34, 0.65, '(G)', fontsize=12)
-plt.figtext(0.64, 0.65, '(H)', fontsize=12)
-plt.figtext(0.01, 0.32, '(I)', fontsize=12)
-plt.figtext(0.34, 0.32, '(J)', fontsize=12)
-
+plt.figtext(0., .96, 'A', fontsize=20)
+plt.figtext(0.33, .96, 'B', fontsize=20)
+plt.figtext(0.65, .96, 'C', fontsize=20)
+plt.figtext(0.0, .63, 'D', fontsize=20)
+plt.figtext(0.33, .63, 'E', fontsize=20)
 
 plt.tight_layout()
-plt.savefig('../../figures/main_figs/fig5_curves.svg', bbox_inches='tight')
 
-# %%
-
-# Generate the jointplot to insert into the figure via illustrator.
-lab = ['$K_A\,\,(\mu\mathrm{M})$', '$K_I\,\,(\mu\mathrm{M})$']
-ka_ki_df = pd.DataFrame(np.array([ka_fc, ki_fc]).T, columns=lab)
-inds = np.arange(0, len(ka_fc), 1)
-np.random.seed(666)
-
-# Calculate the point density
-
-# choices = np.random.choice(inds, size=1E4, replace=False)
-plt.close('all')
-g = sns.JointGrid(lab[0], lab[1], ka_ki_df, xlim=(100, 200), ylim=(0.45, 0.625), space=0.05,
-                  size=2)
-
-g.ax_joint.plot(ka_fc, ki_fc, '.', color='#937D69', ms=2,
-                alpha=0.05, rasterized=True, zorder=1)
-g.plot_joint(sns.kdeplot, cmap=sns.cubehelix_palette(n_colors=10, as_cmap=True, reverse=True), zorder=10, linewidth=1, n_levels=5, shade=True, alpha=0.5, shade_lowest=False,
-             )
-
-
-# Plot the mode and HPD on the marginals.
-ind = np.where(gauss_flatlnprobability == gauss_flatlnprobability.max())[0]
-ka_mode = ka_fc[ind][0]
-ki_mode = ki_fc[ind][0]
-ka_cred = mwc.hpd(ka_fc, mass_frac=0.95)
-ki_cred = mwc.hpd(ki_fc, mass_frac=0.95)
-
-g.ax_marg_y.plot(6, ki_mode, 'o', color=colors[4])
-g.ax_marg_y.vlines(6, ki_cred[0], ki_cred[1], color=colors[4])
-g.ax_marg_x.plot(ka_mode, 0.015, 'o', color=colors[4])
-g.ax_marg_x.hlines(0.015, ka_cred[0], ka_cred[1], color=colors[4])
-
-g.ax_joint.set_xlim([100, 230])
-g.ax_joint.set_ylim([0.45, 0.65])
-g.plot_marginals(sns.kdeplot, shade=True,
-                 color=colors[4], zorder=1, linewidth=1)
-
-# # Plot the mode and HPD for each marginal distribution
-g.fig.set_figwidth(5.75)
-g.fig.set_figheight(3.25)
+# Add plot letter label
+# plt.figtext(0.01, 0.96, '(C)', fontsize=12)
+# plt.figtext(0.33, 0.96, '(D)', fontsize=12)
+# plt.figtext(0.64, 0.96, '(E)', fontsize=12)
+# plt.figtext(0.01, 0.65, '(F)', fontsize=12)
+# plt.figtext(0.34, 0.65, '(G)', fontsize=12)
+# plt.figtext(0.64, 0.65, '(H)', fontsize=12)
+# plt.figtext(0.01, 0.32, '(I)', fontsize=12)
+# plt.figtext(0.34, 0.32, '(J)', fontsize=12)
 #
-
-
-# Save it.
-
+#
 # plt.tight_layout()
-plt.savefig('../../figures/main_figs/fig5_ka_ki_posterior.pdf',
-            bbox_inches='tight')
+# plt.savefig('../../figures/main_figs/fig5_curves.svg', bbox_inches='tight')
