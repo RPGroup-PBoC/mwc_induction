@@ -1460,9 +1460,10 @@ def set_plotting_style():
     2nd edition. To format all plots within a script, simply execute `mwc_induction_utils.set_plotting_style() in the import statements.
     """
     # TODO: Still playing with getting the sizing just right.
-    rc = {'axes.facecolor': '#E3DCD0',
+    rc = {'axes.facecolor': '#E3DCD1',
           'font.family': 'Lucida Sans Unicode',
-          'grid.linestyle': ':',
+          'grid.linestyle': '-',
+          'grid.linewidth': '0.75',
           'grid.color': '#ffffff',
           'mathtext.fontset': 'stixsans',
           'mathtext.sf': 'sans',
@@ -1471,7 +1472,7 @@ def set_plotting_style():
     plt.rc('mathtext', fontset='stixsans', sf='sans')
     sns.set_style('darkgrid', rc=rc)
     sns.set_palette("colorblind", color_codes=True)
-    sns.set_context('paper', rc=rc)
+    sns.set(rc=rc)
 
 
 def scale_plot(figure, layout):
