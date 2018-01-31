@@ -1,3 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/62758735.svg)](https://zenodo.org/badge/latestdoi/62758735)
+
 # An Allosteric Theory of Transcription Factor Induction
 
 This repository contains all experimental data and programs for the analysis
